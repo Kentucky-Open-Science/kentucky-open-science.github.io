@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guestbook &mdash; The Web Archive Project</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="banner">
+  <div class="globe" aria-hidden="true"></div>
+  <div class="wordmark">
+    <div class="name">WebArchive<span class="tld">.com</span></div>
+    <div class="tagline">&bull; THE INTERNET'S OFFICIAL NOSTALGIA REGISTRY &bull; EST. 1999 &bull;</div>
+  </div>
+</header>
+
+<nav class="topnav">
+  <a href="index.html">Home</a>
+  <a href="tech.html">Tech &amp; Gadgets</a>
+  <a href="pop-culture.html">Pop Culture</a>
+  <a href="about.html">About</a>
+  <a href="guestbook.html" class="current">Guestbook</a>
+</nav>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="panel">
+      <h3>Guestbook Stats</h3>
+      <p style="font-size:11px;margin:0;">
+        Total signatures: <strong>2,194</strong><br>
+        This week: 42<br>
+        Spam removed: 11,308<br>
+        Last sig: 11/02/2002
+      </p>
+    </div>
+    <div class="panel">
+      <h3>Rules</h3>
+      <ul>
+        <li>Be respectful to fellow Netizens.</li>
+        <li>No flame wars.</li>
+        <li>HTML tags will be stripped.</li>
+        <li>No CAPS LOCK abuse.</li>
+        <li>One entry per IP per day.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Quick Jump</h3>
+      <ul>
+        <li><a href="#sign">Sign the book</a></li>
+        <li><a href="#entries">View entries</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main">
+    <h1>Guestbook</h1>
+    <p class="lede">
+      Leave your mark on the World Wide Web. Tell us your first
+      screen name. Tell us what you ate for breakfast. We don't
+      really mind. The form is, however, currently disabled.
+    </p>
+
+    <h2 id="sign">Sign the Book</h2>
+    <form class="gb-form" onsubmit="return false;" aria-disabled="true">
+      <label>
+        Your Name / Screen Name:
+        <input type="text" placeholder="e.g. xX_NetscapeKid_Xx" disabled>
+      </label>
+      <label style="display:block;margin-top:10px;">
+        E-Mail (optional, will not be displayed):
+        <input type="text" placeholder="you@aol.com" disabled>
+      </label>
+      <label style="display:block;margin-top:10px;">
+        Homepage URL:
+        <input type="text" placeholder="http://www.geocities.com/SiliconValley/9999" disabled>
+      </label>
+      <label style="display:block;margin-top:10px;">
+        Your Message:
+        <textarea rows="4" placeholder="i was here. ROCK ON." disabled></textarea>
+      </label>
+      <button type="submit" disabled>Submit Signature</button>
+      <div class="disabled-note">
+        &#9888; Form temporarily disabled while the Webmaster upgrades
+        the Perl/CGI scripts on the server. Please check back after
+        Q4 2002.
+      </div>
+    </form>
+
+    <h2 id="entries">Recent Signatures</h2>
+    <p style="font-size:12px;color:var(--muted);">Showing 6 of 2,194. Sorted newest first.</p>
+
+    <div class="gb-entry">
+      <div class="gb-meta">
+        <span class="gb-name">xX_NetscapeKid_Xx</span> &middot;
+        11/02/2002 03:14 AM &middot;
+        AIM: skat3rb0i1988 &middot;
+        Connection: 56k
+      </div>
+      <p style="margin:0;">
+        omg this site is awesome!! reminds me of my old GeoCities page :)
+        anyone else remember the dancing baby gif??? leave a sig if you do!
+        ~peace out~
+      </p>
+    </div>
+
+    <div class="gb-entry">
+      <div class="gb-meta">
+        <span class="gb-name">DanceBaby_Fan99</span> &middot;
+        10/30/2002 11:47 PM &middot;
+        ICQ: 14882319 &middot;
+        Connection: ISDN
+      </div>
+      <p style="margin:0;">
+        i remember dancing baby. i also remember the hampster dance.
+        and that one website that was just a guy yelling. the internet
+        was better then.
+      </p>
+    </div>
+
+    <div class="gb-entry">
+      <div class="gb-meta">
+        <span class="gb-name">webmaster_jenni</span> &middot;
+        10/28/2002 4:02 PM &middot;
+        Email: hidden &middot;
+        Connection: T1 (school)
+      </div>
+      <p style="margin:0;">
+        check out my homepage at geocities.com/heartland/meadows/4421
+        i have updated it with new midi music (Sk8er Boi by Avril Lavigne)
+        and a webring banner. sign my guestbook back kthx!!
+      </p>
+    </div>
+
+    <div class="gb-entry">
+      <div class="gb-meta">
+        <span class="gb-name">L33tH4xx0r2000</span> &middot;
+        10/24/2002 8:19 PM &middot;
+        AIM: l33th4xx0r &middot;
+        Connection: cable!!!
+      </div>
+      <p style="margin:0;">
+        sup nerds. just got broadband. downloaded napster the entire
+        backstreet boys discography in like 9 hours. the future is
+        NOW. peace.
+      </p>
+    </div>
+
+    <div class="gb-entry">
+      <div class="gb-meta">
+        <span class="gb-name">Gameboy_Girl_2002</span> &middot;
+        10/19/2002 12:15 PM &middot;
+        Email: hidden &middot;
+        Connection: 56k (mom on phone)
+      </div>
+      <p style="margin:0;">
+        does anyone else's gameboy color screen scratch easy?? mine
+        has a big scratch right where the battery thing is. anyway,
+        cool site. add my page to your links plz!! :):):)
+      </p>
+    </div>
+
+    <div class="gb-entry">
+      <div class="gb-meta">
+        <span class="gb-name">DialUpDan</span> &middot;
+        09/30/2002 1:48 AM &middot;
+        AIM: dialupdan82 &middot;
+        Connection: 28.8k (somehow)
+      </div>
+      <p style="margin:0;">
+        this page took 47 seconds to load on my modem. completely
+        worth it. great archive. bookmarked. (added to my Favorites
+        folder under "INTERNET COOL STUFF")
+      </p>
+    </div>
+
+    <p style="margin-top:18px;">
+      <a href="#sign">&laquo; Try to sign anyway</a> &nbsp;|&nbsp;
+      <a href="index.html">Return to Lobby</a>
+    </p>
+
+  </main>
+</div>
+
+<footer class="footer-retro">
+  <div class="badges">
+    <span class="badge">POWERED BY MICROSOFT FRONTPAGE&trade;</span>
+    <span class="badge">BEST VIEWED 800x600</span>
+    <span class="badge">NETSCAPE NAVIGATOR APPROVED</span>
+    <span class="badge">HTML 4.01 COMPLIANT</span>
+  </div>
+  <div>
+    &copy; 1999&ndash;2003 The Web Archive Project &middot;
+    <a href="about.html">About</a> &middot;
+    <a href="guestbook.html">Guestbook</a>
+  </div>
+  <div>Guestbook powered by Matt's Script Archive Perl/CGI v0.7</div>
+</footer>
+
+</body>
+</html>

@@ -1,11 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>My Page</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Web Archive Project &mdash; Home</title>
+<meta name="description" content="An online catalog of late-1990s and early-2000s consumer technology and internet culture. Est. 1999.">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Hello World</h1>
-    <p>This is a basic HTML file.</p>
+
+<header class="banner">
+  <div class="globe" aria-hidden="true"></div>
+  <div class="wordmark">
+    <div class="name">WebArchive<span class="tld">.com</span></div>
+    <div class="tagline">&bull; THE INTERNET'S OFFICIAL NOSTALGIA REGISTRY &bull; EST. 1999 &bull;</div>
+  </div>
+</header>
+
+<nav class="topnav">
+  <a href="index.html" class="current">Home</a>
+  <a href="tech.html">Tech &amp; Gadgets</a>
+  <a href="pop-culture.html">Pop Culture</a>
+  <a href="about.html">About</a>
+  <a href="guestbook.html">Guestbook</a>
+</nav>
+
+<div class="marquee" aria-label="Site announcements">
+  <span>
+    *** WELCOME, NETIZEN! &nbsp;&bull;&nbsp; YOU ARE VISITOR # 0,007,432 &nbsp;&bull;&nbsp;
+    NEW ARTIFACTS ADDED MONTHLY &nbsp;&bull;&nbsp; SIGN OUR GUESTBOOK BEFORE YOU LEAVE! &nbsp;&bull;&nbsp;
+    BEST VIEWED IN NETSCAPE NAVIGATOR 4.0 OR INTERNET EXPLORER 5.5+ &nbsp;&bull;&nbsp;
+    POWERED BY MICROSOFT FRONTPAGE&trade; &nbsp;&bull;&nbsp;
+  </span>
+</div>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="panel">
+      <h3>What's New</h3>
+      <ul>
+        <li><a href="tech.html">Discman SHOCK-PROOF</a></li>
+        <li><a href="pop-culture.html">AIM Buddy List</a></li>
+        <li><a href="tech.html">Palm Pilot V</a></li>
+        <li><a href="guestbook.html">42 new signatures!</a></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3>Categories</h3>
+      <ul>
+        <li><a href="tech.html">Tech &amp; Gadgets</a></li>
+        <li><a href="pop-culture.html">Internet Culture</a></li>
+        <li><a href="about.html">About the Archive</a></li>
+        <li><a href="guestbook.html">Guestbook</a></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3>Web Rings</h3>
+      <ul>
+        <li><a href="#">&laquo; Prev Site</a></li>
+        <li><a href="#">List Sites</a></li>
+        <li><a href="#">Random Site</a></li>
+        <li><a href="#">Next Site &raquo;</a></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3>Visitors</h3>
+      <div class="counter" id="counter">0007432</div>
+      <div class="counter-label">since 11/14/1999</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <h1>Welcome to the Archive</h1>
+    <p class="lede">
+      A curated registry of the consumer artifacts &amp; online subcultures
+      that defined the dot-com era. For research, education, and severe
+      nostalgia.
+    </p>
+
+    <p>
+      The Web Archive Project is a non-profit corporate initiative dedicated
+      to preserving the look, feel, and beige plastic of the late 1990s and
+      early 2000s. We catalog the gadgets you owned, the websites you visited
+      after dinner, and the screen names you regret. Our holdings are
+      organized into two principal collections:
+    </p>
+
+    <ul>
+      <li><a href="tech.html"><strong>Tech &amp; Gadgets</strong></a> &mdash; portable music, handheld games, dial-up hardware, and the original mobile phone.</li>
+      <li><a href="pop-culture.html"><strong>Internet &amp; Pop Culture</strong></a> &mdash; instant messaging, file sharing, classroom accessories, and questionable fashion.</li>
+    </ul>
+
+    <p>
+      <span class="under-construction">UNDER CONSTRUCTION</span>
+      &nbsp; New holdings are added on the second Tuesday of every month,
+      modem permitting.
+    </p>
+
+    <h2>Featured Artifacts</h2>
+    <p class="lede">A rotating selection of items from our permanent collection.</p>
+
+    <div class="product-grid">
+
+      <div class="product-card">
+        <span class="badge-new">NEW!</span>
+        <div class="thumb">🎮</div>
+        <div class="name">Nintendo 64</div>
+        <div class="meta">Released 1996 &middot; Tech</div>
+        <div class="price">$199.99</div>
+        <div class="desc">Three-pronged controller. The cartridge slot still works if you blow on it just right.</div>
+        <a href="tech.html" class="buy">More Info</a>
+      </div>
+
+      <div class="product-card">
+        <div class="thumb">📟</div>
+        <div class="name">Motorola Pager</div>
+        <div class="meta">Released 1995 &middot; Tech</div>
+        <div class="price">$79.99</div>
+        <div class="desc">Tells you that someone, somewhere, would like you to call them back. From a payphone.</div>
+        <a href="tech.html" class="buy">More Info</a>
+      </div>
+
+      <div class="product-card">
+        <span class="badge-new">NEW!</span>
+        <div class="thumb">💬</div>
+        <div class="name">AOL Instant Messenger</div>
+        <div class="meta">Released 1997 &middot; Internet</div>
+        <div class="price">FREE*</div>
+        <div class="desc">*With purchase of 700 free hours. The yellow running man is judging your away message.</div>
+        <a href="pop-culture.html" class="buy">More Info</a>
+      </div>
+
+      <div class="product-card">
+        <div class="thumb">💾</div>
+        <div class="name">3.5" Floppy Disk</div>
+        <div class="meta">Industry standard 1987&ndash;2003 &middot; Tech</div>
+        <div class="price">$0.49 ea.</div>
+        <div class="desc">1.44 MB of pure storage power. Now also available as the universal "save" icon.</div>
+        <a href="tech.html" class="buy">More Info</a>
+      </div>
+
+      <div class="product-card">
+        <div class="thumb">📀</div>
+        <div class="name">Napster</div>
+        <div class="meta">Released 1999 &middot; Internet</div>
+        <div class="price">FREE</div>
+        <div class="desc">Like a record store, but the records are wrong, mislabeled, and might be a virus. Lawsuit not included.</div>
+        <a href="pop-culture.html" class="buy">More Info</a>
+      </div>
+
+      <div class="product-card">
+        <div class="thumb">📱</div>
+        <div class="name">Nokia 3310</div>
+        <div class="meta">Released 2000 &middot; Tech</div>
+        <div class="price">$129.99</div>
+        <div class="desc">Indestructible. Battery lasts 11 days. Comes pre-loaded with Snake II.</div>
+        <a href="tech.html" class="buy">More Info</a>
+      </div>
+
+      <div class="product-card">
+        <span class="badge-new">NEW!</span>
+        <div class="thumb">📁</div>
+        <div class="name">Trapper Keeper</div>
+        <div class="meta">Mead Corp., circa 1991 &middot; Pop Culture</div>
+        <div class="price">$12.99</div>
+        <div class="desc">Velcro closure. Trapezoidal. Holds 4 folders, 1 calculator, and your entire identity.</div>
+        <a href="pop-culture.html" class="buy">More Info</a>
+      </div>
+
+      <div class="product-card">
+        <div class="thumb">📀</div>
+        <div class="name">AOL 700-Hour Trial CD</div>
+        <div class="meta">Mailed 1995&ndash;2006 &middot; Internet</div>
+        <div class="price">FREE</div>
+        <div class="desc">Found in: cereal boxes, magazines, the mailbox, the seat pocket of an airplane, your grandmother's drawer.</div>
+        <a href="pop-culture.html" class="buy">More Info</a>
+      </div>
+
+    </div>
+
+    <h2>About This Site</h2>
+    <p>
+      WebArchive.com is operated by <a href="about.html">a single curator</a>
+      out of pure sentimentality. There is no shop. There is no checkout. The
+      "More Info" buttons go to additional pages. The dot-com bubble burst,
+      but we kept the website online out of spite.
+    </p>
+    <p>
+      Please <a href="guestbook.html">sign our guestbook</a> on your way out.
+      Tell us your first AOL screen name. We promise not to laugh.
+    </p>
+
+  </main>
+</div>
+
+<footer class="footer-retro">
+  <div class="badges">
+    <span class="badge">POWERED BY MICROSOFT FRONTPAGE&trade;</span>
+    <span class="badge">BEST VIEWED 800x600</span>
+    <span class="badge">NETSCAPE NAVIGATOR APPROVED</span>
+    <span class="badge">HTML 4.01 COMPLIANT</span>
+  </div>
+  <div>
+    &copy; 1999&ndash;2003 The Web Archive Project &middot;
+    A subsidiary of GeoCities Holdings &middot;
+    <a href="about.html">About</a> &middot;
+    <a href="guestbook.html">Guestbook</a>
+  </div>
+  <div>Last updated: 11/02/2002 at 3:14 AM EST &middot; Site optimized for 56k</div>
+</footer>
+
+<script>
+  // Increment visitor counter on each load (client-side, era-appropriate)
+  (function () {
+    var KEY = 'wap_visits';
+    var n = parseInt(localStorage.getItem(KEY) || '7432', 10) + 1;
+    localStorage.setItem(KEY, n);
+    var el = document.getElementById('counter');
+    if (el) el.textContent = String(n).padStart(7, '0');
+  })();
+</script>
+
 </body>
 </html>
