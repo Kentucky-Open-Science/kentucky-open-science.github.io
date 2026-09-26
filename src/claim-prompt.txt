@@ -1,0 +1,41 @@
+I want to complete task #{{number}} on the Kentucky Open Science (KOS) bounty board with you.
+
+Task:        {{title}}
+Issue:       {{url}}
+Repository:  https://github.com/{{repo}}
+Reward:      {{points}} points on the KOS leaderboard when the pull request merges
+
+The board runs on GitHub issues and bots. Follow these steps and rules exactly: an automated gate checks them, and a maintainer reviews every line.
+
+1. Check the tools. You need git, Node.js 20 or newer, and the GitHub CLI signed in as me (gh auth status). If something is missing, stop and tell me how to fix it.
+
+2. Get the code. Unless we are already inside a clone of {{repo}} or of my fork of it:
+     gh repo fork {{repo}} --clone
+     cd kentucky-open-science.github.io
+   Make sure main matches the main branch of {{repo}} (in a fork: git fetch upstream && git merge --ff-only upstream/main), then install:
+     npm ci
+     npx playwright install chromium
+
+3. Claim the task.
+   - Check that it is open: gh issue view {{number}} --repo {{repo}} --json labels,assignees
+     If it is not labeled kos:ready, stop and tell me who holds it.
+   - Claim it: gh issue comment {{number}} --repo {{repo}} --body "/claim"
+   - A bot answers within a minute or two. Check the issue again until it is labeled kos:leased and assigned to me. If the bot refuses (for example because I already hold another task), stop and tell me what it said.
+   - The lease lasts {{leaseHours}} hours; when it expires the task goes back to the pool. To get {{leaseHours}} more hours, comment /extend (allowed once). If we cannot finish, comment /release so someone else can. One task per person at a time.
+
+4. Do the work.
+   - Read the whole issue: gh issue view {{number}} --repo {{repo}}
+     Stay inside its Scope. If anything is unclear, stop and ask me.
+   - Read AGENTS.md in the repository and follow it.
+   - Work on a new branch from main: git switch -c {{branch}}
+   - Edit the sources in src/ (never _site/, _site-test/, or data/). Keep the site's retro look.
+   - Run npm test until it passes. Every FAIL_TO_PASS test ID in the issue must pass, and you must delete exactly those IDs from tests/known-failures.json. Never add IDs to that file (AGENTS.md describes the one exception, for new pages). Do not edit tests/fixtures/, add dependencies, change unrelated files, or include secrets.
+
+5. Stop for my review.
+   - Commit, then push the branch to my fork: git push -u origin {{branch}}
+   - Draft the pull request description from .github/PULL_REQUEST_TEMPLATE.md: "KOS-Task: #{{number}}", a short summary, the Provenance fields (your model, the tool you are running in, and roughly how much usage this took), and the FAIL_TO_PASS IDs. Leave every attestation box unticked.
+   - Show me the full diff and the description, then wait. I have to read the diff myself.
+
+6. Only when I say so, open the pull request:
+     gh pr create --repo {{repo}} --base main --head <my GitHub login>:{{branch}} --title "{{title}}" --body-file <the description file>
+   Give me the link. I will tick the attestation boxes on GitHub myself, which re-runs the gate. If the gate reports a problem, fix it and push again.

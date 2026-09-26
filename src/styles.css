@@ -596,3 +596,101 @@ a:hover { color: var(--red); background: #fff7a8; }
   white-space: pre;
 }
 .clone code { background: transparent; color: inherit; padding: 0; }
+
+/* ===== BOUNTY BOARD: claim dialog (a 1998-style window) ===== */
+.claim-dialog {
+  padding: 0;
+  border: 2px outset #dfdfdf;
+  background: var(--bg);
+  color: var(--ink);
+  width: min(720px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.45);
+}
+.claim-dialog::backdrop { background: rgba(13, 33, 74, 0.55); }
+.claim-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: linear-gradient(90deg, var(--navy-dark) 0%, var(--navy) 60%, #3a6ea5 100%);
+  padding: 4px 4px 4px 10px;
+}
+.claim-titlebar h2 {
+  margin: 0;
+  font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+  overflow-wrap: anywhere;
+}
+.claim-close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 22px;
+  padding: 0;
+  line-height: 1;
+  font-size: 16px;
+  font-weight: bold;
+  color: black;
+  background: #c0c0c0;
+  border: 2px outset #fff;
+  cursor: pointer;
+}
+.claim-close:active { border-style: inset; }
+.claim-body { padding: 12px 14px 14px; }
+.claim-meta {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--muted);
+}
+.claim-body label {
+  display: block;
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.claim-body textarea {
+  display: block;
+  width: 100%;
+  height: min(46vh, 420px);
+  resize: vertical;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  background: #ffffff;
+  color: var(--ink);
+  border: 2px inset #aaa;
+  padding: 6px 8px;
+}
+.claim-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.claim-button {
+  display: inline-block;
+  background: #c0c0c0;
+  color: black;
+  border: 2px outset #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.claim-button:visited, .claim-button:hover { color: black; }
+.claim-button:hover { background: #d4d0c8; }
+.claim-button:active { border-style: inset; }
+#claim-copy { background: var(--orange); border-color: #ffd081; }
+#claim-copy:hover { background: #ff9a26; }
+.claim-status {
+  min-height: 1.4em;
+  margin: 8px 0 0;
+  font-size: 12px;
+  text-align: right;
+}

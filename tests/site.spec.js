@@ -432,6 +432,58 @@ test('content/skip-link', async ({ page }) => {
   expect(problems.join('\n')).toBe('');
 });
 
+// content/claim-prompt
+// On bounties.html, clicking a task opens a dialog (instead of GitHub) with a
+// prompt a volunteer can paste into their coding agent: it names the task and
+// the repository, says how to claim it, and states the rules. "Copy prompt"
+// puts it on the clipboard; "Open issue on GitHub" links to the task; Escape
+// closes the dialog and returns focus to the task link.
+test('content/claim-prompt', async ({ browser }) => {
+  const id = 'content/claim-prompt';
+  applyBaseline(id);
+  const board = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'board.json'), 'utf8'));
+  const task = board.tasks.find((t) => t.state === 'ready');
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  // Capture "Copy prompt" instead of writing to the real (OS-wide) clipboard.
+  await page.addInitScript(() => {
+    // @ts-ignore test hook
+    window.__copied = null;
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      // @ts-ignore test hook
+      value: { writeText: (text) => ((window.__copied = text), Promise.resolve()) },
+    });
+  });
+  try {
+    await page.goto('bounties.html');
+    const link = page.locator(`main a[href="${task.url}"]`).first();
+    await link.click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole('heading')).toContainText(`#${task.number}`);
+    expect(page.url(), 'the task link must not navigate away').toMatch(/bounties\.html$/);
+
+    const prompt = await dialog.getByRole('textbox').inputValue();
+    for (const must of [`#${task.number}`, task.url, 'Kentucky-Open-Science/kentucky-open-science.github.io', '/claim', '/release', '/extend', 'AGENTS.md', 'tests/known-failures.json', 'KOS-Task:', 'npm test']) {
+      expect(prompt, `prompt mentions ${must}`).toContain(must);
+    }
+    expect(prompt, 'every placeholder is filled').not.toMatch(/\{\{\w+\}\}/);
+
+    await expect(dialog.getByRole('link', { name: 'Open issue on GitHub' })).toHaveAttribute('href', task.url);
+    await dialog.getByRole('button', { name: 'Copy prompt' }).click();
+    await expect(dialog.getByRole('status')).toContainText('copied');
+    // @ts-ignore test hook
+    expect(await page.evaluate(() => window.__copied)).toBe(prompt);
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(link).toBeFocused();
+  } finally {
+    await context.close();
+  }
+});
+
 // content/current-page
 // The top navigation shows the current section visually (orange tab). The same
 // information must be available to assistive technology (WCAG 1.3.1): exactly

@@ -2,6 +2,7 @@
   "$comment": "Site settings for the KOS wiki. Maintainers edit this file; tools/build.js reads it. Project facts come from data/projects.json (refreshed from GitHub), never from here.",
   "org": "Kentucky-Open-Science",
   "siteTitle": "Kentucky Open Science",
+  "tagline": "PUTTING SCIENCE TO WORK FOR KENTUCKIANS!",
   "siteUrl": "https://kentucky-open-science.github.io/",
   "repo": "Kentucky-Open-Science/kentucky-open-science.github.io",
   "mission": "",
