@@ -1,0 +1,53 @@
+name: KOS leaderboard
+
+# Rebuilds data/leaderboard.json and leaderboard.html from accepted tasks and
+# commits them to main. Runs when a task closes, nightly, or by hand.
+# If branch protection blocks direct pushes, allow the github-actions bot or
+# switch the last step to open a PR.
+
+on:
+  issues:
+    types: [closed, reopened, deleted]
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: kos-leaderboard
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name != 'issues' || contains(github.event.issue.labels.*.name, 'kos:task')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build leaderboard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node .github/kos/leaderboard.js
+
+      - name: Commit if changed
+        run: |
+          git config user.name "kos-board[bot]"
+          git config user.email "kos-board@users.noreply.github.com"
+          git add data/leaderboard.json leaderboard.html
+          if git diff --cached --quiet; then
+            echo "leaderboard unchanged"
+          else
+            git commit -m "leaderboard: update standings"
+            git push origin HEAD:main
+          fi

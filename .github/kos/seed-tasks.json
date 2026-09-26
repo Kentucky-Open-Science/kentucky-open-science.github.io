@@ -1,0 +1,165 @@
+[
+  {
+    "title": "[Task] Add a skip-to-content link to every page",
+    "size": "S",
+    "problem": "Keyboard and screen-reader users have to Tab through the banner and the whole navigation on every page before reaching the content. WCAG 2.1 SC 2.4.1 (Bypass Blocks) calls for a mechanism to skip repeated blocks; the standard technique (G1) is a \"Skip to main content\" link that is the first focusable element, visually hidden until it receives focus.\n\nDone means: on every page in `tests/pages.json`, the first Tab stop is a link whose text contains \"skip\" and whose `href` targets the page's `<main>` element.",
+    "scope": "In scope: every `*.html` page (one link immediately after `<body>`, and `id=\"main\"` on `<main>`), `styles.css` (a `.skip-link` rule that hides the link until `:focus`), and `leaderboard.html` (regenerate it with `npm run leaderboard` after editing `index.html`, or edit it the same way).\nOut of scope: any other markup or copy changes.",
+    "failToPass": [
+      "content/skip-link"
+    ],
+    "humanChecklist": [
+      "The link is invisible until focused, then clearly visible with strong contrast against the banner.",
+      "Activating it moves focus into the main content (check with Tab after Enter).",
+      "The retro look is unchanged everywhere else."
+    ],
+    "hints": "The header and nav are duplicated verbatim across pages; keep the new line identical in each. `leaderboard.html` is generated from `index.html`'s header/nav/footer, so `npm run leaderboard` picks the link up automatically."
+  },
+  {
+    "title": "[Task] Honor prefers-reduced-motion (globe, marquee, blink)",
+    "size": "S",
+    "problem": "Three CSS animations run forever on every page: the spinning globe in the banner (`globe-spin`), the scrolling announcement marquee (`marquee-scroll`) and the blinking UNDER CONSTRUCTION badge (`blink`). Users who set the operating-system \"reduce motion\" preference still get all of them. WCAG 2.1 SC 2.3.3 (Animation from Interactions, AAA) and SC 2.2.2 (Pause, Stop, Hide, A) both point at the same fix: when `prefers-reduced-motion: reduce` is set, nothing should keep moving.\n\nDone means: with reduced motion emulated, `document.getAnimations()` reports no running animations on any page. Paused or removed animations both satisfy this.",
+    "scope": "In scope: `styles.css` only — a `@media (prefers-reduced-motion: reduce)` block.\nOut of scope: the marquee's markup and a pause button (that is a separate task); changing the animations for users who have not asked for reduced motion.",
+    "failToPass": [
+      "motion/index.html",
+      "motion/tech.html",
+      "motion/pop-culture.html",
+      "motion/about.html",
+      "motion/guestbook.html",
+      "motion/leaderboard.html"
+    ],
+    "humanChecklist": [
+      "With reduced motion on, the marquee text is still readable (static, not clipped or hidden).",
+      "With reduced motion off, nothing changed."
+    ],
+    "hints": "Chrome DevTools → Rendering → \"Emulate CSS media feature prefers-reduced-motion\" reproduces the test's conditions. `animation: none` removes the animation; `animation-play-state: paused` keeps it but stops it — either passes."
+  },
+  {
+    "title": "[Task] Make the announcements marquee accessible (ARIA, landmark, pause control)",
+    "size": "M",
+    "problem": "The scrolling announcements strip on the home page (`<div class=\"marquee\" aria-label=\"Site announcements\">`) has three problems:\n\n1. `aria-label` on a plain `<div>` is prohibited — a `div` has no role, so the label is ignored or announced inconsistently (html-validate `aria-label-misuse`; axe flags `aria-prohibited-attr` for review).\n2. The strip sits outside every landmark, so screen-reader users navigating by landmark never encounter it (axe `region`).\n3. It moves continuously with no way to pause it. WCAG 2.1 SC 2.2.2 (Pause, Stop, Hide) requires a pause/stop/hide mechanism for auto-updating or moving content that lasts more than five seconds.\n\nDone means: `index.html` validates, all of its content is inside landmarks, and a keyboard-operable Pause/Resume button stops and restarts the marquee.",
+    "scope": "In scope: the marquee block in `index.html`, related rules in `styles.css`, and a few lines of inline `<script>` (there is already one at the bottom of the page) or a small `site.js`.\nOut of scope: the `prefers-reduced-motion` media query (separate task); other pages.",
+    "failToPass": [
+      "html/index.html",
+      "a11y-bp/index.html/region"
+    ],
+    "humanChecklist": [
+      "The Pause button is reachable with Tab, shows a visible focus ring, toggles its label (Pause ↔ Resume) and its `aria-pressed` state.",
+      "Paused text stays visible and readable.",
+      "The strip is inside a landmark with an accessible name (e.g. `<section aria-labelledby=…>` or `role=\"region\"` with a heading/label).",
+      "The retro look is preserved."
+    ],
+    "hints": "A `<section>` with an accessible name is a `region` landmark. Toggling a class that sets `animation-play-state: paused` on `.marquee span` is the simplest pause. Keep the button inside the landmark."
+  },
+  {
+    "title": "[Task] Remove placeholder href=\"#\" links (webring, Add to Cart)",
+    "size": "S",
+    "problem": "Thirty-nine links across three pages point at `href=\"#\"`: the four \"Web Rings\" links on the home page and every \"Add to Cart\" / \"Download\" / \"Sign On\" button on the Tech and Pop Culture pages. They look like actions, do nothing, and scroll the page to the top when activated. That fails WCAG 2.1 SC 2.4.4 (Link Purpose) in spirit and is a real trap for screen-reader users who tab through links.\n\nDone means: no `href=\"#\"`, empty, or `javascript:` links remain on those pages, and no fake affordance is left behind.",
+    "scope": "In scope: `index.html` (Web Rings panel), `tech.html` and `pop-culture.html` (`.buy` links), and `styles.css` if you convert `.buy` into non-interactive styling.\nOut of scope: the product-card copy; other pages.",
+    "failToPass": [
+      "links/index.html",
+      "links/tech.html",
+      "links/pop-culture.html"
+    ],
+    "humanChecklist": [
+      "Product cards still look like cards; the old button either became honest static text (e.g. \"Not for sale\") or a real link to something relevant.",
+      "The Web Rings panel was removed or its links point somewhere real.",
+      "No new `href=\"#\"` anywhere."
+    ],
+    "hints": "Nothing on this site is for sale (see about.html). A `<span class=\"buy\" aria-hidden=\"true\">` keeps the look without the lie; deleting the buttons is also fine. Run `npx playwright test -g links/` to check just these."
+  },
+  {
+    "title": "[Task] Move the 22 inline styles into the stylesheet",
+    "size": "M",
+    "problem": "Four pages carry `style=\"…\"` attributes (tech 2, pop-culture 3, about 5, guestbook 12) for things like `font-size:11px;margin:0`. Inline styles cannot be overridden by user stylesheets or high-contrast modes, are invisible to the design system, and fail the site's HTML validation (`no-inline-style`).\n\nDone means: the four pages validate with no inline `style` attributes and look identical.",
+    "scope": "In scope: `tech.html`, `pop-culture.html`, `about.html`, `guestbook.html`, and `styles.css` (new utility or component classes).\nOut of scope: `index.html` (it has a separate validation task), copy changes, layout changes.",
+    "failToPass": [
+      "html/tech.html",
+      "html/pop-culture.html",
+      "html/about.html",
+      "html/guestbook.html"
+    ],
+    "humanChecklist": [
+      "Before/after screenshots of each page are pixel-identical or differ only trivially.",
+      "Class names are descriptive (`.panel-note`, `.gb-entry-text`), not `.style1`.",
+      "No `!important`."
+    ],
+    "hints": "`npx html-validate about.html` lists every offending line. Several inline styles repeat (`font-size:11px;margin:0` in sidebar panels); one class covers them all."
+  },
+  {
+    "title": "[Task] Make the About page reflow at 320 px (WCAG 1.4.10)",
+    "size": "S",
+    "problem": "At a 320 CSS px wide viewport (a phone in portrait, or a desktop zoomed to 400 %) the About page overflows horizontally: the Contact table is wider than the screen, so the whole page needs two-dimensional scrolling. WCAG 2.1 SC 1.4.10 (Reflow, AA) requires content to present without horizontal scrolling at 320 px, except for parts that genuinely need two-dimensional layout — a data table may scroll inside its own container, but the page must not.\n\nDone means: `document.documentElement.scrollWidth <= window.innerWidth` on `about.html` at 320 px.",
+    "scope": "In scope: the Contact `<table class=\"specs\">` in `about.html` and `styles.css`.\nOut of scope: other pages (they already reflow); changing the table's content.",
+    "failToPass": [
+      "reflow/about.html"
+    ],
+    "humanChecklist": [
+      "At 320 px the table is either stacked/reflowed or scrolls inside a container that is keyboard-focusable (`tabindex=\"0\"` with an accessible name) so keyboard users can reach the overflow.",
+      "At desktop width nothing changed."
+    ],
+    "hints": "The test reports the overflowing elements. A `<div class=\"table-scroll\" tabindex=\"0\" role=\"region\" aria-labelledby=\"contact\">` wrapper with `overflow-x: auto` is the smallest compliant fix; a responsive stacked table is the nicer one."
+  },
+  {
+    "title": "[Task] Rebrand the site as Kentucky Open Science (copy, titles, descriptions)",
+    "size": "M",
+    "problem": "The site still presents itself as \"The Web Archive Project\" / WebArchive.com, a parody of a 2002 website. It is now the public site of Kentucky Open Science (KOS). Every page needs to say so: the wordmark and tagline, the page `<title>`s (must end with \"Kentucky Open Science\" — WCAG 2.4.2), a `<meta name=\"description\">` of at least 50 characters on every page, and body copy that describes KOS rather than the parody.\n\nKeep the retro visual theme; change the words. Done means: no page contains the placeholder brand strings, every page mentions Kentucky Open Science, titles and descriptions are in place.",
+    "scope": "In scope: text, `<title>` and `<meta name=\"description\">` in every `*.html`; `leaderboard.html` via `npm run leaderboard` after `index.html` changes; the CSS comment header in `styles.css`.\nOut of scope: layout, colors, the product-card sections' structure (rewording them is fine; restructuring is a separate task), the projects page (separate task).",
+    "failToPass": [
+      "content/no-placeholder-brand",
+      "content/site-title",
+      "content/meta-description"
+    ],
+    "humanChecklist": [
+      "Copy is factual and drawn from the organization's public GitHub presence (the org page, repository READMEs). Do not invent programs, staff, partners, funding, or dates — leave a `TODO` comment where a maintainer must fill in a fact.",
+      "The maintainer approves the wording before merge.",
+      "Tone can keep the era's playfulness; it must not mislead about what KOS is."
+    ],
+    "hints": "The banned strings are listed in `tests/site.spec.js` (`content/no-placeholder-brand`). Tabs and screen readers announce the `<title>`, so put the page name first: `About — Kentucky Open Science`."
+  },
+  {
+    "title": "[Task] Add a Projects page listing KOS repositories",
+    "size": "M",
+    "problem": "The site has no page describing what Kentucky Open Science actually builds. Add `projects.html`: a catalog of the organization's active, original (non-fork, non-archived) repositories at github.com/Kentucky-Open-Science, each with a one-line description taken from the repository's own README or GitHub description and a link to it, grouped sensibly (e.g. AI infrastructure, research software, data).\n\nDone means: `projects.html` exists, is listed in `tests/pages.json` (so it gets the full accessibility matrix), is linked from the primary `<nav>` of every page, and links to at least five organization repositories.",
+    "scope": "In scope: new `projects.html` (same header/nav/footer as the other pages), the `<nav>` in every page, `tests/pages.json`, `leaderboard.html` via `npm run leaderboard`, and `styles.css` if a list style is needed.\nOut of scope: rewriting other pages' copy (separate rebrand task).",
+    "failToPass": [
+      "content/projects-page"
+    ],
+    "humanChecklist": [
+      "Every description matches the repository's README; nothing is invented.",
+      "At least eight repositories, grouped, with the group headings as real `<h2>`s.",
+      "The new page passes every check in the suite (automatic once it is in `tests/pages.json`).",
+      "Nav order is sensible and identical on every page."
+    ],
+    "hints": "`gh repo list Kentucky-Open-Science --limit 200 --json name,description,isFork,isArchived,pushedAt` gives the raw list; prefer repositories with recent pushes. The new page inherits any site-wide failure still open on main (e.g. `motion/projects.html` while `motion/index.html` is baselined): add exactly those IDs for `projects.html` to `tests/known-failures.json`; the gate permits that for new pages only."
+  },
+  {
+    "title": "[Task] Replace the disabled guestbook form with a working way to say hello",
+    "size": "M",
+    "problem": "The Guestbook page ships a form that is disabled (`aria-disabled=\"true\"`, every control `disabled`, `onsubmit=\"return false\"`) with a note about Perl/CGI scripts being upgraded in 2002. Disabled controls are announced to screen-reader users as things they cannot use, and the page promises an interaction it cannot deliver.\n\nReplace it with something that works without a backend: a clearly labeled link to sign the guestbook on GitHub (a pinned \"Guestbook\" issue or Discussion in this repository that the maintainer creates), and/or a `mailto:` link once KOS has an address. Keep the existing signatures as content if you like.\n\nDone means: no page contains a form without an `action`, a form that swallows submissions, or disabled form controls.",
+    "scope": "In scope: `guestbook.html` and `styles.css`.\nOut of scope: building a backend or wiring a third-party form service; other pages.",
+    "failToPass": [
+      "content/no-dead-forms"
+    ],
+    "humanChecklist": [
+      "The new call to action reads as a link (not a fake button) and says where it goes.",
+      "Existing signature entries, if kept, use real headings or a list so screen readers can navigate them.",
+      "The maintainer has created the GitHub issue/discussion the page links to."
+    ],
+    "hints": "Ask the maintainer for the guestbook issue number before you finish; link it as `https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/<n>`."
+  },
+  {
+    "title": "[Task] Add a custom 404 page",
+    "size": "S",
+    "problem": "GitHub Pages serves a generic GitHub error for unknown URLs. Add `404.html` in the site's style: say the page was not found, link back to the home page, and list the main sections. GitHub Pages serves a root-level `404.html` automatically.\n\nDone means: `404.html` exists, links to the home page, is listed in `tests/pages.json`, and passes the full accessibility matrix.",
+    "scope": "In scope: new `404.html`, `tests/pages.json`.\nOut of scope: other pages.",
+    "failToPass": [
+      "content/404-page"
+    ],
+    "humanChecklist": [
+      "Same header/nav/footer as the other pages so users are never lost.",
+      "`<title>` ends with \"Kentucky Open Science\"; a `<meta name=\"description\">` is present.",
+      "No animation-only cues; the message is in text."
+    ],
+    "hints": "Copy `about.html` as a starting point and replace the main column. Because the page joins `tests/pages.json`, every other check (`a11y/404.html/*`, `motion/404.html`, …) applies. If a site-wide problem is still open on main (for example `motion/index.html` is still in `tests/known-failures.json`), your new page inherits it: add the same ID for `404.html` to `tests/known-failures.json`. The gate allows baseline additions only in that situation — a new page inheriting a failure main already lists for another page."
+  }
+]

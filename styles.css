@@ -452,3 +452,14 @@ a:hover { color: var(--red); background: #fff7a8; }
   .main { padding: 14px; }
   .main h1 { font-size: 22px; }
 }
+
+/* ===== Reflow helpers (WCAG 1.4.10) ===== */
+/* Grid items default to min-width:auto, which lets wide content (tables) push
+   the whole column past a narrow viewport. */
+.layout > * { min-width: 0; }
+
+/* Wrap a data table in this to let it scroll inside its own box instead of the
+   page. Use a <section> with tabindex="0" and aria-labelledby so
+   keyboard and screen-reader users can reach and name it. */
+.table-scroll { overflow-x: auto; max-width: 100%; }
+.table-scroll:focus { outline: 3px solid var(--orange); outline-offset: 2px; }

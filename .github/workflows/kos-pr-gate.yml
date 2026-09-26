@@ -1,0 +1,70 @@
+name: Acceptance tests
+
+# Runs the WCAG / HTML / site-quality suite (tests/) on every PR and on main.
+# For PRs that reference a task, .github/kos/check-pr.js then enforces the
+# task's FAIL_TO_PASS / PASS_TO_PASS, the lease, the baseline ratchet, and the
+# PR's provenance section. Fork-safe: read-only token, runs the PR's code only
+# inside the test suite.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kos-acceptance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the gate compares tests/known-failures.json against the base branch
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the suite
+        id: suite
+        run: npm test
+        continue-on-error: true
+
+      - name: Summarize per-test results
+        run: npm run report
+
+      - name: KOS acceptance gate
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KOS_BASE_REF: origin/${{ github.base_ref }}
+        run: node .github/kos/check-pr.js
+
+      - name: Suite must be green
+        if: steps.suite.outcome != 'success'
+        run: |
+          echo "::error::The test suite failed. Expected failures live in tests/known-failures.json; a test listed there that now passes must be removed from that file."
+          exit 1
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kos-results
+          path: reports/
+          retention-days: 30
