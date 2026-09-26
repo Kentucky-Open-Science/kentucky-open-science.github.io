@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: How the KOS task board works
+    url: https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/blob/main/docs/KOS-TASK-BOARD.md
+    about: Rules, the lease state machine, points, and how to claim a task with your coding agent.
+  - name: Open tasks
+    url: https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues?q=is%3Aissue+is%3Aopen+label%3Akos%3Aready
+    about: Tasks you can claim right now.
