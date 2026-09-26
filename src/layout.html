@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}} &mdash; {{site.siteTitle}}</title>
+<meta name="description" content="{{description}}">
+<link rel="stylesheet" href="{{root}}styles.css">
+</head>
+<body>
+
+<header class="banner">
+  <div class="globe" aria-hidden="true"></div>
+  <div class="wordmark">
+    <div class="name">Kentucky Open Science<span class="tld"> Wiki</span></div>
+    <div class="tagline">&bull; EVERY PUBLIC PROJECT, REBUILT NIGHTLY FROM GITHUB &bull; EST. 2025 &bull;</div>
+  </div>
+</header>
+
+<nav class="topnav">
+{{{nav}}}
+</nav>
+
+{{{body}}}
+
+<footer class="footer-retro">
+  <div class="badges">
+    <span class="badge">POWERED BY GITHUB PAGES</span>
+    <span class="badge">DATA FROM THE GITHUB API</span>
+    <span class="badge">NO COOKIES &middot; NO TRACKERS</span>
+    <span class="badge">WCAG 2.1 AA: WORK IN PROGRESS</span>
+  </div>
+  <div>
+    {{site.siteTitle}} &middot;
+    <a href="https://github.com/{{site.org}}">github.com/{{site.org}}</a> &middot;
+    <a href="{{root}}about.html">About this wiki</a> &middot;
+    <a href="{{root}}bounties.html">Bounty Board</a>
+  </div>
+  <div>Project data refreshed {{updated}} &middot; <a href="https://github.com/{{site.repo}}">Site source on GitHub</a></div>
+</footer>
+{{{scripts}}}
+</body>
+</html>

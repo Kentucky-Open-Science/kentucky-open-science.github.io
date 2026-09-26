@@ -201,8 +201,43 @@ function parseProvenance(prBody) {
   return { model, harness, usage, attestations, missing, unchecked };
 }
 
+// ---------------------------------------------------------------------------
+// Site refresh: the bounty board and leaderboard pages are rebuilt by the site
+// workflow. Label changes made with the Actions token do not trigger other
+// workflows, so the bots dispatch it explicitly after a state change.
+// ---------------------------------------------------------------------------
+
+async function refreshSite({ github, context, core }, config = CONFIG) {
+  const ref = (context.payload && context.payload.repository && context.payload.repository.default_branch) || 'main';
+  try {
+    // projects=false: only the board changed; reuse the committed project snapshot
+    // instead of re-reading every repository (keeps API use low on busy days).
+    await github.rest.actions.createWorkflowDispatch({ owner: context.repo.owner, repo: context.repo.repo, workflow_id: config.board.siteWorkflow, ref, inputs: { projects: 'false' } });
+    return true;
+  } catch (e) {
+    if (core) core.warning(`could not dispatch ${config.board.siteWorkflow}: ${e.message}`);
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Test IDs: "<prefix>/<page>[/<rule>]" where <page> may contain slashes
+// (a11y/projects/DALE-CT.html/list), or "content/<name>".
+// ---------------------------------------------------------------------------
+
+/** @returns {{prefix: string, page: string|null, rule: string}} */
+function splitTestId(id) {
+  const parts = String(id).split('/');
+  const prefix = parts[0];
+  const end = parts.findIndex((p, i) => i > 0 && p.endsWith('.html'));
+  if (prefix === 'content' || end < 0) return { prefix, page: null, rule: parts.slice(1).join('/') };
+  return { prefix, page: parts.slice(1, end + 1).join('/'), rule: parts.slice(end + 1).join('/') };
+}
+
 module.exports = {
   CONFIG,
+  refreshSite,
+  splitTestId,
   readMarker,
   writeMarker,
   parseSections,

@@ -193,7 +193,7 @@ test('merged PR accepts the task, awards points and reviewer credit, closes it',
   assert.equal(acc.reviewerPoints, 6);
   assert.equal(lib.readMarker(issue.body, 'lease'), null);
   assert.match(lastComment(gh), /\+25 points\*\* to @ann/);
-  assert.equal(gh.__dispatched[0].workflow_id, 'kos-leaderboard.yml');
+  assert.equal(gh.__dispatched[gh.__dispatched.length - 1].workflow_id, 'kos-site.yml');
 });
 
 test('PR closed without merge returns the task to leased with a fresh clock', async () => {
@@ -211,4 +211,42 @@ test('PRs that reference no task are ignored', async () => {
   const gh = fakeGithub({ issues: [] });
   const r = await prState({ github: gh, context: context({ pull_request: { number: 1, user: { login: 'x' }, body: 'docs only' }, action: 'opened' }), core });
   assert.equal(r.handled, false);
+});
+
+// ---------------------------------------------------------------------------
+// Site refresh + board data
+// ---------------------------------------------------------------------------
+
+test('a successful /claim asks the site workflow to rebuild the bounty board', async () => {
+  const issue = makeIssue(5, { labels: [L.task, L.ready, L.sizes.S] });
+  const gh = fakeGithub({ issues: [issue] });
+  await board({ github: gh, context: context({ issue, comment: comment('ann', '/claim') }), core, now: NOW });
+  assert.deepEqual(gh.__dispatched.map((d) => d.workflow_id), ['kos-site.yml']);
+});
+
+test('a refused /claim does not rebuild the site', async () => {
+  const issue = makeIssue(5, { labels: [L.task, L.triage] });
+  const gh = fakeGithub({ issues: [issue] });
+  await board({ github: gh, context: context({ issue, comment: comment('ann', '/claim') }), core, now: NOW });
+  assert.equal(gh.__dispatched.length, 0);
+});
+
+test('board data lists open tasks by state with holder, expiry, and points', () => {
+  const { summarize } = require('../leaderboard');
+  const { view } = require('./fake-github');
+  const lease = lib.newLease('ann', NOW);
+  const open = [
+    view(makeIssue(7, { labels: [L.task, L.ready, L.sizes.M] })),
+    view(makeIssue(8, { labels: [L.task, L.leased, L.sizes.S], assignees: ['ann'], body: lib.writeMarker('', 'lease', lease) })),
+    view(makeIssue(9, { labels: [L.task, L.submitted], assignees: ['bob'], body: lib.writeMarker('', 'lease', { ...lib.newLease('bob', NOW), pr: 12 }) })),
+  ];
+  const accepted = [
+    view(makeIssue(3, { labels: [L.task, L.accepted, L.sizes.M], state: 'closed', body: lib.writeMarker('', 'accepted', { pr: 4, solver: 'cy', size: 'M', points: 25, reviewers: ['dee'], reviewerPoints: 6, mergedAt: '2026-09-20T00:00:00Z' }) })),
+  ];
+  const d = summarize({ open, accepted, repo: 'o/r', now: NOW });
+  assert.deepEqual(d.status, { ready: 1, leased: 1, submitted: 1, triage: 0 });
+  assert.deepEqual(d.tasks.map((t) => [t.number, t.state, t.points, t.holder]), [[7, 'ready', 25, null], [8, 'leased', 10, 'ann'], [9, 'submitted', 10, 'bob']]);
+  assert.equal(d.tasks[1].expires, lease.expires);
+  assert.equal(d.tasks[2].pr, 12);
+  assert.deepEqual(d.leaderboard.map((p) => [p.login, p.points]), [['cy', 25], ['dee', 6]]);
 });

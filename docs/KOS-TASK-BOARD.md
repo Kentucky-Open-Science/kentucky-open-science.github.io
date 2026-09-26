@@ -5,7 +5,8 @@ well-specified programming tasks and volunteers complete them with the AI-agent
 hours they would otherwise lose at the end of their subscription week. Every
 task has machine-checkable acceptance criteria, exactly one person holds it at a
 time, a human reviews every line before merge, and completed work earns points
-on the [public leaderboard](../leaderboard.html).
+on the [public leaderboard](https://kentucky-open-science.github.io/leaderboard.html).
+Open tasks are listed on the [bounty board](https://kentucky-open-science.github.io/bounties.html).
 
 This document is the protocol. It is deliberately boring: GitHub Issues are the
 board, labels are the state, GitHub Actions are the referee.
@@ -107,6 +108,10 @@ per page — WCAG 2.1 AA via axe-core, HTML validity, reflow at 320 px, reduced
 motion, focus visibility, dead links — so most accessibility tasks can cite
 existing IDs. Add a page to `tests/pages.json` and it gets the full matrix.
 
+The suite tests the site built from frozen fixtures (`tests/fixtures/`), not
+from the nightly data, so a task's tests fail and pass because of code changes
+only. A task that needs different fixture data must say so in its scope.
+
 Good tasks are small enough to finish in one lease (S or M), touch a bounded set
 of files, and have acceptance criteria that would make a reviewer's decision
 obvious.
@@ -134,17 +139,17 @@ points (and reviewer credit to approvers), and closes the issue.
 
 - **Labels and seed tasks:** `GITHUB_TOKEN=<token> node .github/kos/bootstrap.js` creates the labels (idempotent) and files the tasks in `.github/kos/seed-tasks.json` that do not already exist. Use `--dry-run` first.
 - **Lease sweep:** runs hourly ("KOS lease expiry"); run it by hand from the Actions tab if you disabled schedules. GitHub pauses cron in repositories with no commits for 60 days.
-- **Leaderboard:** rebuilt on task close and nightly; it commits `data/leaderboard.json` and `leaderboard.html` to `main`. If you enable branch protection, allow the `github-actions` bot to push or change the last step to open a PR. `npm run leaderboard` re-renders the page locally from the committed data (needed when you change the site's header/nav/footer).
+- **Site, bounty board, and leaderboard:** the "KOS site" workflow (`kos-site.yml`) refreshes `data/projects.json` (public repositories) and `data/board.json` (tasks and points), builds, and deploys to GitHub Pages. It runs on every push to `main`, nightly, when a person changes a task's labels, and when the bots dispatch it after `/claim`, `/release`, `/extend`, a lease expiry, or a PR transition. The nightly run commits the refreshed data; if you enable branch protection, allow the `github-actions` bot to push or drop that step. Pages must be set to deploy from GitHub Actions (Settings → Pages → Source).
 - **Config:** `.github/kos/config.json` — lease hours, extensions, warning window, points, label names.
 - **Fork PRs from first-time contributors** need a maintainer to click "Approve and run" once (Settings → Actions → "Fork pull request workflows"). Set it to require approval only for first-time contributors, not for everyone, or the pilot will feel slow.
-- **Tests for the bots:** `npm run test:board` runs the unit tests for the lease logic with a fake GitHub API.
+- **Tests for the bots and the builder:** `npm run test:unit` runs the unit tests for the lease logic (with a fake GitHub API) and the site builder. The acceptance workflow runs them on every PR.
 
 ## Points, leaderboard, and bounties
 
 - Points are fixed at acceptance from the size label: S = 10, M = 25, L = 60 (see config). The record is written into the task itself, so history does not change if the config does.
 - Each reviewer who approved the merged PR earns 25 % of the task's points. Review time is the scarce resource; this makes it visible.
 - Expired or released leases earn nothing and cost nothing.
-- The [leaderboard](../leaderboard.html) is regenerated automatically and lives on the KOS site.
+- The [leaderboard](https://kentucky-open-science.github.io/leaderboard.html) and the [bounty board](https://kentucky-open-science.github.io/bounties.html) are regenerated automatically and live on the KOS site.
 - A submitter may attach a cash bounty to a task. Because a task has exactly one solver there is nothing to split: the whole bounty goes to whoever completes it. Bounty handling waits until KOS has a legal entity; until then, points only.
 
 ## What the pilot measures
@@ -164,6 +169,6 @@ extra is collected.
 
 - Volunteers' agents run on volunteers' machines under their own subscriptions. The board holds no credentials and calls no model.
 - Only the lease holder's PR can pass the gate for a task, and only one person holds a lease.
-- Workflows that have write permissions (`kos-board`, `kos-lease-expiry`, `kos-pr-state`, `kos-leaderboard`) never execute code from a pull request. The only workflow that runs PR code (`kos-pr-gate`) has a read-only token.
+- Workflows that have write permissions (`kos-board`, `kos-lease-expiry`, `kos-pr-state`, `kos-site`) never execute code from a pull request. The only workflow that runs PR code (`kos-pr-gate`) has a read-only token.
 - Tasks must not require secrets or private data; the submitter attests to this and maintainers check at triage.
 - Every merged change records who ran what model under which harness, and which human signed off. That record is what lets an organization accept work from strangers' agents.

@@ -1,0 +1,87 @@
+---
+title: Wiki home
+description: The Kentucky Open Science wiki — a searchable guide to every public KOS project on GitHub, rebuilt automatically every night, plus the accessibility bounty board.
+nav: home
+---
+<div class="marquee" aria-label="Site announcements">
+  <span>
+    *** WELCOME TO THE KENTUCKY OPEN SCIENCE WIKI &nbsp;&bull;&nbsp; {{stats.total}} PUBLIC PROJECTS ON GITHUB &nbsp;&bull;&nbsp;
+    NEW: THE ACCESSIBILITY BOUNTY BOARD &mdash; CLAIM A TASK, EARN POINTS &nbsp;&bull;&nbsp;
+    {{board.ready}} TASKS OPEN TO CLAIM RIGHT NOW &nbsp;&bull;&nbsp;
+    EVERY PAGE REBUILT NIGHTLY FROM GITHUB &nbsp;&bull;&nbsp;
+  </span>
+</div>
+
+<div class="layout">
+
+  <aside class="sidebar">
+{{> sidebar-areas}}
+
+    <div class="panel">
+      <h3>Web Rings</h3>
+      <ul>
+        <li><a href="#">&laquo; Prev Site</a></li>
+        <li><a href="#">List Sites</a></li>
+        <li><a href="#">Random Site</a></li>
+        <li><a href="#">Next Site &raquo;</a></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3>Public projects</h3>
+      <div class="counter" id="counter">{{home.counter}}</div>
+      <div class="counter-label">on GitHub as of {{updated}}</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <h1>Welcome to the KOS Wiki</h1>
+    <p class="lede">
+      A searchable guide to every public repository in the Kentucky Open
+      Science GitHub organization, rebuilt automatically from GitHub every night.
+    </p>
+{{{home.mission}}}
+    <p>
+      Kentucky Open Science publishes its research software, trained models,
+      benchmarks, and datasets in the open at
+      <a href="https://github.com/{{site.org}}">github.com/{{site.org}}</a>.
+      Right now that is <strong>{{stats.total}} public repositories</strong>:
+      {{stats.originals}} original projects ({{stats.active}} active,
+      {{stats.archived}} archived) and {{stats.forks}} forks of other projects.
+      The most common languages are {{stats.topLanguages}}.
+    </p>
+
+    <form class="search-form search-hero" role="search" action="projects.html" method="get">
+      <label for="home-search">Search every project, topic, and README</label>
+      <input type="search" id="home-search" name="q" placeholder="try: chest CT, REDCap, drone">
+      <button type="submit">Search</button>
+    </form>
+
+    <h2>Research areas</h2>
+{{{home.areas}}}
+
+    <h2>Recently updated</h2>
+    <div class="product-grid">
+{{{home.recent}}}
+    </div>
+
+    <h2>Help wanted: the accessibility bounty board</h2>
+    <p>
+      This site is being brought up to WCAG 2.1 AA, the standard adopted by the
+      ADA Title II web rule, one small task at a time. Each task has automated
+      acceptance tests; a volunteer claims it, fixes it (with or without a coding
+      agent), and a maintainer reviews the change. Merged fixes earn points on the
+      <a href="leaderboard.html">leaderboard</a>.
+    </p>
+    <p>
+      <strong>{{board.ready}}</strong> tasks are open to claim,
+      <strong>{{board.leased}}</strong> are in progress, and
+      <strong>{{board.accepted}}</strong> have been completed.
+      <a href="bounties.html">See the bounty board</a>.
+    </p>
+
+    <h2>Popular topics</h2>
+{{{home.topics}}}
+
+  </main>
+</div>

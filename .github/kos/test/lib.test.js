@@ -110,3 +110,21 @@ test('provenance parsing: a filled template passes', () => {
   assert.equal(p.harness, 'Claude Code 2.1');
   assert.equal(p.usage, '~1 session');
 });
+
+test('splitTestId handles pages in subdirectories', () => {
+  assert.deepEqual(lib.splitTestId('a11y/projects/DALE-CT.html/list'), { prefix: 'a11y', page: 'projects/DALE-CT.html', rule: 'list' });
+  assert.deepEqual(lib.splitTestId('motion/index.html'), { prefix: 'motion', page: 'index.html', rule: '' });
+  assert.deepEqual(lib.splitTestId('content/skip-link'), { prefix: 'content', page: null, rule: 'skip-link' });
+});
+
+test('a new page may inherit exactly the site-wide failures main already lists', () => {
+  const { isInheritedNewPageFailure } = require('../check-pr');
+  const main = ['motion/index.html', 'a11y/projects/DALE-CT.html/list', 'content/skip-link'];
+  const pages = ['index.html', 'projects/DALE-CT.html'];
+  assert.equal(isInheritedNewPageFailure('motion/404.html', main, pages), true);
+  assert.equal(isInheritedNewPageFailure('a11y/projects/new.html/list', main, pages), true);
+  assert.equal(isInheritedNewPageFailure('a11y/404.html/list', main, pages), true);
+  assert.equal(isInheritedNewPageFailure('a11y/404.html/color-contrast', main, pages), false, 'main does not list this rule anywhere');
+  assert.equal(isInheritedNewPageFailure('motion/index.html', main, pages), false, 'existing page');
+  assert.equal(isInheritedNewPageFailure('content/404-page', main, pages), false, 'content IDs never inherit');
+});

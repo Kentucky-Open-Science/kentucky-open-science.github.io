@@ -9,14 +9,15 @@
 
 const path = require('node:path');
 const { test, expect } = require('@playwright/test');
-const { HtmlValidate } = require('html-validate');
-const { ROOT, PAGES, applyBaseline } = require('./helpers');
+const { HtmlValidate, FileSystemConfigLoader } = require('html-validate');
+const { SITE, PAGES, applyBaseline } = require('./helpers');
 
-const htmlvalidate = new HtmlValidate();
+// FileSystemConfigLoader picks up .htmlvalidate.json at the repository root.
+const htmlvalidate = new HtmlValidate(new FileSystemConfigLoader());
 
 function formatMessages(result) {
   return result.results
-    .flatMap((file) => file.messages.map((m) => `  ${path.basename(file.filePath)}:${m.line}:${m.column}  ${m.ruleId}  ${m.message}`))
+    .flatMap((file) => file.messages.map((m) => `  ${path.relative(SITE, file.filePath)}:${m.line}:${m.column}  ${m.ruleId}  ${m.message}`))
     .join('\n');
 }
 
@@ -24,7 +25,7 @@ for (const pageName of PAGES) {
   const id = `html/${pageName}`;
   test(id, async () => {
     applyBaseline(id);
-    const report = await htmlvalidate.validateFile(path.join(ROOT, pageName));
+    const report = await htmlvalidate.validateFile(path.join(SITE, pageName));
     expect(report.valid ? '' : formatMessages(report), `html-validate on ${pageName}`).toBe('');
   });
 }

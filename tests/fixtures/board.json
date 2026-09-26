@@ -1,0 +1,21 @@
+{
+  "$comment": "Test fixture for the bounty board and leaderboard pages. Never deployed; the live data is data/board.json.",
+  "generated": "2026-09-26T12:00:00.000Z",
+  "repo": "Kentucky-Open-Science/kentucky-open-science.github.io",
+  "status": { "ready": 2, "leased": 1, "submitted": 1, "triage": 1 },
+  "accepted": 1,
+  "tasks": [
+    { "number": 101, "title": "[Task] Example ready task with a fairly long title that has to wrap on a phone", "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/101", "state": "ready", "size": "S", "points": 10, "holder": null, "expires": null, "pr": null },
+    { "number": 102, "title": "[Task] Example medium task", "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/102", "state": "ready", "size": "M", "points": 25, "holder": null, "expires": null, "pr": null },
+    { "number": 103, "title": "[Task] Example leased task", "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/103", "state": "leased", "size": "S", "points": 10, "holder": "octocat", "expires": "2026-09-28T12:00:00.000Z", "pr": null },
+    { "number": 104, "title": "[Task] Example task in review", "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/104", "state": "submitted", "size": "M", "points": 25, "holder": "octocat", "expires": null, "pr": 110 },
+    { "number": 105, "title": "[Task] Example task waiting for triage", "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/105", "state": "triage", "size": null, "points": 10, "holder": null, "expires": null, "pr": null }
+  ],
+  "leaderboard": [
+    { "login": "octocat", "points": 25, "tasks": 1, "reviews": 0, "last": "2026-09-20T12:00:00.000Z", "rank": 1 },
+    { "login": "hubot", "points": 6, "tasks": 0, "reviews": 1, "last": "2026-09-20T12:00:00.000Z", "rank": 2 }
+  ],
+  "completions": [
+    { "task": 100, "title": "[Task] Example completed task", "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/100", "solver": "octocat", "size": "M", "points": 25, "reviewers": ["hubot"], "reviewerPoints": 6, "pr": 99, "prUrl": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/pull/99", "mergedAt": "2026-09-20T12:00:00.000Z" }
+  ]
+}

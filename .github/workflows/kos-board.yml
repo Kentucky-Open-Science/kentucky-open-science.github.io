@@ -11,6 +11,7 @@ on:
 permissions:
   issues: write
   contents: read
+  actions: write # to dispatch the site rebuild (kos-site.yml) after a state change
 
 # Serialize commands per issue so two /claim comments cannot interleave.
 concurrency:

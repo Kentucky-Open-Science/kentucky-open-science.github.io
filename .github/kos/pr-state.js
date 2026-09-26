@@ -59,6 +59,7 @@ async function prState({ github, context, core, config = lib.CONFIG, now = new D
       await swap(L.leased, L.submitted);
       await github.rest.issues.update({ ...repo, issue_number: taskNumber, body: lib.writeMarker(issue.body, 'lease', { ...lease, pr: pr.number, submitted: new Date(now).toISOString() }) });
       await sayIssue(`📬 @${author} submitted #${pr.number} for review. The lease clock is paused while the PR is open.`);
+      await lib.refreshSite({ github, context, core }, config);
       return { handled: true, ok: true, transition: 'leased->submitted' };
     }
     return { handled: true, ok: true, transition: 'none', state };
@@ -94,12 +95,8 @@ async function prState({ github, context, core, config = lib.CONFIG, now = new D
       await github.rest.issues.update({ ...repo, issue_number: taskNumber, body, state: 'closed', state_reason: 'completed' });
       const reviewerNote = reviewers.length ? ` Reviewer credit (+${accepted.reviewerPoints} each): ${reviewers.map((r) => '@' + r).join(', ')}.` : '';
       await sayIssue(`🏆 Accepted via #${pr.number}. **+${points} points** to @${author} (size ${size || 'unspecified'}).${reviewerNote} The leaderboard updates within a few minutes.`);
-      // Rebuild the leaderboard now rather than waiting for the nightly run.
-      try {
-        await github.rest.actions.createWorkflowDispatch({ ...repo, workflow_id: 'kos-leaderboard.yml', ref: pr.base && pr.base.ref ? pr.base.ref : 'main' });
-      } catch (e) {
-        core.warning(`could not dispatch the leaderboard workflow: ${e.message}`);
-      }
+      // Rebuild the bounty board and leaderboard now rather than waiting for the nightly run.
+      await lib.refreshSite({ github, context, core }, config);
       return { handled: true, ok: true, transition: `${state}->accepted`, accepted };
     }
     // Closed without merge.
@@ -107,6 +104,7 @@ async function prState({ github, context, core, config = lib.CONFIG, now = new D
       const fresh = { ...lib.newLease(author, now, config), extensions: lease ? lease.extensions : 0 };
       await swap(L.submitted, L.leased);
       await github.rest.issues.update({ ...repo, issue_number: taskNumber, body: lib.writeMarker(issue.body, 'lease', fresh) });
+      await lib.refreshSite({ github, context, core }, config);
       await sayIssue(`↩️ #${pr.number} was closed without merging. @${author} still holds the lease; a fresh ${config.lease.hours} h clock started (expires ${lib.fmt(fresh.expires)}). Open a new PR, or \`/release\`.`);
       return { handled: true, ok: true, transition: 'submitted->leased' };
     }

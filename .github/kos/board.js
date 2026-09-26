@@ -103,6 +103,7 @@ async function board({ github, context, core, config = lib.CONFIG, now = new Dat
         `- If the lease expires the task returns to the pool and unmerged work is discarded; the next claimant starts from the original snapshot.`,
       ].join('\n'),
     );
+    await lib.refreshSite({ github, context, core }, config);
     return { handled: true, cmd, ok: true, lease: newLease };
   }
 
@@ -127,6 +128,7 @@ async function board({ github, context, core, config = lib.CONFIG, now = new Dat
     await addLabel(L.ready);
     await setBody(lib.writeMarker(fresh.body, 'lease', null));
     await say(`🔓 Released by @${actor}. The task is open for a new \`/claim\`.`);
+    await lib.refreshSite({ github, context, core }, config);
     return { handled: true, cmd, ok: true };
   }
 
@@ -146,6 +148,7 @@ async function board({ github, context, core, config = lib.CONFIG, now = new Dat
     const updated = { ...lease, expires: lib.addHours(lease.expires, config.lease.hours), extensions: lease.extensions + 1, warned: false };
     await setBody(lib.writeMarker(fresh.body, 'lease', updated));
     await say(`⏱️ Extended. New expiry: **${lib.fmt(updated.expires)}** (${updated.extensions}/${config.lease.maxExtensions} extensions used).`);
+    await lib.refreshSite({ github, context, core }, config);
     return { handled: true, cmd, ok: true, lease: updated };
   }
 

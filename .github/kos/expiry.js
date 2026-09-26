@@ -68,6 +68,7 @@ async function expiry({ github, context, core, config = lib.CONFIG, now = new Da
     }
   }
 
+  if (summary.expired.length || summary.repaired.length) await lib.refreshSite({ github, context, core }, config);
   core.info(`lease sweep: checked ${summary.checked}, expired ${summary.expired.join(', ') || '-'}, warned ${summary.warned.join(', ') || '-'}, repaired ${summary.repaired.join(', ') || '-'}`);
   return summary;
 }

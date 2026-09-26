@@ -2,18 +2,20 @@
   "name": "kentucky-open-science-site",
   "version": "0.1.0",
   "private": true,
-  "description": "Kentucky Open Science public site + the KOS task-board dogfood (WCAG 2.1 AA harness).",
+  "description": "Kentucky Open Science wiki (generated from public GitHub data) + the KOS task board (WCAG 2.1 AA harness).",
   "license": "MIT",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "serve": "node tests/serve.js",
+    "build": "node tools/build.js",
+    "fetch": "node tools/fetch-projects.js && node .github/kos/leaderboard.js",
+    "serve": "node tools/build.js && node tests/serve.js",
     "test": "playwright test",
     "report": "node tests/kos-report.js reports/playwright.json reports/kos-results.json",
     "baseline": "node tests/kos-report.js --baseline reports/playwright.json tests/known-failures.json",
-    "leaderboard": "node .github/kos/leaderboard.js --offline",
-    "test:board": "node --test .github/kos/test/*.test.js"
+    "test:unit": "node --test \".github/kos/test/*.test.js\" \"tools/test/*.test.js\"",
+    "test:board": "node --test \".github/kos/test/*.test.js\""
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

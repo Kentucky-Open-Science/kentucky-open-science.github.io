@@ -64,14 +64,11 @@ function basePagesList() {
  * `<prefix>/<page>/<rule>`; `content/*` IDs are never inheritable.
  */
 function isInheritedNewPageFailure(id, mainBaseline, basePages) {
-  const parts = id.split('/');
-  if (parts.length < 2 || parts[0] === 'content') return false;
-  const [prefix, page, ...rest] = parts;
-  if (!page.endsWith('.html') || basePages.includes(page)) return false;
-  const suffix = rest.join('/');
+  const t = lib.splitTestId(id);
+  if (!t.page || basePages.includes(t.page)) return false;
   return mainBaseline.some((b) => {
-    const bp = b.split('/');
-    return bp[0] === prefix && bp.slice(2).join('/') === suffix && bp[1] !== page;
+    const m = lib.splitTestId(b);
+    return m.page && m.prefix === t.prefix && m.rule === t.rule && m.page !== t.page;
   });
 }
 
@@ -205,4 +202,4 @@ if (require.main === module) {
   );
 }
 
-module.exports = { main };
+module.exports = { main, isInheritedNewPageFailure };

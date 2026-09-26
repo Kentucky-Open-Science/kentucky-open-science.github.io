@@ -44,7 +44,7 @@ body:
       label: Scope
       description: Files, pages, or components in scope, and anything explicitly out of scope (keeps two tasks from colliding).
       placeholder: |
-        In scope: styles.css, index.html (marquee only)
+        In scope: src/styles.css, src/pages/index.html (marquee only)
         Out of scope: rewording any copy; other pages
     validations:
       required: true
