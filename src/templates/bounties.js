@@ -114,7 +114,7 @@ ${table('The most recent accepted tasks', ['Task', 'Solved by', 'Points', 'Merge
     </div>
   </aside>
 
-  <main class="main">
+  <main class="main" id="main">
     <h1>Accessibility Bounty Board</h1>
     <p class="lede">
       This website is being brought up to WCAG 2.1 AA, the standard adopted by
