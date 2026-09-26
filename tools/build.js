@@ -13,7 +13,8 @@
 //   src/partials/*.html      shared blocks ({{> name}})
 //   src/pages/*.html         hand-written pages (front matter + body)
 //   src/templates/*.js       data-driven pages: projects, project, bounties, leaderboard
-//   src/styles.css, src/search.js
+//   src/styles.css, src/search.js, src/claim.js
+//   src/claim-prompt.txt     the prompt the bounty board hands to volunteers' agents
 //   src/site.json            nav, research areas, site settings
 //   data/projects.json       public repositories (tools/fetch-projects.js)
 //   data/board.json          task board + leaderboard (.github/kos/leaderboard.js)
@@ -101,6 +102,7 @@ function buildModel() {
     areas: allAreas,
     areaOf: (p) => byId[areaIdOf.get(p)],
     isRecent: (p) => generatedMs - new Date(p.pushedAt).getTime() <= site.recentDays * 86400000,
+    claimPrompt: fs.readFileSync(path.join(SRC, 'claim-prompt.txt'), 'utf8').replace(/\r\n/g, '\n').trim() + '\n',
     partial: (name, root) => render(fs.readFileSync(path.join(SRC, 'partials', `${name}.html`), 'utf8'), { root, site }, path.join(SRC, 'partials')),
     stats: {
       total: projects.length,
@@ -186,6 +188,7 @@ function build() {
     description: 'Claim a small, tested accessibility fix for the Kentucky Open Science website, complete it with or without a coding agent, and earn points on the leaderboard.',
     current: 'bounties',
     body: renderBounties(model),
+    scripts: '<script src="claim.js"></script>\n',
   });
   page('leaderboard.html', {
     title: 'Task Board Leaderboard',
@@ -201,8 +204,7 @@ function build() {
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, html);
   }
-  fs.copyFileSync(path.join(SRC, 'styles.css'), path.join(OUT, 'styles.css'));
-  fs.copyFileSync(path.join(SRC, 'search.js'), path.join(OUT, 'search.js'));
+  for (const file of ['styles.css', 'search.js', 'claim.js']) fs.copyFileSync(path.join(SRC, file), path.join(OUT, file));
   fs.writeFileSync(path.join(OUT, 'search-index.json'), JSON.stringify(searchIndex(model)));
   fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
   if (!QUIET) console.log(`built ${pages.length} pages (${model.projects.length} projects) -> ${path.relative(ROOT, OUT) || '.'}`);

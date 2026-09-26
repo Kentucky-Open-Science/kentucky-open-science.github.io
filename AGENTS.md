@@ -69,8 +69,9 @@ remove its ID from the file. That is deliberate:
 5. Prepare the PR body from `.github/PULL_REQUEST_TEMPLATE.md`: `KOS-Task: #<n>`,
    a summary, the provenance fields (**model**, **harness**, **approx. usage**),
    the test IDs, and the attestation checklist. Leave the attestations
-   **unchecked** and hand the diff to the human: only they may tick the boxes
-   and open the PR.
+   **unchecked**, show the human the full diff and the PR body, and wait. Open
+   the PR only when they tell you to. Only the human ticks the attestation
+   boxes (on the PR page on GitHub, which re-runs the gate).
 6. Never commit `node_modules/`, `_site/`, `_site-test/`, `reports/`, or
    `test-results/`. Never add a dependency unless the task asks for it. Never
    touch `data/` by hand.
