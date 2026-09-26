@@ -1,0 +1,81 @@
+---
+title: About this wiki
+description: How the Kentucky Open Science wiki is built from public GitHub data, how to correct a project page, and how the site's accessibility work is organized.
+nav: about
+---
+<div class="layout">
+
+  <aside class="sidebar">
+{{> sidebar-search}}
+{{> sidebar-areas}}
+  </aside>
+
+  <main class="main">
+    <h1>About this wiki</h1>
+    <p class="lede">
+      What this site is, where its facts come from, and how to fix one.
+    </p>
+
+    <h2 id="how">How the wiki is built</h2>
+    <p>
+      Every night a GitHub Actions workflow asks the GitHub API for the public
+      repositories of the <a href="https://github.com/{{site.org}}">{{site.org}}</a>
+      organization: each repository's description, topics, languages, license,
+      activity, latest release, top contributors, and README. It writes that to
+      a data file, regenerates every page of this site from it, and publishes
+      the result with GitHub Pages. Nobody edits the project pages by hand.
+    </p>
+    <p>
+      Only public repositories are read and published. The generator requests
+      public repositories, checks every entry again before writing it, and the
+      site's test suite fails if anything else ever appears in the data.
+    </p>
+
+    <h2 id="fix">Correcting a project page</h2>
+    <p>
+      Because every project page is built from the repository itself, the fix
+      for a wrong or thin page is almost always on GitHub:
+    </p>
+    <ul>
+      <li><strong>Missing or wrong summary:</strong> set the repository's
+        description (the gear icon next to "About" on the repository page) and
+        make the first paragraph of its README say what the project is.</li>
+      <li><strong>Wrong research area:</strong> add
+        <a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/classifying-your-repository-with-topics">GitHub topics</a>
+        to the repository. Areas are assigned from topics; the mapping lives in
+        <code>src/site.json</code> in the <a href="https://github.com/{{site.repo}}">site repository</a>.</li>
+      <li><strong>Anything else:</strong> open an issue in the
+        <a href="https://github.com/{{site.repo}}/issues">site repository</a>.</li>
+    </ul>
+    <p>Changes show up after the next nightly rebuild.</p>
+
+    <h2 id="look">About the look</h2>
+    <p>
+      The 1990s web-portal theme is intentional, and so is the plan for it: keep
+      the look, and make it work for everyone. The scrolling marquee, the spinning
+      globe, and the blinking badges are exactly the kind of thing that fails
+      accessibility checks, which makes this site a useful practice target.
+    </p>
+
+    <h2 id="accessibility">Accessibility</h2>
+    <p>
+      The goal is conformance with WCAG 2.1 Level AA, the technical standard
+      adopted by the ADA Title II web accessibility rule. The site is not there
+      yet. Every known problem is a task on the <a href="bounties.html">bounty board</a>,
+      backed by an automated test, and anyone can claim one. If you run into a
+      barrier that is not on the board, please
+      <a href="https://github.com/{{site.repo}}/issues/new">open an issue</a>.
+    </p>
+
+    <h2 id="facts">Site facts</h2>
+    <table class="specs">
+      <tbody>
+      <tr><th>Projects covered</th><td>{{stats.total}} public repositories ({{stats.originals}} original, {{stats.forks}} forks)</td></tr>
+      <tr><th>Pages generated</th><td>{{stats.pages}}</td></tr>
+      <tr><th>Project data refreshed</th><td>{{updated}}</td></tr>
+      <tr><th>Source code</th><td><a href="https://github.com/{{site.repo}}">github.com/{{site.repo}}</a></td></tr>
+      <tr><th>Task-board rules</th><td><a href="https://github.com/{{site.repo}}/blob/main/docs/KOS-TASK-BOARD.md">docs/KOS-TASK-BOARD.md</a></td></tr>
+      </tbody>
+    </table>
+  </main>
+</div>

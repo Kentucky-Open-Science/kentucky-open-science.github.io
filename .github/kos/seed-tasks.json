@@ -1,0 +1,149 @@
+[
+  {
+    "title": "[Task] Add a skip-to-content link to every page",
+    "size": "S",
+    "problem": "Keyboard and screen-reader users have to Tab through the banner and the whole navigation on every page before they reach the content. WCAG 2.1 SC 2.4.1 (Bypass Blocks, Level A) requires a way to skip repeated blocks; the standard technique (G1) is a \"Skip to main content\" link that is the first focusable element on the page and stays visually hidden until it receives focus.\n\nDone means: on every page in `tests/pages.json`, the first Tab stop is a link whose text contains \"skip\" and whose `href` targets the page's `<main>` element.",
+    "scope": "In scope: `src/layout.html` (the link, immediately after `<body>`), the `<main>` element of each page (give it `id=\"main\"`; they live in `src/pages/*.html` and `src/templates/*.js`), and `src/styles.css` (a `.skip-link` rule that hides the link until `:focus`).\nOut of scope: any other markup or copy.",
+    "failToPass": ["content/skip-link"],
+    "humanChecklist": [
+      "The link is invisible until focused, then clearly visible with strong contrast against the banner.",
+      "Activating it moves focus into the main content (press Enter, then Tab: the next stop is inside `<main>`).",
+      "The retro look is unchanged everywhere else."
+    ],
+    "hints": "Every page is rendered through `src/layout.html`, so the link is written once. `grep -rn \"<main\" src` finds the six places that open `<main>` (the leaderboard template already has `id=\"main\"`). `npm test` rebuilds the site before it runs; to look at the result yourself, `npm run build && npm run serve`."
+  },
+  {
+    "title": "[Task] Honor prefers-reduced-motion (globe, marquee, blinking badges)",
+    "size": "S",
+    "problem": "Three CSS animations run forever: the spinning globe in the banner on every page (`globe-spin`), the scrolling announcement marquee on the home page (`marquee-scroll`), and the blinking UPDATED! badges on the home page (`blink`). People who have asked their operating system to reduce motion (often because motion makes them dizzy or nauseous) still get all three. Honoring the `prefers-reduced-motion` media query is the standard technique (WCAG C39) for SC 2.3.3 Animation from Interactions.\n\nDone means: with reduced motion emulated, `document.getAnimations()` reports no running animations on any page. Paused or removed animations both satisfy this.",
+    "scope": "In scope: `src/styles.css` only, as a `@media (prefers-reduced-motion: reduce)` block.\nOut of scope: a pause button for everyone else (separate task), the marquee's markup (separate task), and any change for users who have not asked for reduced motion.",
+    "failToPass": [
+      "motion/index.html",
+      "motion/projects.html",
+      "motion/projects/DALE-CT.html",
+      "motion/projects/vllm.html",
+      "motion/bounties.html",
+      "motion/leaderboard.html",
+      "motion/about.html"
+    ],
+    "humanChecklist": [
+      "With reduced motion on, the marquee text is still readable: static, not clipped mid-word or hidden.",
+      "With reduced motion on, the UPDATED! badges are still visible (just not blinking).",
+      "With reduced motion off, nothing changed."
+    ],
+    "hints": "Chrome DevTools → Rendering → \"Emulate CSS media feature prefers-reduced-motion\" reproduces the test's conditions. `animation: none` removes an animation; `animation-play-state: paused` stops it — either passes. The marquee text starts off-screen (`padding-left: 100%`), so removing its animation alone may leave it invisible."
+  },
+  {
+    "title": "[Task] Let visitors pause the moving and blinking content (WCAG 2.2.2)",
+    "size": "M",
+    "problem": "WCAG 2.1 SC 2.2.2 (Pause, Stop, Hide, Level A) says that anything that moves, blinks, or scrolls automatically for more than five seconds alongside other content needs a way for the user to pause, stop, or hide it. This site has three such things: the spinning globe in the banner (every page), the scrolling marquee (home page), and the blinking UPDATED! badges (home page). The reduced-motion task only helps people who have set an operating-system preference; 2.2.2 requires a control that works for everyone.\n\nDone means: on every page, after activating a control named \"Pause\" or \"Stop\" (a button, checkbox, or switch), no animation that lasts longer than five seconds is still running. (An animation that ends within five seconds needs no control.)",
+    "scope": "In scope: `src/layout.html` (a site-wide control, for example in the banner), `src/styles.css`, and a small script (a new `src/site.js` copied into the build by `tools/build.js`, or an inline `<script>` in the layout).\nOut of scope: the `prefers-reduced-motion` media query (separate task) and the marquee's markup or landmark (separate task).",
+    "failToPass": [
+      "pause/index.html",
+      "pause/projects.html",
+      "pause/projects/DALE-CT.html",
+      "pause/projects/vllm.html",
+      "pause/bounties.html",
+      "pause/leaderboard.html",
+      "pause/about.html"
+    ],
+    "humanChecklist": [
+      "The control is reachable with Tab, shows a visible focus indicator, and its label or state changes when used (Pause ↔ Play, with `aria-pressed` or a checkbox state).",
+      "Paused content stays visible and readable, including the marquee text.",
+      "The control fits the retro look.",
+      "Optional: the choice is remembered across pages (for example in localStorage)."
+    ],
+    "hints": "The test looks for a button, checkbox, or switch whose accessible name matches /pause|stop/i and clicks the first one. A class on `<html>` that sets `animation-play-state: paused` on `.globe::before`, `.marquee span`, and `.badge-new` is the simplest pause. `tools/build.js` copies static files by name (`styles.css`, `search.js`); add yours there if you create one. If the marquee task is in flight at the same time, coordinate on the issue: both touch the home page's marquee area."
+  },
+  {
+    "title": "[Task] Put the announcements marquee in a named landmark",
+    "size": "S",
+    "problem": "The scrolling announcement strip on the home page is `<div class=\"marquee\" aria-label=\"Site announcements\">`. Two problems:\n\n1. `aria-label` on a plain `<div>` is not allowed: a `div` has no role, so the label is ignored or announced inconsistently (html-validate `aria-label-misuse`).\n2. The strip sits outside every landmark (axe `region`), so screen-reader users who move through a page by landmarks never encounter it.\n\nDone means: `index.html` validates, and all of its content is inside landmarks.",
+    "scope": "In scope: the marquee block in `src/pages/index.html` and any related rules in `src/styles.css`.\nOut of scope: making it stop moving (separate reduced-motion and pause tasks) and other pages.",
+    "failToPass": ["html/index.html", "a11y-bp/index.html/region"],
+    "humanChecklist": [
+      "The strip is inside a landmark with an accessible name (for example `<section aria-label=\"Site announcements\">`, or a `<section>` labelled by a visually hidden heading).",
+      "A screen reader reads the announcement text once, in a sensible order.",
+      "The look is unchanged."
+    ],
+    "hints": "A `<section>` with an accessible name is a `region` landmark, and `aria-label` is allowed on it. Run `npx playwright test -g \"index.html/region|html/index.html\"` to check just these two."
+  },
+  {
+    "title": "[Task] Replace the placeholder Web Rings links on the home page",
+    "size": "S",
+    "problem": "The \"Web Rings\" panel in the home page sidebar has four links — « Prev Site, List Sites, Random Site, Next Site » — that all point at `href=\"#\"`. They look like navigation, lead nowhere, and jump the page back to the top when activated: a trap for keyboard and screen-reader users, who hear four links with no destination (WCAG 2.4.4 Link Purpose, in spirit).\n\nDone means: the home page has no `href=\"#\"`, empty, or `javascript:` links.",
+    "scope": "In scope: the Web Rings panel in `src/pages/index.html`, and `src/styles.css` if needed.\nOut of scope: the other sidebar panels.",
+    "failToPass": ["links/index.html"],
+    "humanChecklist": [
+      "The panel is either removed, or its links point somewhere real and relevant that the maintainer approved on the issue.",
+      "No new placeholder links anywhere on the site."
+    ],
+    "hints": "There is no real web ring. Deleting the panel is a complete fix. If you would rather keep the retro touch (for example a panel of real links to other Kentucky open-science efforts), propose the destinations on the issue and wait for a maintainer's OK before using them."
+  },
+  {
+    "title": "[Task] Make every link's text say where it goes",
+    "size": "M",
+    "problem": "Screen-reader users often pull up a list of every link on a page, out of context. Some links on this site make no sense that way:\n\n- **Home page:** every \"Recently updated\" card ends in a link called \"More Info\" — eight links with the same generic text and eight different destinations. The card's project name is a plain `<div>`, so assistive technology has no programmatic context for the link. This fails WCAG 2.4.4 Link Purpose (In Context), Level A.\n- **About page:** two different links are both called \"site repository\" (one goes to the repository, one to its issues).\n- **Project pages:** the \"What the README covers\" links reuse the README's heading text, so a README section called \"About\" collides with the \"About\" link in the site navigation (see the vllm page).\n\nThe last two pass 2.4.4 thanks to the surrounding sentence or heading, but fail the stricter link-only rule the site's test enforces (SC 2.4.9, AAA), which is what a links list actually needs.\n\nDone means: on every page, no link has generic text (\"More Info\", \"click here\", …), and links that share the same text lead to the same place.",
+    "scope": "In scope: `src/templates/home.js` (the cards), `src/pages/about.html` (link wording), `src/templates/project.js` (the README section links), and `src/styles.css` if the card markup changes.\nOut of scope: other copy changes.",
+    "failToPass": ["linktext/index.html", "linktext/about.html", "linktext/projects/vllm.html"],
+    "humanChecklist": [
+      "The cards still look like the retro cards; the project name is now the link, or the link text includes the project name.",
+      "Wherever a link has an `aria-label`, the label contains the visible text (WCAG 2.5.3 Label in Name).",
+      "README section links make clear they go to the README on GitHub (visible text or a visually hidden prefix).",
+      "A maintainer approved the new wording."
+    ],
+    "hints": "The test uses a link's `aria-label` when present, otherwise its text content. A visually hidden `<span>` inside a link adds context for screen readers without changing the design; the project needs a `.visually-hidden` utility class for that (none exists yet). Check with `npx playwright test -g linktext/`."
+  },
+  {
+    "title": "[Task] Tell assistive technology which page is current in the navigation",
+    "size": "S",
+    "problem": "The top navigation shows the current section with an orange tab (`class=\"current\"`). That information is visual only: a screen reader announces all five links the same way. WCAG 2.1 SC 1.3.1 (Info and Relationships, Level A) requires information conveyed through presentation to be available programmatically; `aria-current` is the standard way to do it for navigation.\n\nDone means: on every page exactly one link in the primary `<nav>` has `aria-current`, and on a section's own page (index, projects, bounties, leaderboard, about) it is `aria-current=\"page\"` on the link to that page.",
+    "scope": "In scope: the `nav()` function in `src/templates/common.js`, and `src/styles.css` if you choose to style `[aria-current]` instead of `.current`.\nOut of scope: nav order and labels.",
+    "failToPass": ["content/current-page"],
+    "humanChecklist": [
+      "Project pages (`projects/*.html`) mark \"Projects\" with a value that does not claim the link is the page itself (for example `aria-current=\"true\"`, not `\"page\"`).",
+      "The visual style of the current tab is unchanged."
+    ],
+    "hints": "One function renders the navigation for every page, and it already knows which item is current."
+  },
+  {
+    "title": "[Task] Make project pages reflow at 320 px (WCAG 1.4.10)",
+    "size": "S",
+    "problem": "At a viewport 320 CSS px wide (a phone in portrait, or a desktop zoomed to 400 %), every project page scrolls sideways: the \"Get the code\" box holds `git clone https://github.com/...` as one long, unbreakable line. WCAG 2.1 SC 1.4.10 (Reflow, Level AA) requires content to be usable without two-dimensional scrolling at that width, except for parts that genuinely need two-dimensional layout. A code sample may scroll inside its own box, but then keyboard users must be able to reach and scroll that box.\n\nDone means: `document.documentElement.scrollWidth <= window.innerWidth` on project pages at 320 px.",
+    "scope": "In scope: the \"Get the code\" block in `src/templates/project.js` and `src/styles.css`.\nOut of scope: other sections of the project page (unless you find they also overflow; say so on the issue).",
+    "failToPass": ["reflow/projects/DALE-CT.html", "reflow/projects/vllm.html"],
+    "humanChecklist": [
+      "The command can still be copied and pasted exactly (no inserted spaces or hyphens).",
+      "If the box scrolls instead of wrapping, it is keyboard-focusable (`tabindex=\"0\"`), has an accessible name, and shows a visible focus indicator.",
+      "At desktop width nothing changed."
+    ],
+    "hints": "`overflow-wrap: anywhere` (with `white-space: pre-wrap`) wraps the URL without changing it. The alternative is `overflow-x: auto` plus `tabindex=\"0\"`, `role=\"region\"`, and an `aria-label`. Also look at the page for a long repository name: `npm run build`, then open `_site/projects/kentucky-open-science.github.io.html` at 320 px."
+  },
+  {
+    "title": "[Task] Make the bounty board's tables reflow at 320 px (WCAG 1.4.10)",
+    "size": "S",
+    "problem": "At a viewport 320 CSS px wide, the bounty board page scrolls sideways: its task tables (Open to claim, In progress, In review, Recently completed) are wider than the screen. WCAG 2.1 SC 1.4.10 (Reflow, Level AA) lets a data table scroll inside its own container, but the page as a whole must not. The leaderboard page already shows one way to do it: a keyboard-focusable, labelled `.table-scroll` wrapper.\n\nDone means: no horizontal page scroll on `bounties.html` at 320 px.",
+    "scope": "In scope: `src/templates/bounties.js` and `src/styles.css`.\nOut of scope: the leaderboard page, and the tables' columns or content.",
+    "failToPass": ["reflow/bounties.html"],
+    "humanChecklist": [
+      "At 320 px each table either reflows (for example stacked rows) or scrolls inside a container that is keyboard-focusable and has an accessible name.",
+      "Captions and column headers are intact.",
+      "At desktop width nothing changed."
+    ],
+    "hints": "The tests build the page from `tests/fixtures/board.json`, which has a task in every state so every table renders; one task title is deliberately long."
+  },
+  {
+    "title": "[Task] Add a custom 404 page",
+    "size": "S",
+    "problem": "When someone follows a broken link, GitHub Pages shows its own generic error page: no site navigation, no way back. GitHub Pages serves a root-level `404.html` instead when one exists. Add one in the site's style that says the page was not found, links to the home page, and offers the main sections (and the project search).\n\nDone means: `404.html` exists, links to the home page, is listed in `tests/pages.json`, and passes the full accessibility matrix apart from failures it inherits from the rest of the site.",
+    "scope": "In scope: a new `src/pages/404.html` (`tools/build.js` builds every page in `src/pages/`), `tools/build.js` if the page needs special link handling (see hints), `tests/pages.json`, and `tests/known-failures.json` (inherited IDs only).\nOut of scope: other pages.",
+    "failToPass": ["content/404-page"],
+    "humanChecklist": [
+      "Same header, navigation, and footer as the other pages, so nobody is stranded.",
+      "Its `<title>` ends with \"Kentucky Open Science\" and it has a `<meta name=\"description\">`.",
+      "It works at a nested missing URL too, such as `/projects/no-such-project.html`: styles load and links work.",
+      "The message is in text, not an image."
+    ],
+    "hints": "GitHub Pages serves `404.html` for a missing URL at any depth, so links relative to the page (`styles.css`, `index.html`) break under `/projects/`. Build this page with root-absolute links (`/styles.css`); see `root` in `page()` in `tools/build.js`. Because the page joins `tests/pages.json`, every per-page check applies to it; if a site-wide problem is still open on main (for example `motion/index.html` is in `tests/known-failures.json`), add the same ID for `404.html`. The gate allows baseline additions only in that case."
+  }
+]

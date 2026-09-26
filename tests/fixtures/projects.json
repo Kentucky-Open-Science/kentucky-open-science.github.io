@@ -1,0 +1,1768 @@
+{
+ "generated": "2026-09-26T12:00:00.000Z",
+ "org": {
+  "login": "Kentucky-Open-Science",
+  "name": "Kentucky Open Science",
+  "url": "https://github.com/Kentucky-Open-Science",
+  "description": "",
+  "publicRepos": 17
+ },
+ "projects": [
+  {
+   "name": "chest-ct-foundation-model-benchmark",
+   "fullName": "Kentucky-Open-Science/chest-ct-foundation-model-benchmark",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/chest-ct-foundation-model-benchmark",
+   "description": "Single-protocol benchmark for chest-CT foundation models: one frozen-probe protocol, shared patient-disjoint splits, bootstrap CIs, every encoder probed by the same harness",
+   "homepage": "",
+   "topics": [
+    "benchmark",
+    "computed-tomography",
+    "foundation-models",
+    "medical-imaging",
+    "representation-learning"
+   ],
+   "language": "Python",
+   "languages": [
+    {
+     "name": "Python",
+     "percent": 100
+    }
+   ],
+   "license": {
+    "spdx": "Apache-2.0",
+    "name": "Apache License 2.0"
+   },
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2026-08-26T18:34:48Z",
+   "pushedAt": "2026-09-25T02:14:30Z",
+   "sizeKb": 172,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/chest-ct-foundation-model-benchmark#readme",
+    "summary": [
+     "A single-protocol evaluation of frozen chest-CT foundation models.",
+     "Published CT encoders are difficult to compare. Each reports results on its own data partition, under its own probing recipe, with its own preprocessing. This repository provides the components needed to compare them directly: a unified loader that normalizes heterogeneous encoders behind one interface, fixed patient-disjoint splits distributed as data, and a frozen-probe protocol applied identically to every model.",
+     "Maintained by Evan W. Damron. Apache-2.0. Companion to DALE-CT.",
+     "splits/splits.csv defines every partition used here. Each row assigns one volume to one role within one experiment:",
+     "Identifiers are given without file extensions. CT-RATE volumes appear as {volume_id}.nii.gz in the official release; RAD-ChestCT uses NoteAcc_DEID.",
+     "Linear multiple-instance probes over per-volume token bags."
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "Contents",
+      "anchor": "contents"
+     },
+     {
+      "level": 2,
+      "text": "Splits",
+      "anchor": "splits"
+     },
+     {
+      "level": 2,
+      "text": "Preparing the data",
+      "anchor": "preparing-the-data"
+     },
+     {
+      "level": 2,
+      "text": "Preparing the labels",
+      "anchor": "preparing-the-labels"
+     },
+     {
+      "level": 2,
+      "text": "Results",
+      "anchor": "results"
+     },
+     {
+      "level": 3,
+      "text": "Volume-level classification",
+      "anchor": "volume-level-classification"
+     },
+     {
+      "level": 3,
+      "text": "Dense localization",
+      "anchor": "dense-localization"
+     },
+     {
+      "level": 2,
+      "text": "Pretraining data and domain status",
+      "anchor": "pretraining-data-and-domain-status"
+     },
+     {
+      "level": 2,
+      "text": "Model coverage",
+      "anchor": "model-coverage"
+     },
+     {
+      "level": 2,
+      "text": "Installation",
+      "anchor": "installation"
+     },
+     {
+      "level": 2,
+      "text": "Usage",
+      "anchor": "usage"
+     },
+     {
+      "level": 2,
+      "text": "Testing",
+      "anchor": "testing"
+     },
+     {
+      "level": 2,
+      "text": "Adding a model",
+      "anchor": "adding-a-model"
+     },
+     {
+      "level": 2,
+      "text": "Citation",
+      "anchor": "citation"
+     }
+    ],
+    "text": "A single-protocol evaluation of frozen chest-CT foundation models.\nPublished CT encoders are difficult to compare. Each reports results on its own data partition, under its own probing recipe, with its own preprocessing. This repository provides the components needed to compare them directly: a unified loader that normalizes heterogeneous encoders behind one interface, fixed patient-disjoint splits distributed as data, and a frozen-probe protocol applied identically to every model.\nMaintained by Evan W. Damron. Apache-2.0. Companion to DALE-CT.\nContents\n• splits/ — the evaluation partitions, as scan identifiers • results/ — all reported metrics, as CSV • ctbench/ — the evaluation harness • configs/ — protocol configurations (embedding extraction, volume-level probes, dense probes) • tests/ — a synthetic end-to-end gate for the harness\nSplits\nsplits/splits.csv defines every partition used here. Each row assigns one volume to one role within one experiment:\nThe CT-RATE partitions are patient-disjoint. Note that CT-RATE assigns patient identifiers separately within its train and validation pools, so comparing volume_id.split(\"_\")[1] across the two produces spurious collisions; the manifests here are derived from the prefixed identifiers and contain no patient overlap between training and test.\nIdentifiers are given without file extensions. CT-RATE volumes appear as {volume_id}.nii.gz in the official release; RAD-ChestCT uses NoteAcc_DEID.\nOnly identifiers are distributed here — no images and no labels. Obtain CT-RATE (CC-BY-NC-SA) and RAD-ChestCT (CC-BY) from their sources under their respective licenses, and set CTBENCH_DATA_ROOT accordingly. The label CSVs the probes read are derived from those downloads by ctbench.prepare_labels (see below).\nPreparing the data\nRAD-ChestCT is used as distributed: its Zenodo release is already one .npz per scan, which the loader reads directly.\nCT-RATE requires one conversion step. Its NIfTI files do not store Hounsfield units — each volume carries its own RescaleSlope and RescaleIntercept in the metadata CSV, and the NIfTI headers leave the corresponding fields unset. The intercept is not constant across the corpus, so the metadata is required rather than optional.\nRepeat with train_metadata.csv and an output of CT-RATE_train_hu. The conversion applies the per-volume rescale, transposes to (Z, H, W), and stores float16, with no clipping, resampling, or reorientation; model-specific preprocessing happens later inside each backbone's extractor. Passing --manifest restricts the conversion to the volumes the benchmark actually evaluates. Writes are atomic and existing outputs are validated and skipped, so an interrupted run resumes cheaply.\nBoth sources are read by file name, which keeps re-runs cheap: adding a model or resuming an interrupted extraction touches only the volumes still outstanding. A sharded-tar reader is retained for the CT-RATE training split under ctrate_train_webdataset, but it is not the default — that pipeline decodes before applying the manifest filter, so a resumed run re-reads every volume it has already processed.\nPreparing the labels\nThe probes read three label CSVs under CTBENCH_DATA_ROOT, none distributed here. ctbench.prepare_labels builds all three from the official downloads:\nCT-RATE's train_predicted_labels.csv and valid_predicted_labels.csv are copied unchanged from the official multi_abnormality_labels directory. RAD-ChestCT/rad_labels.csv is derived from the Zenodo release's img{train,valid,test}_Abnormality_and_Location_Labels.csv: each of the 16 classes shared with CT-RATE is the union of one or more RAD-ChestCT abnormalities over all location columns (the mapping is in ctbench/prepare_labels.py and reproduces the paper's label file exactly).\nResults\nAll metrics are computed on the splits above, with frozen encoders. Full tables are in results/; the volume-level tables include 95% bootstrap confidence intervals.\nVolume-level classification\nLinear multiple-instance probes over per-volume token bags.\nMacro averages. CT-RATE test n=992; RAD-ChestCT test n=360. The frozen arm applies the CT-RATE-trained classifier directly to RAD-ChestCT; the retrained arm keeps the encoder frozen and fits a new classifier on the RAD-ChestCT training split. Point estimates come from the validation-selected probe; the seed-variance stage behind the reported spreads did not run uniformly for the 3D baselines (n_seeds in results/ctrate_indomain.csv: 5 for the 2D models, 4 for COLIPRI-CRM, 1 for the remaining 3D baselines), while the bootstrap CIs are computed identically for every model.\nDense localization\nLinear probes on spatially-resolved features, predicting ReXGroundingCT finding masks (14 classes) and TotalSegmentator organ coverage (118 classes). Reported as macro AUROC on the held-out scans; see results/dense_probes.csv for AUPRC and probe selection details.\nLabels are computed against each model's own token geometry rather than a shared grid, so every row is spatially aligned by construction: organ coverage is pooled onto the 24³ token grid for volumetric transformers, computed per window for sliding-window encoders, and onto the 2D patch grid for slice encoders. TAP-CT's 2.5D and 3D variants process fixed-depth chunks, so their labels pool over each token's chunk footprint (per-slice 14×14 for 2.5D; four slices by 28×28 for 3D), and Tangerine's cover its 16³ grid over the resampled volume.\nCT-CLIP's near-chance result reflects its tokenizer rather than an alignment error. The token layout was checked against the upstream CTViT implementation, and the pipeline was validated by an axis-permutation diagnostic on COLIPRI, for which the assumed layout correlates with anatomy at 0.458 against 0.329 or below for every alternative ordering.\nPretraining data and domain status\nWhether an evaluation is in-domain depends on what each encoder was pretrained on, so the benchmark records provenance per model rather than labeling the splits globally. Several encoders were pretrained on the CT-RATE training split itself; for those, ctrate_mil and dense_probe are in-domain evaluations, and for Tangerine in particular the probe-training volumes were seen during pretraining (the evaluation volumes come from the held-out validation pool). No model in the benchmark saw RAD-ChestCT during pretraining, which makes rad_transfer a clean external test across the board.\nSources: each model's paper or model card; McConnell et al. state the CT-RATE train/validation handling for Tangerine explicitly, and the Curia-2 report states its pretraining set is shared with Curia.\nModel coverage\nEncoders expose different structure, and the benchmark records what each one supports rather than leaving results blank.\nMerlin returns one pooled embedding per volume with no token grid, so dense probing is not defined for it. Volumetric encoders have no per-slice summary token, so the slice-level probe applies only to slice-based models.\nInstallation\nFilesystem locations are set through environment variables, each with a local default:\nUsage\nEvaluation is separated at the embedding boundary, so each encoder is run once and probes are run as often as needed.\nDense evaluation runs on the 414 ReXGroundingCT-annotated validation scans and needs its ground truth generated once, then per-model embeddings, then probes:\nVolume-level protocol: a grid over six learning rates and three pooling schemes (average, maximum, learned attention), a linear layer over the label set, probe selection by validation AUPRC, per-class F1-maximizing thresholds fit on the validation split, and 2,000-resample bootstrap confidence intervals. Resample indices are fixed per task and shared across models, so paired comparisons remain valid.\nDense protocol: a linear layer on frozen tokens, trained for 15,000 steps with SGD, learning rate selected from a four-point grid by validation AUPRC.\nTesting\ntests/smoke_synthetic.py runs the volume-level chain (select, variance, frozen …"
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "EvanDamron",
+     "url": "https://github.com/EvanDamron",
+     "contributions": 4
+    }
+   ]
+  },
+  {
+   "name": "CLASSify-Connect",
+   "fullName": "Kentucky-Open-Science/CLASSify-Connect",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/CLASSify-Connect",
+   "description": "",
+   "homepage": "",
+   "topics": [
+    "kentucky-open-science",
+    "medical-imaging",
+    "redcap",
+    "redcap-external-module",
+    "redcap-repo"
+   ],
+   "language": "PHP",
+   "languages": [
+    {
+     "name": "PHP",
+     "percent": 96.5
+    },
+    {
+     "name": "JavaScript",
+     "percent": 3.5
+    }
+   ],
+   "license": {
+    "spdx": "MIT",
+    "name": "MIT License"
+   },
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "master",
+   "createdAt": "2024-09-26T14:06:13Z",
+   "pushedAt": "2025-08-21T16:59:35Z",
+   "sizeKb": 5483,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/CLASSify-Connect#readme",
+    "summary": [
+     "CLASSify is a self-service machine learning platform developed by Aaron Mullen for the Center for Applied Artificial Intelligence located at the University of Kentucky. The platform supports numerous state-of-the-art machine learning models, synthetic data generation and balancing, and more.",
+     "CLASSifyConnect is an external module developed for REDCap projects which allows a user to directly submit REDCap form data to the CLASSify application without needing to manually download data. A new page is added to each project with the module enabled which allows the user to see their current uploaded jobs, as well as submit new jobs.",
+     "Once this step has been completed, you'll be directed over to the CLASSify site where you can finish configuring by selecting which models you want to run and which additional features you would like to use."
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "Overview",
+      "anchor": "overview"
+     },
+     {
+      "level": 3,
+      "text": "What is CLASSify?",
+      "anchor": "what-is-classify"
+     },
+     {
+      "level": 3,
+      "text": "What is CLASSifyConnect?",
+      "anchor": "what-is-classifyconnect"
+     },
+     {
+      "level": 3,
+      "text": "Getting Access to CLASSify",
+      "anchor": "getting-access-to-classify"
+     },
+     {
+      "level": 3,
+      "text": "How does it work?",
+      "anchor": "how-does-it-work"
+     },
+     {
+      "level": 2,
+      "text": "Setting Up CLASSifyConnect",
+      "anchor": "setting-up-classifyconnect"
+     },
+     {
+      "level": 2,
+      "text": "Contact",
+      "anchor": "contact"
+     }
+    ],
+    "text": "Overview\nWhat is CLASSify?\nCLASSify is a self-service machine learning platform developed by Aaron Mullen for the Center for Applied Artificial Intelligence located at the University of Kentucky. The platform supports numerous state-of-the-art machine learning models, synthetic data generation and balancing, and more.\nWhat is CLASSifyConnect?\nCLASSifyConnect is an external module developed for REDCap projects which allows a user to directly submit REDCap form data to the CLASSify application without needing to manually download data. A new page is added to each project with the module enabled which allows the user to see their current uploaded jobs, as well as submit new jobs.\nGetting Access to CLASSify\nIn order to use this module, you will need to first be given access to the CLASSify machine learning platform. This is currently done on an application basis. Applications are filed using the CAAI Collaboration Intake Form. Make sure to adequately describe your project and intent as resources are alotted carefully.\nHow does it work?\nVisiting the new page on the left-hand side of your REDCap project view, you will see two large buttons and a data table. Simply select the + button labelled Upload REDCap Forms(s). Here you can select which of your forms you would like to concatenate into a single large CSV type data source which can be sent to CLASSify.\nOnce those have been selected and a filename has been entered, you will see a list of data columns from your project, as well as a dropdown for selecting your classifier column. Check the data types to ensure that they were automatically detected as the appropriate field. Uncheck any fields you don't want to include in your upload, including fields that may introduce faulty bias, like record identifier fields. The default record_id field of REDCap is automatically removed for your convenience.\nOnce this step has been completed, you'll be directed over to the CLASSify site where you can finish configuring by selecting which models you want to run and which additional features you would like to use.\nSetting Up CLASSifyConnect\nFirstly, as with all external modules, your REDCap administrator must approve of and install the module into your REDCap instance. Additionally, it will need to be enabled on your individual project by a project administrator. The steps for enabling modules are documented here:\nOnce this step has been completed, you will need to configure elements of the External Module settings in order to appropriately make connections to the CLASSify API. This requires an API key acquired from the account page of CLASSify once you have been allowed access. This key is then used for ALL requests made in your project. Do not share this key with anyone you are not comfortable making requests on your behalf.\nOnce you have your API key, you may go to the External Modules tab on the left-hand side of REDCap and select Manage. Provided that you have enabled the module, you can then input your API key in the approved field, and save your configuration. Now the module is ready for work.\nContact\nIssues can be reported ideally by pull request on this project's Github Page or additionally I can be reached by email."
+   },
+   "release": {
+    "name": "CLASSifyConnect_v1.0.1",
+    "tag": "1.0.1",
+    "url": "https://github.com/Kentucky-Open-Science/CLASSify-Connect/releases/tag/1.0.1",
+    "publishedAt": "2025-08-21T16:21:16Z"
+   },
+   "contributors": [
+    {
+     "login": "NCPE227",
+     "url": "https://github.com/NCPE227",
+     "contributions": 62
+    }
+   ]
+  },
+  {
+   "name": "DALE-CT",
+   "fullName": "Kentucky-Open-Science/DALE-CT",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/DALE-CT",
+   "description": "",
+   "homepage": "",
+   "topics": [
+    "kentucky-open-science",
+    "medical-imaging"
+   ],
+   "language": "Python",
+   "languages": [
+    {
+     "name": "Python",
+     "percent": 99.3
+    },
+    {
+     "name": "Dockerfile",
+     "percent": 0.7
+    }
+   ],
+   "license": {
+    "spdx": "Apache-2.0",
+    "name": "Apache License 2.0"
+   },
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2026-05-08T00:50:38Z",
+   "pushedAt": "2026-08-26T19:37:19Z",
+   "sizeKb": 468,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/DALE-CT#readme",
+    "summary": [
+     "Training code and model release for DALE-CT (Depth-Aware Latent-Euclidean Computed Tomography) — a family of 2D slice-based Vision Transformers trained entirely from scratch on chest CT with the heuristics-free LeJEPA objective and depth-aware slab sampling: self-supervised views are drawn from across a physical z-axis slab rather than a single slice, so the frozen representations form an anatomical world model — they linearly decode volumetric slice position (R^2 ≈ 0.97), recover slice ordering without labels, and localize organs and findings, despite no 3D or positional supervision.",
+     "Paper: DALE-CT: Depth-Aware 2D Slice Encoders Learn an Anatomical World Model of Chest CT · Benchmark: chest-ct-foundation-model-benchmark — the single-protocol evaluation harness, patient-disjoint splits, and full result tables for every model in the paper"
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "Released models",
+      "anchor": "released-models"
+     },
+     {
+      "level": 2,
+      "text": "Repository map",
+      "anchor": "repository-map"
+     },
+     {
+      "level": 2,
+      "text": "Citation",
+      "anchor": "citation"
+     },
+     {
+      "level": 2,
+      "text": "License",
+      "anchor": "license"
+     }
+    ],
+    "text": "Training code and model release for DALE-CT (Depth-Aware Latent-Euclidean Computed Tomography) — a family of 2D slice-based Vision Transformers trained entirely from scratch on chest CT with the heuristics-free LeJEPA objective and depth-aware slab sampling: self-supervised views are drawn from across a physical z-axis slab rather than a single slice, so the frozen representations form an anatomical world model — they linearly decode volumetric slice position (R^2 ≈ 0.97), recover slice ordering without labels, and localize organs and findings, despite no 3D or positional supervision.\nPaper: DALE-CT: Depth-Aware 2D Slice Encoders Learn an Anatomical World Model of Chest CT · Benchmark: chest-ct-foundation-model-benchmark — the single-protocol evaluation harness, patient-disjoint splits, and full result tables for every model in the paper\nReleased models\nAll weights are on the Hugging Face Hub (CC-BY-NC-SA-4.0); the DALE-CT variants load in one line via timm (Finetuned DINOv2 is a transformers model — see its card):\nThe earlier DALE-CT-1S release (patch-14, [CLS]-only anatomical supervision) remains available as the backbone used by Ker-VLJEPA-3B; DALE-CT-1S-v2 is the configuration benchmarked in the paper.\nAll numbers are our own head-to-head measurements: every model in the paper (including public 3D baselines COLIPRI-CRM, Merlin, CT-FM, CT-CLIP) is probed under one linear-probing MIL protocol on shared splits with bootstrap confidence intervals. The protocol, splits, and result tables are maintained in the chest-ct-foundation-model-benchmark repository. Each model card documents the exact Hounsfield-Unit preprocessing its backbone expects — DALE-CT-0-L uses different normalization statistics than the CT-RATE-trained variants.\nRepository map\nThe evaluation harness above is kept as released with the paper; the maintained, self-contained version — including the protocol documentation — is the chest-ct-foundation-model-benchmark repository.\nDataset preparation (CT-RATE → WebDataset shards, TotalSegmentator masks) lives in a separate preprocessing pipeline that is not yet public.\nPaths in configs refer to our cluster layout; point them at your own data roots. Raw datasets and checkpoints are never stored in this repository.\nCitation\nLicense\nCode is released under Apache-2.0; model weights on the Hugging Face Hub are CC-BY-NC-SA-4.0."
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "EvanDamron",
+     "url": "https://github.com/EvanDamron",
+     "contributions": 18
+    }
+   ]
+  },
+  {
+   "name": "dinov2-I16",
+   "fullName": "Kentucky-Open-Science/dinov2-I16",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/dinov2-I16",
+   "description": "Patch for DinoV2 training code to support PyTorch 2.4",
+   "homepage": "",
+   "topics": [],
+   "language": "Jupyter Notebook",
+   "languages": [
+    {
+     "name": "Jupyter Notebook",
+     "percent": 65.6
+    },
+    {
+     "name": "Python",
+     "percent": 34.3
+    },
+    {
+     "name": "Shell",
+     "percent": 0.2
+    }
+   ],
+   "license": {
+    "spdx": "Apache-2.0",
+    "name": "Apache License 2.0"
+   },
+   "stars": 1,
+   "forks": 1,
+   "openIssues": 4,
+   "hasIssues": false,
+   "archived": false,
+   "fork": true,
+   "isTemplate": false,
+   "parent": {
+    "fullName": "zinccat/dinov2-patch",
+    "url": "https://github.com/zinccat/dinov2-patch",
+    "description": "Patch for DinoV2 training code to support PyTorch 2.4"
+   },
+   "defaultBranch": "main",
+   "createdAt": "2024-09-03T13:33:55Z",
+   "pushedAt": "2026-03-12T19:25:54Z",
+   "sizeKb": 1135,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/dinov2-I16#readme",
+    "summary": [
+     "This is a patch for the original repository to make it work with the latest version of PyTorch (>2.1).",
+     "Install the dependencies using the following command:",
+     "Then run the following command to install the package:",
+     "Then add the training images to data/train.",
+     "You can now start the training using torchrun instead of submitit. The following command will start the training on 2 GPUs:",
+     "Thanks a lot to https://github.com/csaroff/dinov2 for an example of custom dataset.",
+     ":new: [2023-10-26] Added DINOv2 backbones with registers, following Vision Transformers Need Registers.",
+     "Maxime Oquab, Timothée Darcet, Théo Moutakanni, Huy V. Vo, Marc Szafraniec, Vasil Khalidov, Patrick Labatut, Armand Joulin, Piotr Bojanowski",
+     "[Paper #1] Paper #2] [Blog] [Demo] [BibTeX]",
+     "https://github.com/facebookresearch/dinov2/assets/60359573/f168823e-7922-415a-b429-578badf5c356",
+     "A corresponding model card is included in the repository."
+    ],
+    "headings": [
+     {
+      "level": 1,
+      "text": "DINOv2: Learning Robust Visual Features without Supervision",
+      "anchor": "dinov2-learning-robust-visual-features-without-supervision"
+     },
+     {
+      "level": 2,
+      "text": "Pretrained models",
+      "anchor": "pretrained-models"
+     },
+     {
+      "level": 3,
+      "text": "Pretrained backbones (via PyTorch Hub)",
+      "anchor": "pretrained-backbones-via-pytorch-hub"
+     },
+     {
+      "level": 3,
+      "text": "Pretrained heads - Image classification",
+      "anchor": "pretrained-heads---image-classification"
+     },
+     {
+      "level": 3,
+      "text": "Pretrained heads - Depth estimation",
+      "anchor": "pretrained-heads---depth-estimation"
+     },
+     {
+      "level": 3,
+      "text": "Pretrained heads - Semantic segmentation",
+      "anchor": "pretrained-heads---semantic-segmentation"
+     },
+     {
+      "level": 2,
+      "text": "Installation",
+      "anchor": "installation"
+     },
+     {
+      "level": 2,
+      "text": "Data preparation",
+      "anchor": "data-preparation"
+     },
+     {
+      "level": 3,
+      "text": "ImageNet-1k",
+      "anchor": "imagenet-1k"
+     },
+     {
+      "level": 3,
+      "text": "ImageNet-22k",
+      "anchor": "imagenet-22k"
+     },
+     {
+      "level": 2,
+      "text": "Training",
+      "anchor": "training"
+     },
+     {
+      "level": 3,
+      "text": "Fast setup: training DINOv2 ViT-L/16 on ImageNet-1k",
+      "anchor": "fast-setup-training-dinov2-vit-l16-on-imagenet-1k"
+     },
+     {
+      "level": 3,
+      "text": "Long setup: training DINOv2 ViT-L/14 on ImageNet-22k",
+      "anchor": "long-setup-training-dinov2-vit-l14-on-imagenet-22k"
+     },
+     {
+      "level": 2,
+      "text": "Evaluation",
+      "anchor": "evaluation"
+     },
+     {
+      "level": 3,
+      "text": "k-NN classification on ImageNet-1k",
+      "anchor": "k-nn-classification-on-imagenet-1k"
+     },
+     {
+      "level": 3,
+      "text": "Logistic regression classification on ImageNet-1k",
+      "anchor": "logistic-regression-classification-on-imagenet-1k"
+     },
+     {
+      "level": 3,
+      "text": "Linear classification with data augmentation on ImageNet-1k",
+      "anchor": "linear-classification-with-data-augmentation-on-imagenet-1k"
+     },
+     {
+      "level": 2,
+      "text": "Notebooks",
+      "anchor": "notebooks"
+     },
+     {
+      "level": 2,
+      "text": "License",
+      "anchor": "license"
+     },
+     {
+      "level": 2,
+      "text": "Contributing",
+      "anchor": "contributing"
+     },
+     {
+      "level": 2,
+      "text": "Citing DINOv2",
+      "anchor": "citing-dinov2"
+     }
+    ],
+    "text": "This is a patch for the original repository to make it work with the latest version of PyTorch (>2.1).\nInstall the dependencies using the following command:\nThen run the following command to install the package:\nThen add the training images to data/train.\nYou can now start the training using torchrun instead of submitit. The following command will start the training on 2 GPUs:\nThanks a lot to https://github.com/csaroff/dinov2 for an example of custom dataset.\n:new: [2023-10-26] Added DINOv2 backbones with registers, following Vision Transformers Need Registers.\nDINOv2: Learning Robust Visual Features without Supervision\nMeta AI Research, FAIR\nMaxime Oquab, Timothée Darcet, Théo Moutakanni, Huy V. Vo, Marc Szafraniec, Vasil Khalidov, Patrick Labatut, Armand Joulin, Piotr Bojanowski\n[Paper #1] Paper #2] [Blog] [Demo] [BibTeX]\nPyTorch implementation and pretrained models for DINOv2. For details, see the papers: DINOv2: Learning Robust Visual Features without Supervision and Vision Transformers Need Registers.\nDINOv2 models produce high-performance visual features that can be directly employed with classifiers as simple as linear layers on a variety of computer vision tasks; these visual features are robust and perform well across domains without any requirement for fine-tuning. The models were pretrained on a dataset of 142 M images without using any labels or annotations.\nhttps://github.com/facebookresearch/dinov2/assets/60359573/f168823e-7922-415a-b429-578badf5c356\nVisualization of the three first principal components of the patch features of all frames, mapped to RGB values.\nPretrained models\nmodel # ofparams withregisters ImageNetk-NN ImageNetlinear download ViT-S/14 distilled 21 M :x: 79.0% 81.1% backbone only ViT-S/14 distilled 21 M :white_check_mark: 79.1% 80.9% backbone only ViT-B/14 distilled 86 M :x: 82.1% 84.5% backbone only ViT-B/14 distilled 86 M :white_check_mark: 82.0% 84.6% backbone only ViT-L/14 distilled 300 M :x: 83.5% 86.3% backbone only ViT-L/14 distilled 300 M :white_check_mark: 83.8% 86.7% backbone only ViT-g/14 1,100 M :x: 83.5% 86.5% backbone only ViT-g/14 1,100 M :white_check_mark: 83.7% 87.1% backbone only\nPretrained backbones (via PyTorch Hub)\nPlease follow the instructions here to install PyTorch (the only required dependency for loading the model). Installing PyTorch with CUDA support is strongly recommended.\nA corresponding model card is included in the repository.\nPretrained heads - Image classification\nbackbone withregisters download ImageNet ViT-S/14 distilled :x: linear head (1 layer, 4 layers) ViT-S/14 distilled :white_check_mark: linear head (1 layer, 4 layers) ViT-B/14 distilled :x: linear head (1 layer, 4 layers) ViT-B/14 distilled :white_check_mark: linear head (1 layer, 4 layers) ViT-L/14 distilled :x: linear head (1 layer, 4 layers) ViT-L/14 distilled :white_check_mark: linear head (1 layer, 4 layers) ViT-g/14 :x: linear head (1 layer, 4 layers) ViT-g/14 :white_check_mark: linear head (1 layer, 4 layers)\nThe (full) classifier models can be loaded via PyTorch Hub:\nPretrained heads - Depth estimation\nbackbone download head NYUd KITTI ViT-S/14 distilled linear (1 layer, 4 layers), DPT linear (1 layer, 4 layers), DPT ViT-B/14 distilled linear (1 layer, 4 layers), DPT linear (1 layer, 4 layers), DPT ViT-L/14 distilled linear (1 layer, 4 layers), DPT linear (1 layer, 4 layers), DPT ViT-g/14 linear (1 layer, 4 layers), DPT linear (1 layer, 4 layers), DPT\nPretrained heads - Semantic segmentation\nbackbone download model download head ADE20K ADE20K VOC2012 ViT-S/14 distilled linear, multi-scale linear, multi-scale ViT-B/14 distilled linear, multi-scale linear, multi-scale ViT-L/14 distilled linear, multi-scale linear, multi-scale ViT-g/14 Mask2Former linear, multi-scale linear, multi-scale\nInstallation\nThe training and evaluation code requires PyTorch 2.0 and xFormers 0.0.18 as well as a number of other 3rd party packages. Note that the code has only been tested with the specified versions and also expects a Linux environment. To setup all the required dependencies for training and evaluation, please follow the instructions below:\nconda (Recommended) - Clone the repository and then create and activate a dinov2 conda environment using the provided environment definition:\npip - Clone the repository and then use the provided requirements.txt to install the dependencies:\nFor dense tasks (depth estimation and semantic segmentation), there are additional dependencies (specific versions of mmcv and mmsegmentation) which are captured in the extras dependency specifications:\nconda (Recommended):\npip:\nData preparation\nImageNet-1k\nThe root directory of the dataset should hold the following contents:\n• /test/ILSVRC2012_test_00000001.JPEG • /test/[..] • /test/ILSVRC2012_test_00100000.JPEG • /train/n01440764/n01440764_10026.JPEG • /train/[...] • /train/n15075141/n15075141_9993.JPEG • /val/n01440764/ILSVRC2012_val_00000293.JPEG • /val/[...] • /val/n15075141/ILSVRC2012_val_00049174.JPEG • /labels.txt\nThe provided dataset implementation expects a few additional metadata files to be present under the extra directory:\n• /class-ids-TRAIN.npy • /class-ids-VAL.npy • /class-names-TRAIN.npy • /class-names-VAL.npy • /entries-TEST.npy • /entries-TRAIN.npy • /entries-VAL.npy\nThese metadata files can be generated (once) with the following lines of Python code:\nNote that the root and extra directories do not have to be distinct directories.\nImageNet-22k\nPlease adapt the dataset class to match your local setup.\n:warning: To execute the commands provided in the next sections for training and evaluation, the dinov2 package should be included in the Python module search path, i.e. simply prefix the command to run with PYTHONPATH=..\nTraining\nFast setup: training DINOv2 ViT-L/16 on ImageNet-1k\nRun DINOv2 training on 4 A100-80GB nodes (32 GPUs) in a SLURM cluster environment with submitit:\nTraining time is approximately 1 day and the resulting checkpoint should reach 81.6% on k-NN eval and 82.9% on linear eval.\nThe training code saves the weights of the teacher in the eval folder every 12500 iterations for evaluation.\nLong setup: training DINOv2 ViT-L/14 on ImageNet-22k\nRun DINOv2 training on 12 A100-80GB nodes (96 GPUs) in a SLURM cluster environment with submitit:\nTraining time is approximately 3.3 days and the resulting checkpoint should reach 82.0% on k-NN eval and 84.5% on linear eval.\nThe training code saves the weights of the teacher in the eval folder every 12500 iterations for evaluation.\nEvaluation\nThe training code regularly saves the teacher weights. In order to evaluate the model, run the following evaluation on a single node:\nk-NN classification on ImageNet-1k\nLogistic regression classification on ImageNet-1k\nLinear classification with data augmentation on ImageNet-1k\nWe release the weights from evaluating the different models:\nmodel withregisters ImageNettop-1 linear evaluation ViT-S/14 distilled :x: 81.1% linear head weights ViT-S/14 distilled :white_check_mark: 80.8% linear head weights ViT-B/14 distilled :x: 84.5% linear head weights ViT-B/14 distilled :white_check_mark: 84.4% linear head weights ViT-L/14 distilled :x: 86.3% linear head weights ViT-L/14 distilled :white_check_mark: 86.5% linear head weights ViT-g/14 :x: 86.5% linear head weights ViT-g/14 :white_check_mark: 87.0% linear head weights\nThe performance of the provided pretrained model weights can be evaluated as follows on ImageNet-1k:\nNotebooks\nA few notebooks are provided to help the community leverage the models and code:\nDepth estimation - How to load and use the depth heads in combination with a matching backbone via mmcv Semantic segmentation - How to load and use the segmentation heads in combination with a matching backbone via mmcv, and also how to load and use the Mask2Former-based segmentation model trained on ADE20K\nLicense\nDINOv2 code and model weights are released under the Apache License 2.0. See LICENSE for additional details.\nContributing\nSee contributing …"
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "codybum",
+     "url": "https://github.com/codybum",
+     "contributions": 196
+    },
+    {
+     "login": "patricklabatut",
+     "url": "https://github.com/patricklabatut",
+     "contributions": 27
+    },
+    {
+     "login": "zinccat",
+     "url": "https://github.com/zinccat",
+     "contributions": 5
+    },
+    {
+     "login": "qasfb",
+     "url": "https://github.com/qasfb",
+     "contributions": 3
+    },
+    {
+     "login": "leo-gan",
+     "url": "https://github.com/leo-gan",
+     "contributions": 2
+    },
+    {
+     "login": "goggle",
+     "url": "https://github.com/goggle",
+     "contributions": 1
+    },
+    {
+     "login": "Aryanutkarsh",
+     "url": "https://github.com/Aryanutkarsh",
+     "contributions": 1
+    }
+   ]
+  },
+  {
+   "name": "ECG_Predictor",
+   "fullName": "Kentucky-Open-Science/ECG_Predictor",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/ECG_Predictor",
+   "description": "Predict them beats",
+   "homepage": "",
+   "topics": [
+    "ecg",
+    "kentucky-open-science",
+    "medical-imaging"
+   ],
+   "language": "Python",
+   "languages": [
+    {
+     "name": "Python",
+     "percent": 100
+    }
+   ],
+   "license": null,
+   "stars": 1,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": false,
+   "archived": true,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2022-05-24T15:10:10Z",
+   "pushedAt": "2025-09-22T19:22:27Z",
+   "sizeKb": 38697,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/ECG_Predictor#readme",
+    "summary": [],
+    "headings": [
+     {
+      "level": 3,
+      "text": "Usage",
+      "anchor": "usage"
+     }
+    ],
+    "text": "Usage\n• Download the ECG5000 dataset and place it into datasets/ECG5000/!files! wget http://www.timeseriesclassification.com/Downloads/ECG5000.zip unzip ECG5000.zip • pip install -r requirements.txt • run training/testing script (ex: python ./1/train_1_ECG5000.py)"
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "armstrongsam25",
+     "url": "https://github.com/armstrongsam25",
+     "contributions": 19
+    },
+    {
+     "login": "snyk-bot",
+     "url": "https://github.com/snyk-bot",
+     "contributions": 1
+    }
+   ]
+  },
+  {
+   "name": "FlightTracker-Publication-Validator",
+   "fullName": "Kentucky-Open-Science/FlightTracker-Publication-Validator",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/FlightTracker-Publication-Validator",
+   "description": "",
+   "homepage": "",
+   "topics": [
+    "aviation",
+    "kentucky-open-science",
+    "redcap",
+    "redcap-external-module",
+    "redcap-repo"
+   ],
+   "language": "PHP",
+   "languages": [
+    {
+     "name": "PHP",
+     "percent": 55.5
+    },
+    {
+     "name": "JavaScript",
+     "percent": 33.5
+    },
+    {
+     "name": "CSS",
+     "percent": 11
+    }
+   ],
+   "license": {
+    "spdx": "MIT",
+    "name": "MIT License"
+   },
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2024-10-25T15:21:28Z",
+   "pushedAt": "2026-08-21T14:07:17Z",
+   "sizeKb": 153,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/FlightTracker-Publication-Validator#readme",
+    "summary": [
+     "Once the module is enabled for a project, make sure to select Manage on the left-hand control panel for the project in the External Modules tab. Then select Configure for Flight Tracker Publication Validator - vx.x.x to begin the configuration process as follows.",
+     "Now with these steps enabled, a user should be able to access the survey and select which of their publications were made possible given a service request.",
+     "The Validator uses pre-filled form values and API linked projects to populate data dynamically for the end-user. The survey is intercepted using built-in hooks to provide customized options for each user based on their publications in Flight Tracker repositories. This was done with specific formatting in mind based on University of Kentucky's use case. Future additions are intended to make working with this module easier for other institutions."
+    ],
+    "headings": [
+     {
+      "level": 1,
+      "text": "Configuration",
+      "anchor": "configuration"
+     },
+     {
+      "level": 1,
+      "text": "How Does It Work?",
+      "anchor": "how-does-it-work"
+     },
+     {
+      "level": 1,
+      "text": "Reasoning Behind Survey Formatting",
+      "anchor": "reasoning-behind-survey-formatting"
+     },
+     {
+      "level": 1,
+      "text": "Contact",
+      "anchor": "contact"
+     },
+     {
+      "level": 1,
+      "text": "Future Content",
+      "anchor": "future-content"
+     }
+    ],
+    "text": "• Rename the folder to include a version number (for example: _v1.0.0) if it does not already have a version or it will not be recognized by REDCap.\nConfiguration\nOnce the module is enabled for a project, make sure to select Manage on the left-hand control panel for the project in the External Modules tab. Then select Configure for Flight Tracker Publication Validator - vx.x.x to begin the configuration process as follows.\n• Input the instrument name for the validation form. The project will otherwise assume the form is titled \"pub_validation\". • Add an API key for a cohort of Flight Tracker data. These cohorts were generated by University of Kentucky CCTS and are publications of users who made Service Requests to CCTS in that year. • Repeat step 2 for as many cohorts as you require. • Save the configuration\nNow with these steps enabled, a user should be able to access the survey and select which of their publications were made possible given a service request.\nHow Does It Work?\nThe Validator uses pre-filled form values and API linked projects to populate data dynamically for the end-user. The survey is intercepted using built-in hooks to provide customized options for each user based on their publications in Flight Tracker repositories. This was done with specific formatting in mind based on University of Kentucky's use case. Future additions are intended to make working with this module easier for other institutions.\nThe Services form all the fields to follow a similar format to what is provided. In place of 'year1' you could instead use the numerical year (say, 2019) and the project will know how to handle it. The UK ID field is named \"linkblue\", for other institutions using a different name for an identifier, you should change this field both in the code and in the form.\nCurrently, there are two surveys with specific formatting. These are included in the templates folder. These can be expanded to include additional years and doing so should not affect functionality. The Pub Validation form will require text box fields with the field name supported_pubs_xxxx where 'xxxx' would be publication year. Any other field in this form is suitable for change.\nWith these two forms in place, when a user moves to complete the Pub Validation form, they will be presented with a loading screen while API linked projects are queried for publications for the given user. These are then built into multiple choice panes for the researcher to select publications from. When the form is completed, these values are saved in a tab separated format so that they are easily processed for export via a custom CSV export view. This is accessible on the lefthand side of the project interface under External Modules on a page titled Custom CSV Export.\nReasoning Behind Survey Formatting\nThe hidden fields are used to convey data in a way that is easier to access and process when rewriting aspects of the page and collecting necessary data for display.\nThe hidden linkblue field is there for matching users to their data as all the data from the flighttracker databases need to be pulled and then matched. I am working out if I can just get 1 user's data to make it more lean.\nThe hidden years are there for me to have an easy way to collect which years I'm working with to filter only publications which occurred after that point and ones which have not yet been chosen.\nThe fields to hold data are formatted as paragraph boxes rather than multiple choice. This is due to the nature of how multiple choice is treated in redcap. Javascript is used to give the appearance of multiple choice input, but it is then loaded as an array of the citations selected into the paragraph box for easy usage later.\nContact\nIf you encounter issues or have feature requests, you can reach out to me by email or open a pull request on the project's github page.\nFuture Content\n• Additional configuration steps allowing for easier use by other institutions. •"
+   },
+   "release": {
+    "name": "FlightTrackerPublicationValidator_v1.0.0",
+    "tag": "1.0.0",
+    "url": "https://github.com/Kentucky-Open-Science/FlightTracker-Publication-Validator/releases/tag/1.0.0",
+    "publishedAt": "2026-04-03T17:09:59Z"
+   },
+   "contributors": [
+    {
+     "login": "NCPE227",
+     "url": "https://github.com/NCPE227",
+     "contributions": 35
+    }
+   ]
+  },
+  {
+   "name": "kentucky-open-science.github.io",
+   "fullName": "Kentucky-Open-Science/kentucky-open-science.github.io",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io",
+   "description": "Web",
+   "homepage": "",
+   "topics": [
+    "kentucky-open-science"
+   ],
+   "language": "HTML",
+   "languages": [
+    {
+     "name": "HTML",
+     "percent": 80.9
+    },
+    {
+     "name": "CSS",
+     "percent": 19.1
+    }
+   ],
+   "license": null,
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2026-04-29T13:40:31Z",
+   "pushedAt": "2026-05-01T18:47:24Z",
+   "sizeKb": 16,
+   "readme": null,
+   "release": null,
+   "contributors": [
+    {
+     "login": "armstrongsam25",
+     "url": "https://github.com/armstrongsam25",
+     "contributions": 1
+    },
+    {
+     "login": "codybum",
+     "url": "https://github.com/codybum",
+     "contributions": 1
+    }
+   ]
+  },
+  {
+   "name": "kySTATS",
+   "fullName": "Kentucky-Open-Science/kySTATS",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/kySTATS",
+   "description": "",
+   "homepage": "",
+   "topics": [
+    "kentucky-open-science"
+   ],
+   "language": "Python",
+   "languages": [
+    {
+     "name": "Python",
+     "percent": 100
+    }
+   ],
+   "license": null,
+   "stars": 1,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "master",
+   "createdAt": "2024-05-17T13:34:42Z",
+   "pushedAt": "2024-05-22T13:21:07Z",
+   "sizeKb": 78,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/kySTATS#readme",
+    "summary": [],
+    "headings": [
+     {
+      "level": 2,
+      "text": "Task 1: Single File",
+      "anchor": "task-1-single-file"
+     },
+     {
+      "level": 1,
+      "text": "Example Code",
+      "anchor": "example-code"
+     },
+     {
+      "level": 2,
+      "text": "Smart Data Frame",
+      "anchor": "smart-data-frame"
+     },
+     {
+      "level": 2,
+      "text": "Smart Data Lake",
+      "anchor": "smart-data-lake"
+     },
+     {
+      "level": 2,
+      "text": "Agent",
+      "anchor": "agent"
+     }
+    ],
+    "text": "Task 1: Single File\nExample Code\nSmart Data Frame\n• desc: This is an example of a smart data frame • file: pandas_ai_sdf.py\n• desc: This is an example of a smart data frame /w KY STATS data • file:pandas_ai_sdf_KY.py\nSmart Data Lake\n• desc: This is an example of a smart data lake • file:pandas_ai_datalake.py\nAgent\n• desc: This is an example of a smart data lake • file:pandas_ai_agent.py\n• desc: This is an example of a smart data lake /w slipstream output • file:pandas_ai_agent_sl.py"
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "codybum",
+     "url": "https://github.com/codybum",
+     "contributions": 7
+    }
+   ]
+  },
+  {
+   "name": "LLM-Wiki-Setup",
+   "fullName": "Kentucky-Open-Science/LLM-Wiki-Setup",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/LLM-Wiki-Setup",
+   "description": "Interview-driven setup kit: an AI agent builds you a provenance-tagged knowledge wiki + layered instruction stack for Claude Code, Codex, and free-claude-code, across any number of machines",
+   "homepage": "",
+   "topics": [],
+   "language": "Python",
+   "languages": [
+    {
+     "name": "Python",
+     "percent": 94
+    },
+    {
+     "name": "Shell",
+     "percent": 6
+    }
+   ],
+   "license": {
+    "spdx": "Apache-2.0",
+    "name": "Apache License 2.0"
+   },
+   "stars": 1,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2026-08-24T15:38:32Z",
+   "pushedAt": "2026-08-26T19:32:05Z",
+   "sizeKb": 93,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/LLM-Wiki-Setup#readme",
+    "summary": [
+     "Give your coding agent a memory and a map.",
+     "This is a setup kit that an AI agent (Claude Code, Codex, or free-claude-code) runs against your machine to build you a personal agentic work system:",
+     "It is built by interview, not template-filling: the agent first scans your machine (read-only, disclosed up front), infers what it can, and asks only what it can't. And it is not domain-locked: the wiki's page-type schema is composed per user from a catalog of types with a mechanism for minting new ones — it fits deep-learning research, product engineering, data work, ops, and long-form writing equally, including all of them at once.",
+     "The agent discloses what it will scan, interviews you in short adaptive waves, proposes a plan, and only then creates anything. Expect 15–40 minutes depending on how much of your existing world you want ingested on day one."
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "The problems this solves",
+      "anchor": "the-problems-this-solves"
+     },
+     {
+      "level": 2,
+      "text": "Quickstart",
+      "anchor": "quickstart"
+     },
+     {
+      "level": 2,
+      "text": "What you end up with",
+      "anchor": "what-you-end-up-with"
+     },
+     {
+      "level": 2,
+      "text": "Supported agents",
+      "anchor": "supported-agents"
+     },
+     {
+      "level": 2,
+      "text": "What it will and won't do",
+      "anchor": "what-it-will-and-wont-do"
+     },
+     {
+      "level": 2,
+      "text": "Agent directive",
+      "anchor": "agent-directive"
+     }
+    ],
+    "text": "Give your coding agent a memory and a map.\nThis is a setup kit that an AI agent (Claude Code, Codex, or free-claude-code) runs against your machine to build you a personal agentic work system:\n• A private knowledge wiki — a git repo of verified, provenance-tagged facts about your projects, machines, data, sources, and collaborators. Your agent consults it before asking you anything, files new facts passively as you work, and never presents a guess as a fact. It is the shared memory between sessions, between machines, and between you and the agent. • A layered instruction stack — global policy → working guidelines → (optionally) per-repo instructions → the wiki's own schema — generated for your tools, your machines, and your kind of work, and kept identical across the harnesses you use. • A sync discipline — GitHub as the hub — that lets any number of machines (a laptop, a GPU box, a shared cluster) share one brain, with guardrails for the machines that need them.\nIt is built by interview, not template-filling: the agent first scans your machine (read-only, disclosed up front), infers what it can, and asks only what it can't. And it is not domain-locked: the wiki's page-type schema is composed per user from a catalog of types with a mechanism for minting new ones — it fits deep-learning research, product engineering, data work, ops, and long-form writing equally, including all of them at once.\nThe problems this solves\nQuickstart\n• Clone this repo anywhere you like. The clone becomes your hub — the place you return to whenever you want to set up, tune, or audit your system. The hub itself is never modified: everything generated lands in your wiki repo and the config locations you approve, so git pull here is always clean. • Open your agent inside the clone: • Claude Code or free-claude-code: run claude • Codex: run codex • Say: \"Set me up.\"\nThe agent discloses what it will scan, interviews you in short adaptive waves, proposes a plan, and only then creates anything. Expect 15–40 minutes depending on how much of your existing world you want ingested on day one.\nAlready have CLAUDE.md files, an AGENTS.md, or a wiki? Setup adopts and merges: it reads what you have, maps it onto the schema, and shows you a diff — your existing rules survive; nothing is overwritten silently. Re-run any time:\n• \"Tune my setup\" — refine anything, from one policy to the whole schema • \"Audit my wiki\" — health check: orphans, missing provenance, config drift • \"Add a machine / repo / collaborator\" — targeted extension flows\nWhat you end up with\nSingle machine works fully on day one. Multi-machine (SSH, remote dispatch, shared-cluster guardrails, secure boxes) is an optional module the interview offers when it sees the evidence.\nSupported agents\nWindows, macOS, and Linux are all supported; shipped tooling is Python 3, standard library only.\nWhat it will and won't do\n• The scan is read-only and disclosed before it happens. Secrets, private keys, .env files, and credential stores are never opened. • Nothing leaves your machine. The only network actions are git/GitHub operations you explicitly approve (e.g. creating your private wiki repo). • Your wiki repo is created private — recommended, and confirmed with you. • This repo is never modified by your setup. All state lives in your wiki. • Nothing runs automatically: no hooks you didn't approve, no CI, no schedulers. Lint and audit run when you invoke them.\nAgent directive\nIf you are an AI agent reading this, you have been asked to set up (or tune, audit, or extend) this user's agentic work system. Proceed as follows:\n• Read CLAUDE.md / AGENTS.md in this directory — the operating contract. Two rules bind every flow: never modify this repository, and all user-specific state goes to the user's wiki repo or the deploy targets they approve — nowhere else. • Check for .wiki-path here. Present ⇒ a setup exists: read /setup/ first. Absent ⇒ first run. • Route the request: • first-time setup, \"set me up\" → flows/setup.md • an existing setup with no recorded baseline → flows/adopt.md • refine an existing setup → flows/tune.md • health check → flows/audit.md • new machine, repo, or collaborator → flows/add.md • Follow the flow exactly. Flows are canonical; skills and slash commands are thin pointers to them. Do not improvise a different procedure."
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "EvanDamron",
+     "url": "https://github.com/EvanDamron",
+     "contributions": 3
+    }
+   ]
+  },
+  {
+   "name": "llmfactory",
+   "fullName": "Kentucky-Open-Science/llmfactory",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/llmfactory",
+   "description": "",
+   "homepage": "",
+   "topics": [
+    "kentucky-open-science",
+    "large-language-models"
+   ],
+   "language": null,
+   "languages": [],
+   "license": null,
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2024-01-31T21:52:56Z",
+   "pushedAt": "2024-01-31T21:52:57Z",
+   "sizeKb": 0,
+   "readme": null,
+   "release": null,
+   "contributors": []
+  },
+  {
+   "name": "native_research_llms",
+   "fullName": "Kentucky-Open-Science/native_research_llms",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/native_research_llms",
+   "description": "Registry of LLMs pretrained from scratch by universities, non-profit research institutes, and national laboratories",
+   "homepage": "",
+   "topics": [
+    "kentucky-open-science",
+    "large-language-models"
+   ],
+   "language": "Ruby",
+   "languages": [
+    {
+     "name": "Ruby",
+     "percent": 100
+    }
+   ],
+   "license": {
+    "spdx": "CC0-1.0",
+    "name": "Creative Commons Zero v1.0 Universal"
+   },
+   "stars": 2,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2026-07-16T13:27:34Z",
+   "pushedAt": "2026-09-22T14:06:56Z",
+   "sizeKb": 174,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/native_research_llms#readme",
+    "summary": [
+     "An index of foundation models trained natively, from scratch, on their own data and tokenizer, by academic and research institutions. Universities come first; research institutes, national labs, and public consortia are tracked alongside.",
+     "Foundation model development is dominated by well-funded commercial labs, and data opacity, licensing constraints, and architectural gatekeeping come with it. In response, universities and other public institutions have pretrained large language models from a tabula rasa state: random weights, own corpus, own tokenizer, auditable end to end.",
+     "Entries marked ⚠ carry a caveat worth reading before you rely on them, usually a restrictive license or a documented access constraint.",
+     "No commercial partner, no corporate-donated compute. University teams on university or public compute. This is the headline ranking."
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "Contents",
+      "anchor": "contents"
+     },
+     {
+      "level": 2,
+      "text": "Rankings",
+      "anchor": "rankings"
+     },
+     {
+      "level": 3,
+      "text": "Academic-only",
+      "anchor": "academic-only"
+     },
+     {
+      "level": 3,
+      "text": "University-led, commercially backed",
+      "anchor": "university-led-commercially-backed"
+     },
+     {
+      "level": 2,
+      "text": "Universities",
+      "anchor": "universities"
+     },
+     {
+      "level": 3,
+      "text": "Fully open and reproducible",
+      "anchor": "fully-open-and-reproducible"
+     },
+     {
+      "level": 3,
+      "text": "Multilingual and regional",
+      "anchor": "multilingual-and-regional"
+     },
+     {
+      "level": 3,
+      "text": "Biomedical and clinical",
+      "anchor": "biomedical-and-clinical"
+     },
+     {
+      "level": 3,
+      "text": "Small and efficient",
+      "anchor": "small-and-efficient"
+     },
+     {
+      "level": 3,
+      "text": "Alternative architectures and objectives",
+      "anchor": "alternative-architectures-and-objectives"
+     },
+     {
+      "level": 2,
+      "text": "Research institutes and national labs",
+      "anchor": "research-institutes-and-national-labs"
+     },
+     {
+      "level": 3,
+      "text": "Fully open and reproducible",
+      "anchor": "fully-open-and-reproducible-1"
+     },
+     {
+      "level": 3,
+      "text": "Multilingual and regional",
+      "anchor": "multilingual-and-regional-1"
+     },
+     {
+      "level": 3,
+      "text": "Small and efficient",
+      "anchor": "small-and-efficient-1"
+     },
+     {
+      "level": 3,
+      "text": "Alternative architectures and objectives",
+      "anchor": "alternative-architectures-and-objectives-1"
+     },
+     {
+      "level": 2,
+      "text": "Public research consortia",
+      "anchor": "public-research-consortia"
+     },
+     {
+      "level": 2,
+      "text": "Related",
+      "anchor": "related"
+     },
+     {
+      "level": 2,
+      "text": "Contributing",
+      "anchor": "contributing"
+     }
+    ],
+    "text": "An index of foundation models trained natively, from scratch, on their own data and tokenizer, by academic and research institutions. Universities come first; research institutes, national labs, and public consortia are tracked alongside.\nFoundation model development is dominated by well-funded commercial labs, and data opacity, licensing constraints, and architectural gatekeeping come with it. In response, universities and other public institutions have pretrained large language models from a tabula rasa state: random weights, own corpus, own tokenizer, auditable end to end.\nAcademic means a university. This list puts universities first, because that is the question worth asking: which universities have actually built a foundation model end to end? Non-profit research institutes, national laboratories, government institutes, and think tanks (Ai2, EleutherAI, BAAI, TII, NII, and the like) do serious from-scratch work and are tracked here, but in a separate section below, because they are not universities.\nThe from-scratch rule is strict: continued pretraining on a commercial base does not qualify, however substantial the training that follows. Reusing an architecture is fine; inheriting weights is not. A verified entry also has openly downloadable weights and roughly 1B+ parameters. A commercial co-developer does not move a university off the first list; the partner is noted inline. See the inclusion criteria, the architectures and corpora specifications, and the unverified candidates that miss a bar.\nEntries marked ⚠ carry a caveat worth reading before you rely on them, usually a restrictive license or a documented access constraint.\nContents\n• Rankings • Universities • Research institutes and national labs • Public research consortia • Related\nRankings\nThe headline metric is IFEval strict-avg (instruction-following accuracy, the Open LLM Leaderboard's \"IFEval\" column), measured against the original-ChatGPT line, GPT-3.5-turbo-1106 = 55.9. It asks one question: has a from-scratch university model reached what made ChatGPT usable?\nAcademic-only\nNo commercial partner, no corporate-donated compute. University teams on university or public compute. This is the headline ranking.\nThree academic-only models clear the original-ChatGPT line: KOS-V5-Instruct (72.2), KOS-V4-Instruct (61.6), and YuLan-Mini (61.5) — KOS-V5-Instruct clears the line by 16.3 points on 235B tokens; KOS-V4-Instruct and YuLan-Mini remain separated by 0.1 points, well inside the benchmark's ±2.1-point standard error on 541 prompts, so they are statistically tied. KOS-V5-Instruct post-trains with two GRPO legs against the official IFEval and BFCL checkers. Minerva is academic-only but state-resourced (Italy's PNRR/FAIR programme, CINECA).\nUniversity-led, commercially backed\nSame from-scratch rule, but a commercial partner supplied compute or engineering. Separated because a donated industrial training budget is not a resource a university lab can match, and ranking the two together measures sponsorship as much as method.\nMarin reaches 70.8 on 12.7T tokens — 71x KOS-V4-Instruct's 180B — with TPUs provided by Google. Jais 2 leads the table on 2.6T with Inception. KOS-V5-Instruct's 72.2 clears both on 235B tokens — 54x less data than Marin, 11x less than Jais 2. These are strong results and belong on this site; they are not a like-for-like comparison with a lab running its own GPU cluster.\nIFEval strict-avg and MMLU (5-shot accuracy), as percentages; 8 of these we measured on a common pristine harness on 2026-07-18. Five university models clear the original-ChatGPT line: Jais 2 (74.9), KOS-V5-Instruct (72.2), Marin (70.8), KOS-V4-Instruct (61.6), and YuLan-Mini (61.5). The two benchmarks rank the set almost independently: KOS-V5-Instruct follows instructions well (2nd) at a 45.1 MMLU, while KOS-V4 sits near the MMLU chance floor by design (it is an instruction model, not a knowledge model), and Poro-34B is the largest model here yet mid-pack on instructions. Multilingual models (Poro, Minerva, Croissant, Tucano, LLäMmlein) are measured on English and understate their designed capability. (Apertus 75.2 and SmallThinker 85.8 report IFEval in loose or unlabeled formats that are not strict-avg, so they are off the line; * = Poro MMLU pending.)\nThe full tables (research institutes, a GPT-3.5-generation reference set, MMLU, format caveats, and the complete needs-eval list) are on the rankings page.\nUniversities\nThe academic list. Led by a university; a commercial co-developer is noted inline but does not disqualify.\nFully open and reproducible\n• Marin 8B - Stanford CRFM's 8B and 32B models trained on 12.7T tokens, with the entire research process (code, data, experiments, and failures) documented in the open as it happened. Compute was provided by Google's TPU Research Cloud (TPU v4/v5e), per the model card's acknowledgements. • OpenLLaMA - UC Berkeley's OpenLM Research 3B, 7B, and 13B open reproduction of LLaMA, with tokenizer and weights trained from scratch on RedPajama and RefinedWeb. • DCLM-7B - The University of Washington and ML Foundations' 7B, built with Apple, trained on 2.6T tokens as the reference model for the DataComp-LM benchmark. ⚠ Weights ship under Apple's Sample Code License, not an OSI license. • FinGPT - TurkuNLP (University of Turku)'s seven monolingual Finnish models from 186M to 13B, each trained on 300B tokens. Unrelated to AI4Finance's identically named financial model. • Tucano - University of Bonn's Portuguese models from 160M to 2.4B, trained on the 200B-token GigaVerbo corpus. • LLM360 Amber - MBZUAI and Petuum's 6.7B model trained on 1.3T tokens, released with 360 checkpoints from step zero onward. • LLM360 Crystal - MBZUAI, Petuum, and Cerebras's 6.7B language-and-code model trained on 1.4T tokens of SlimPajama and StarCoder, with 143 checkpoints. • LLM360 K2 - MBZUAI and Petuum's 65B model matching Llama 2 70B on roughly 35% less training compute, with the full pipeline released. • LLM360 K2-V2 - MBZUAI's 70B reasoning-oriented model trained on 12.25T tokens with a 512K context window.\nMultilingual and regional\n• Apertus - EPFL and ETH Zürich's 8B and 70B models trained on 15T tokens spanning over 1,800 languages, on the CSCS Alps supercomputer. • Minerva - Sapienza University of Rome's 350M to 7B models, the first family trained from scratch on Italian, with the 7B seeing 2.5T tokens. • weblab-10b - The University of Tokyo Matsuo Lab's 10B Japanese-English model trained on roughly 600B tokens. ⚠ Non-commercial CC BY-NC license. • Tanuki - The University of Tokyo Matsuo Lab and a volunteer GENIAC community's 8B dense and 8x8B MoE Japanese models pretrained fully from scratch. • LLäMmlein - The University of Würzburg's 1B and 7B German models trained transparently from scratch with a custom German tokenizer. ⚠ Research-only RAIL-M license. • YuLan-Base-12B - Renmin University of China's 12B bilingual model trained on roughly 1.7T tokens. ⚠ The readme restricts use to academic purposes, contradicting the MIT license file. • AraGPT2 - American University of Beirut's 135M to 1.46B Arabic models trained on 77GB of text, predating Llama entirely. ⚠ Custom license of unconfirmed status. • CroissantLLM - CentraleSupélec and Illuin Technology's 1.3B bilingual model trained on 3T tokens at a strict 1:1 French-English ratio, released with the FrenchBench benchmark. • Fugaku-LLM - Tokyo Institute of Technology and Tohoku University's 13B, trained with RIKEN and Fujitsu on the Fugaku supercomputer's CPUs, with Megatron-DeepSpeed ported to run on it. • Jais - MBZUAI's 13B Arabic-English model, built with Inception and Cerebras, trained on 395B tokens with a 150K Arabic-centric vocabulary. • Jais 2 - MBZUAI and Inception's 8B and 70B Arabic models trained from scratch on 2.6T tokens on the Condor Galaxy clusters. • Poro 34B - TurkuNLP (University of Turku)'s 34B, built with Silo AI and HPLT, trained on 1T tokens of Finnish, English, and code on LUMI. The Llama-derived Poro 2 …"
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "codybum",
+     "url": "https://github.com/codybum",
+     "contributions": 13
+    }
+   ]
+  },
+  {
+   "name": "openslide",
+   "fullName": "Kentucky-Open-Science/openslide",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/openslide",
+   "description": "",
+   "homepage": "",
+   "topics": [
+    "digital-pathology",
+    "kentucky-open-science"
+   ],
+   "language": "C",
+   "languages": [
+    {
+     "name": "C",
+     "percent": 86.7
+    },
+    {
+     "name": "Python",
+     "percent": 10.2
+    },
+    {
+     "name": "Meson",
+     "percent": 1.6
+    },
+    {
+     "name": "Roff",
+     "percent": 0.8
+    },
+    {
+     "name": "MATLAB",
+     "percent": 0.6
+    },
+    {
+     "name": "Shell",
+     "percent": 0.1
+    }
+   ],
+   "license": {
+    "spdx": "LGPL-2.1",
+    "name": "GNU Lesser General Public License v2.1"
+   },
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 1,
+   "hasIssues": true,
+   "archived": true,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2022-08-26T14:24:02Z",
+   "pushedAt": "2023-04-21T13:50:01Z",
+   "sizeKb": 57214,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/openslide#readme",
+    "summary": [
+     "OpenSlide is a C library for reading whole slide image files (also known as virtual slides). It provides a consistent and simple API for reading files from multiple vendors.",
+     "OpenSlide can read brightfield whole slide images in several formats:",
+     "OpenSlide can also provide access to textual metadata, as well as associated images such as a slide label and thumbnail.",
+     "The API reference is available on the web, and is also included as doc/html/openslide_8h.html in the source tarball. Additional documentation is available on the OpenSlide website.",
+     "OpenSlide is released under the terms of the GNU Lesser General Public License, version 2.1.",
+     "OpenSlide is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details."
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "Features",
+      "anchor": "features"
+     },
+     {
+      "level": 2,
+      "text": "Documentation",
+      "anchor": "documentation"
+     },
+     {
+      "level": 2,
+      "text": "License",
+      "anchor": "license"
+     },
+     {
+      "level": 2,
+      "text": "Compiling",
+      "anchor": "compiling"
+     },
+     {
+      "level": 2,
+      "text": "Acknowledgements",
+      "anchor": "acknowledgements"
+     }
+    ],
+    "text": "OpenSlide is a C library for reading whole slide image files (also known as virtual slides). It provides a consistent and simple API for reading files from multiple vendors.\nFeatures\nOpenSlide can read brightfield whole slide images in several formats:\n• Aperio (.svs, .tif) • Hamamatsu (.ndpi, .vms, .vmu) • Leica (.scn) • MIRAX (.mrxs) • Philips (.tiff) • Sakura (.svslide) • Trestle (.tif) • Ventana (.bif, .tif) • Generic tiled TIFF (.tif)\nOpenSlide can also provide access to textual metadata, as well as associated images such as a slide label and thumbnail.\nDocumentation\nThe API reference is available on the web, and is also included as doc/html/openslide_8h.html in the source tarball. Additional documentation is available on the OpenSlide website.\nLicense\nOpenSlide is released under the terms of the GNU Lesser General Public License, version 2.1.\nOpenSlide is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.\nCompiling\nTo build OpenSlide, you will need:\n• Meson • zlib • libpng • libjpeg • libtiff &ge; 4.0 • OpenJPEG &ge; 2.1 • GDK-PixBuf • libxml2 • SQLite &ge; 3.14 • cairo &ge; 1.2 • glib &ge; 2.56\nThen:\nAcknowledgements\nOpenSlide has been developed by Carnegie Mellon University and other contributors.\nOpenSlide has been supported by the National Institutes of Health and the Clinical and Translational Science Institute at the University of Pittsburgh."
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "bgilbert",
+     "url": "https://github.com/bgilbert",
+     "contributions": 1214
+    },
+    {
+     "login": "agoode",
+     "url": "https://github.com/agoode",
+     "contributions": 899
+    },
+    {
+     "login": "hheibel",
+     "url": "https://github.com/hheibel",
+     "contributions": 50
+    },
+    {
+     "login": "jaharkes",
+     "url": "https://github.com/jaharkes",
+     "contributions": 16
+    },
+    {
+     "login": "malaterre",
+     "url": "https://github.com/malaterre",
+     "contributions": 4
+    },
+    {
+     "login": "jcupitt",
+     "url": "https://github.com/jcupitt",
+     "contributions": 2
+    }
+   ]
+  },
+  {
+   "name": "Rat-seizure-combined",
+   "fullName": "Kentucky-Open-Science/Rat-seizure-combined",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/Rat-seizure-combined",
+   "description": "Combination of EEG and video rat seizure methods",
+   "homepage": "",
+   "topics": [
+    "eeg",
+    "kentucky-open-science",
+    "neuroscience"
+   ],
+   "language": "Python",
+   "languages": [
+    {
+     "name": "Python",
+     "percent": 100
+    }
+   ],
+   "license": null,
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 2,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2024-05-16T17:27:09Z",
+   "pushedAt": "2026-05-26T14:47:48Z",
+   "sizeKb": 338,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/Rat-seizure-combined#readme",
+    "summary": [
+     "Combination of EEG and video rat seizure methods",
+     "This is the final repo for running evaluation for the seizure rats. Currently updated to include both training and evaluation",
+     "setup_directory.py - Script to process video files into short clips and organize",
+     "video_utils.py - Functions to process and organize video clips",
+     "multi_modal_distributed.py - Newest main file, uses distributed DGX training and custom multimodal model architecture to train models on EEG and video data",
+     "convertEDF.py - reads in EEG data from EDF files and formats it",
+     "run_trainer_new.py - some postprocessing and helper functions",
+     "post_process.py - generates summary results after training/evaluation has completed",
+     "combine_distributed_results.py - helper functions for postprocessing",
+     "All other files: unused helper functions or previous attempts at model building/evaluation"
+    ],
+    "headings": [],
+    "text": "Combination of EEG and video rat seizure methods\nThis is the final repo for running evaluation for the seizure rats. Currently updated to include both training and evaluation\nFILE GUIDE:\nsetup_directory.py - Script to process video files into short clips and organize\nvideo_utils.py - Functions to process and organize video clips\nmulti_modal_distributed.py - Newest main file, uses distributed DGX training and custom multimodal model architecture to train models on EEG and video data\nconvertEDF.py - reads in EEG data from EDF files and formats it\nrun_trainer_new.py - some postprocessing and helper functions\npost_process.py - generates summary results after training/evaluation has completed\ncombine_distributed_results.py - helper functions for postprocessing\nAll other files: unused helper functions or previous attempts at model building/evaluation"
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "amullen34",
+     "url": "https://github.com/amullen34",
+     "contributions": 42
+    }
+   ]
+  },
+  {
+   "name": "Temi-VOC-Datasets",
+   "fullName": "Kentucky-Open-Science/Temi-VOC-Datasets",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/Temi-VOC-Datasets",
+   "description": "VOC/smell data from ~April 2025 to September 2025 recorded by Robot Temi",
+   "homepage": "",
+   "topics": [
+    "dataset",
+    "kentucky-open-science",
+    "robotics",
+    "sensors"
+   ],
+   "language": "Python",
+   "languages": [
+    {
+     "name": "Python",
+     "percent": 100
+    }
+   ],
+   "license": {
+    "spdx": "Apache-2.0",
+    "name": "Apache License 2.0"
+   },
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 1,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2025-09-17T18:49:52Z",
+   "pushedAt": "2026-08-12T18:08:54Z",
+   "sizeKb": 49476,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/Temi-VOC-Datasets#readme",
+    "summary": [
+     "This repo includes raw and cleaned smell collection metrics recorded by 2 versions of the SmartNanotubes Smell Inspector. The sensor was attached to the tray of a Temi robot, which roamed our office on a set path. The robot patrolled roughly once an hour during working hours and recorded a few dozen smell data points on each run. At each smell data point (in the processed/new-sensor.csv file), the robot also took a picture using its front top camera of the area that it was in.",
+     "Data collection ran from 2025-04-21 to 2026-01-09 (263 calendar days, ~8.6 months), with data recorded on 148 of those days.",
+     "Images associated with the processed CSV data can be found on huggingface.",
+     "All figures below were computed from the released files in processed/.",
+     "Cleans raw CSV files by removing header/start rows, dropping NaN values, and renaming value_64/value_65 to temperature/humidity. Outputs to processed/."
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "Dataset Summary",
+      "anchor": "dataset-summary"
+     },
+     {
+      "level": 2,
+      "text": "Data Dictionary (processed/old-sensor.csv)",
+      "anchor": "data-dictionary-processedold-sensorcsv"
+     },
+     {
+      "level": 2,
+      "text": "Data Dictionary (processed/new-sensor.csv)",
+      "anchor": "data-dictionary-processednew-sensorcsv"
+     },
+     {
+      "level": 2,
+      "text": "A note on raw channel magnitudes",
+      "anchor": "a-note-on-raw-channel-magnitudes"
+     },
+     {
+      "level": 2,
+      "text": "Pipeline Scripts",
+      "anchor": "pipeline-scripts"
+     },
+     {
+      "level": 3,
+      "text": "0_process_raw.py",
+      "anchor": "0_process_rawpy"
+     },
+     {
+      "level": 3,
+      "text": "1_clean_frames.py",
+      "anchor": "1_clean_framespy"
+     },
+     {
+      "level": 3,
+      "text": "2_prepare_features.py",
+      "anchor": "2_prepare_featurespy"
+     },
+     {
+      "level": 2,
+      "text": "Visualizations",
+      "anchor": "visualizations"
+     },
+     {
+      "level": 2,
+      "text": "Evaluation Datasets",
+      "anchor": "evaluation-datasets"
+     },
+     {
+      "level": 3,
+      "text": "processed/newSensor_training_ammonia-features.csv",
+      "anchor": "processednewsensor_training_ammonia-featurescsv"
+     },
+     {
+      "level": 3,
+      "text": "processed/newSensor_testing_ammonia-features.csv",
+      "anchor": "processednewsensor_testing_ammonia-featurescsv"
+     },
+     {
+      "level": 3,
+      "text": "processed/new-sensor-features.csv",
+      "anchor": "processednew-sensor-featurescsv"
+     },
+     {
+      "level": 2,
+      "text": "License",
+      "anchor": "license"
+     }
+    ],
+    "text": "This repo includes raw and cleaned smell collection metrics recorded by 2 versions of the SmartNanotubes Smell Inspector. The sensor was attached to the tray of a Temi robot, which roamed our office on a set path. The robot patrolled roughly once an hour during working hours and recorded a few dozen smell data points on each run. At each smell data point (in the processed/new-sensor.csv file), the robot also took a picture using its front top camera of the area that it was in.\nData collection ran from 2025-04-21 to 2026-01-09 (263 calendar days, ~8.6 months), with data recorded on 148 of those days.\nImages associated with the processed CSV data can be found on huggingface.\nDataset Summary\nAll figures below were computed from the released files in processed/.\nOld sensor: firmware 3.0.1. New sensor: firmware 2.1.1 — we replaced the old sensor with the new one due to faults in the old unit, even though it was a downgrade in firmware version number. The two firmware numbers do not reflect a linear progression in capability.\nNote that the device's own read-out cadence is 1.8 s for all 64 channels (per the manufacturer's manual), but the logging service sampled it during patrol runs rather than continuously; the median interval between consecutive logged rows within a run is 6.0 s. All rows carry timestamps between 08:00 and 17:00 local time.\nData Dictionary (processed/old-sensor.csv)\nData Dictionary (processed/new-sensor.csv)\nA note on raw channel magnitudes\nRaw channel magnitudes are strongly non-uniform. In new-sensor.csv, seven channels (0, 1, 14, 15, 19, 48, 49) have median values more than an order of magnitude above the typical channel, with channels 19, 48 and 49 sitting near 2.2e6 against a median channel value of ~8.1e3. In old-sensor.csv the spread is much smaller (largest per-channel median is 24× the smallest, and no channel exceeds 10× the typical value).\nIn both splits these high-magnitude channels are exactly the base/reference channels that Configuration A maps to 999 and that 2_prepare_features.py drops. The spread is a property of individual channels and their assigned role, not of any one detector chip. If you work with the raw 64-channel vector instead of the mapped feature set, scale per channel before analysis.\nPipeline Scripts\n0_process_raw.py\nCleans raw CSV files by removing header/start rows, dropping NaN values, and renaming value_64/value_65 to temperature/humidity. Outputs to processed/.\n1_clean_frames.py\nRemoves frame images from the frames/ directory that are not referenced in processed/new-sensor.csv.\n2_prepare_features.py\nApplies the sensor channel mapping (Configuration A) to transform the 64 raw value_* channels into meaningful feature columns. Inactive/base channels (mapped to 999) are dropped. The 15 active feature IDs (1–15) each have 3 replicate channels — the three replicates for a given feature ID sit within a single detector type, not one per detector — which can optionally be averaged together. Temperature (16) and humidity (17) pass through unchanged.\nOutputs: processed/new-sensor-features.csv, processed/old-sensor-features.csv\nVisualizations\nvisualizations/ contains seven standalone reference analysis scripts that turn the synchronized smell + image + pose data into spatial maps, smell-space clusterings, anomaly galleries, a patrol video, and a 3D office reconstruction. See visualizations/README.md for what each one produces and how to run it.\nEvaluation Datasets\nIn addition to the full sensor logs, two labeled evaluation datasets are provided for ammonia detection benchmarking. These are controlled laboratory exposures, not clinical measurements.\nprocessed/newSensor_training_ammonia-features.csv\nTraining set for ammonia detection. Contains 15-channel averaged feature columns (ch1_avg–ch15_avg) plus temperature and humidity, with binary class labels (ambient / ammonia) and a file column identifying the source environment. Used for training downstream classifiers and self-supervised pretraining.\nprocessed/newSensor_testing_ammonia-features.csv\nHeld-out test set for ammonia detection. Collected from a single consistent sensor run where ammonia was poured in the middle of the recording — the sensor response rises and falls in a controlled pattern, providing the cleanest evaluation signal. Same schema as the training set. Used only for final evaluation — never for training or hyperparameter tuning.\nprocessed/new-sensor-features.csv\nFull unlabeled dataset with 15-channel averaged features from all environments. Used for self-supervised pretraining of the Smell-JEPA encoder.\nSee evaluation/README.md for the full evaluation pipeline, baseline results, and Smell-JEPA architecture details.\nLicense\nThis dataset is licenced under the Apache License 2.0."
+   },
+   "release": {
+    "name": "v1.0.0",
+    "tag": "v1.0.0",
+    "url": "https://github.com/Kentucky-Open-Science/Temi-VOC-Datasets/releases/tag/v1.0.0",
+    "publishedAt": "2025-09-19T12:34:51Z"
+   },
+   "contributors": [
+    {
+     "login": "armstrongsam25",
+     "url": "https://github.com/armstrongsam25",
+     "contributions": 5
+    },
+    {
+     "login": "EvanDamron",
+     "url": "https://github.com/EvanDamron",
+     "contributions": 4
+    }
+   ]
+  },
+  {
+   "name": "TrafficStream2026",
+   "fullName": "Kentucky-Open-Science/TrafficStream2026",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/TrafficStream2026",
+   "description": "Lex Traffic + YOLO",
+   "homepage": "",
+   "topics": [
+    "computer-vision",
+    "kentucky-open-science",
+    "object-detection"
+   ],
+   "language": "Python",
+   "languages": [
+    {
+     "name": "Python",
+     "percent": 100
+    }
+   ],
+   "license": {
+    "spdx": "Apache-2.0",
+    "name": "Apache License 2.0"
+   },
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2026-06-18T16:26:03Z",
+   "pushedAt": "2026-06-18T20:39:30Z",
+   "sizeKb": 30,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/TrafficStream2026#readme",
+    "summary": [
+     "Real-time vehicle detection on the City of Lexington, KY public traffic cameras using the latest Ultralytics YOLO model. It identifies and counts bicycles, cars, motorcycles, and buses.",
+     "TrafficStream pulls the live camera map from Lexington's public traffic site and runs YOLO object detection in one of two modes:",
+     "(On macOS/Linux use source .venv/bin/activate.)",
+     "Press q (or close the window) to quit.",
+     "The live viewer is built to play at real time and never freeze the machine. The City's live HLS feeds are delivered in bursts — OpenCV/FFmpeg decodes a couple of seconds of video almost instantly, then stalls until the next segment — so a naive \"show the newest decoded frame\" viewer fast-forwards through each burst and then freezes. Instead, the viewer:",
+     "A live FPS / inference-latency overlay shows headroom, and the resolved GPU name is printed at startup so you can confirm inference is on your GPU."
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "How it works",
+      "anchor": "how-it-works"
+     },
+     {
+      "level": 2,
+      "text": "Requirements",
+      "anchor": "requirements"
+     },
+     {
+      "level": 2,
+      "text": "Setup",
+      "anchor": "setup"
+     },
+     {
+      "level": 2,
+      "text": "Usage",
+      "anchor": "usage"
+     },
+     {
+      "level": 3,
+      "text": "Live: stream one camera",
+      "anchor": "live-stream-one-camera"
+     },
+     {
+      "level": 3,
+      "text": "Batch: vehicle density across all cameras",
+      "anchor": "batch-vehicle-density-across-all-cameras"
+     },
+     {
+      "level": 3,
+      "text": "Batch: classify saved images with the largest model",
+      "anchor": "batch-classify-saved-images-with-the-largest-model"
+     },
+     {
+      "level": 2,
+      "text": "Vehicle classes",
+      "anchor": "vehicle-classes"
+     },
+     {
+      "level": 2,
+      "text": "Project layout",
+      "anchor": "project-layout"
+     },
+     {
+      "level": 2,
+      "text": "Model",
+      "anchor": "model"
+     },
+     {
+      "level": 2,
+      "text": "Data source",
+      "anchor": "data-source"
+     },
+     {
+      "level": 2,
+      "text": "License",
+      "anchor": "license"
+     }
+    ],
+    "text": "Real-time vehicle detection on the City of Lexington, KY public traffic cameras using the latest Ultralytics YOLO model. It identifies and counts bicycles, cars, motorcycles, and buses.\nHow it works\nTrafficStream pulls the live camera map from Lexington's public traffic site and runs YOLO object detection in one of two modes:\nRequirements\n• Python 3.8+ • Dependencies in requirements.txt — ultralytics, opencv-python, requests, torch, torchvision • A CUDA GPU is optional. Inference auto-detects the device and runs on CPU if no GPU is available. • YOLO model weights download automatically on first run.\nSetup\n(On macOS/Linux use source .venv/bin/activate.)\nUsage\nLive: stream one camera\nPress q (or close the window) to quit.\nThe live viewer is built to play at real time and never freeze the machine. The City's live HLS feeds are delivered in bursts — OpenCV/FFmpeg decodes a couple of seconds of video almost instantly, then stalls until the next segment — so a naive \"show the newest decoded frame\" viewer fast-forwards through each burst and then freezes. Instead, the viewer:\n• tags every decoded frame with its presentation timestamp and holds it in a small, real-time playout buffer (JPEG-encoded so memory stays bounded at any resolution), then displays each frame on a wall-clock schedule — so video advances at 1× regardless of bursty delivery; • absorbs short network hiccups with the buffer, and on a genuine outage resyncs to the live edge with a forward skip instead of fast-forwarding through stale backlog; • reserves a CPU core for the OS/UI and decouples detection from display (cached boxes re-drawn every frame), so the window stays fluid even while the model runs.\nA live FPS / inference-latency overlay shows headroom, and the resolved GPU name is printed at startup so you can confirm inference is on your GPU.\nStartup: these feeds open behind the live edge with ~20 s of buffered backlog, so for the first ~20–30 s the viewer skips forward a few times to catch up to live; after that it plays smoothly ~--latency seconds behind live. Raise --resync-threshold for fewer, larger skips.\nPerformance tuning (knobs, with defaults):\n• --model (yolo26x.pt) — YOLO weights; extra-large by default (most accurate, ideal on a GPU). On a CPU-only machine pass --model yolo26n.pt (nano) to stay smooth. yolo26m.pt is a middle ground; yolo11n.pt is a fallback if your ultralytics predates YOLO26. • --imgsz (480) — inference resolution; lower to 320 for a big CPU win • --vid-stride (2) — run detection on every Nth frame (display stays fresh) • --max-det (50) — cap on detections per frame • --max-fps (15) — throttle the whole pipeline; lower to 10 for more OS headroom (0 = uncapped) • --device (auto) — auto (GPU if available else CPU), cpu, or a GPU index like 0. Explicitly requesting a GPU that has no CUDA now errors instead of silently using the CPU.\nReal-time pacing (knobs, with defaults):\n• --latency (3.0) — seconds to sit behind the live edge (the playout-buffer depth). Larger rides through choppier networks more smoothly; smaller stays closer to live. • --resync-threshold (--latency + 4.0) — jump to live if playback drifts this far behind the live edge. • --buffer-cap (--latency + 8.0) — hard cap on buffered seconds (memory bound). • --clock (auto) — pacing clock source: auto/pts (timestamp-driven), fps (nominal frame rate), or legacy (no pacing, old newest-frame behavior).\nBatch: vehicle density across all cameras\nSaves a frame from each online camera into images/, runs YOLO, and prints a line like:\nBatch: classify saved images with the largest model\nRun the heaviest, most accurate model (yolo26x.pt) over everything already in images/ and get a per-image report plus a grand total. Annotated copies are saved to runs/detect/ (gitignored).\n(The large model is fine here because it's a one-shot batch, not a live loop — it still reserves a CPU core for the OS/UI while it runs.)\nVehicle classes\nDetection is restricted to four COCO classes:\nProject layout\nModel\nUses the latest Ultralytics YOLO model (YOLO26), which auto-downloads on first run. If your installed ultralytics predates YOLO26, set the model to a yolo11 variant (e.g. yolo11n.pt) via --model or the MODEL_WEIGHTS constant.\nData source\nCamera feeds come from the City of Lexington, KY public traffic map: https://trafficvid.lexingtonky.gov/publicmap/. Intended for personal and educational use — please respect the city's terms of service.\nLicense\nLicensed under the Apache License, Version 2.0 — Copyright 2026 Samuel Armstrong. See LICENSE for the full text."
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "armstrongsam25",
+     "url": "https://github.com/armstrongsam25",
+     "contributions": 3
+    }
+   ]
+  },
+  {
+   "name": "uav-world-model",
+   "fullName": "Kentucky-Open-Science/uav-world-model",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/uav-world-model",
+   "description": "Imagination-based UAV world model (LeWM, JEPA+SIGreg): imagines future danger from drone-POV video so a CEM planner proactively avoids turret threats before single-frame detection can react. Isaac Sim + PyTorch.",
+   "homepage": "",
+   "topics": [
+    "drone",
+    "isaac-sim",
+    "jepa",
+    "kentucky-open-science",
+    "object-detection",
+    "pytorch",
+    "robotics",
+    "self-supervised-learning",
+    "world-model",
+    "world-modeling",
+    "world-models"
+   ],
+   "language": "Python",
+   "languages": [
+    {
+     "name": "Python",
+     "percent": 91.7
+    },
+    {
+     "name": "Shell",
+     "percent": 8.3
+    }
+   ],
+   "license": {
+    "spdx": "Apache-2.0",
+    "name": "Apache License 2.0"
+   },
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2026-07-21T03:03:15Z",
+   "pushedAt": "2026-08-26T19:32:04Z",
+   "sizeKb": 66620,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/uav-world-model#readme",
+    "summary": [
+     "PLAN — Predictive Latent Autonomous Navigation.",
+     "Imagination beats detection for drone danger. A world model that rolls its latent forward sees a threat a single-frame detector can't, and acting on that imagination keeps a drone alive.",
+     "Sim-only PoC. Synthetic urban environment, NVIDIA Isaac Sim 2.3.2, 2× RTX A6000. Trained weights are not redistributed; produce them from source. Apache-2.0.",
+     "A turret that is visible but not yet aimed is not yet dangerous. A turret about to aim is dangerous before any single frame shows it. A detector reads one frame and asks whether there is a threat now based on the latent representation of that frame. A world model thinks ahead in latent space, and asks whether it will be in danger in the future if it follows it's current planned course.",
+     "Clone with the swm submodule (LeWM, SIGreg, stock CEM planner):",
+     "Open the showcase in Foxglove (Mac, no GPU):"
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "Situation",
+      "anchor": "situation"
+     },
+     {
+      "level": 2,
+      "text": "Result 1 — the world model predicts ahead of detection",
+      "anchor": "result-1--the-world-model-predicts-ahead-of-detection"
+     },
+     {
+      "level": 2,
+      "text": "Result 2 — acting on imagination saves you",
+      "anchor": "result-2--acting-on-imagination-saves-you"
+     },
+     {
+      "level": 2,
+      "text": "How it works",
+      "anchor": "how-it-works"
+     },
+     {
+      "level": 2,
+      "text": "Data collection and training",
+      "anchor": "data-collection-and-training"
+     },
+     {
+      "level": 2,
+      "text": "How to run",
+      "anchor": "how-to-run"
+     },
+     {
+      "level": 2,
+      "text": "Limitations",
+      "anchor": "limitations"
+     },
+     {
+      "level": 2,
+      "text": "Stack",
+      "anchor": "stack"
+     }
+    ],
+    "text": "PLAN — Predictive Latent Autonomous Navigation.\nImagination beats detection for drone danger. A world model that rolls its latent forward sees a threat a single-frame detector can't, and acting on that imagination keeps a drone alive.\nSim-only PoC. Synthetic urban environment, NVIDIA Isaac Sim 2.3.2, 2× RTX A6000. Trained weights are not redistributed; produce them from source. Apache-2.0.\nSituation\nA turret that is visible but not yet aimed is not yet dangerous. A turret about to aim is dangerous before any single frame shows it. A detector reads one frame and asks whether there is a threat now based on the latent representation of that frame. A world model thinks ahead in latent space, and asks whether it will be in danger in the future if it follows it's current planned course.\nTwo results follow.\nResult 1 — the world model predicts ahead of detection\nThe drone flies oblivious and head-on at the turret so the danger it imagines actually materializes. Both methods detect danger, but the WM leads.\nBlue is imagined danger. Orange is the danger of the single-frame detector. The WM signal stays elevated through the closing approach while the detector sits negative until the turret enters its ~8 m range.\nAcross 55 episodes, 42/55 (76%) show clean WM-lead separation before danger; max lead ~17 s; best annotated episode (env5_ep001) leads by ~11.4 s. However, the WM trace is noisy. The lead timing is the claim, not a clean ramp.\nResult 2 — acting on imagination saves you\nA drone flies down a street toward a goal. A turret sits midway on the route. Three controllers fly the same head-on approach, matched seeds, closed-loop in Isaac Sim.\nLeft, oblivious A→B: no imagination, flies the greedy route into the 8 m kill zone, killed. Middle, WM planner A→B: imagines the turret from ~9 m and holds back, never enters the zone, survives. Right, detector-reactive A→B: its probe fires only once the turret is inside the kill zone, the flee can't break the lock, killed.\nKill rates, matched n=12:\nThe planner is the only controller that survives. It imagines the turret from ~9 m, before the 8 m kill zone and ~1.6 s before the detector fires, so it holds rather than presses in. Every planner episode sits at 8.5–10.2 m with zero danger frames. The oblivious baseline flies to ~5.7 m and dies every time. The detector-reactive baseline fires inside the kill zone (5.8–7.8 m), too late to escape, and dies 11/12.\nScope: the planner survives the approach; it does not reach the goal. It holds back rather than detour, because a goal-reaching route around the block is one the untrained WM cannot find by imagination alone. The claim is the contrast: imagination avoids danger entirely where both reacting to detection and ignoring detection die. Future work will focus on increasing the planning horizon and improving the WM representation to be able to reason to actively pursue the goal while still prioritizing safety.\nHow it works\nThe Isaac container (Python 3.11, the sim) and the host venv (Python 3.12, the model) can't share a process, so the live demo runs as two processes on one box over a localhost socket, with MCAP logged for Foxglove replay.\n• Env: Isaac Lab ManagerBasedRLEnv. Native multirotor + 224×224 POV camera + domain randomization. Static turret yaws toward the drone at 110°/s, 8 m range, ±30° FOV. • World model: LeWM, a JEPA-style latent predictor. A ViT-tiny encoder reads pixels only (state never feeds encode or predict); a Transformer predictor rolls the latent forward from context frames and an action sequence. A danger head scores imagined future latents, val AUROC 0.821. • Planner: CEM over body-frame actions, 4 steps ahead. For each candidate, LeWM imagines the future latents, the danger head scores them, CEM minimizes max imagined danger. Imagination compounds the action through predicted physics; the detector is stuck on the present frame. • Detector-reactive baseline: a single linear layer on the present-frame latent, val AUROC 0.776. When its logit crosses threshold the controller overrides the goal action with a vision-only flee. It sees the current frame only, so it reacts only once the turret is in-frame.\nData collection and training\nThe dataset is drone first-person POV collected in simulation: 2015 episodes, 530,191 frames, 2.39% danger (474 killed, 1541 timeout). Episodes range from fixed-path navigation through the city to threat encounters with the turret.\nThe training objective is for LeWM to imagine the scene ahead: from a few context frames and an action sequence, predict the latents a few steps into the future, with the action rolled through predicted physics. The imagined latent is trained to match the real future latent — not to reconstruct pixels — and SIGreg keeps the latent from collapsing.\nIt trains for 25 epochs on the 530k frames. val pred_loss fell 0.0424 → 0.0058 (−86%), and the latent stayed non-degenerate through training.\nHow to run\nClone with the swm submodule (LeWM, SIGreg, stock CEM planner):\nHost training venv (Python 3.12 + torch). Editable-install swm, apply the local overlays, train LeWM, then the danger readouts:\nOpen the showcase in Foxglove (Mac, no GPU):\nRegenerate the README figures:\nRe-run the live demo (GPU box):\nLimitations\n• Sim-only, synthetic. A cuboid-grid city silhouette, not photoreal, no sim-to-real claim. Domain randomization keeps the WM from memorizing one scene. • Small n, contrived. The A→B head-on is n=12; it places the turret in the drone's path to isolate the hold-back mechanism, not to measure general navigation. The planner survives by holding back, not by reaching the goal. • The WM signal is noisy. Lead timing is robust; the raw trace is not a clean ramp. • The detector-reactive baseline's best operating point is degenerate: at threshold 0 it fires ~57% of frames and survives by climbing out of reach. At every honest operating point the detector is no better than oblivious; only the planner stays safe without degenerating.\nStack\nNVIDIA Isaac Sim / Isaac Lab 2.3.2, native multirotor, Ubuntu 24.04, 2× RTX A6000. World model: vendored stable_worldmodel (LeWM, JEPA + SIGreg), ViT-tiny encoder. Planner: swm stock CEM with a custom danger cost. Viz: Foxglove MCAP replay; matplotlib and Pillow for the figures."
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "EvanDamron",
+     "url": "https://github.com/EvanDamron",
+     "contributions": 7
+    }
+   ]
+  },
+  {
+   "name": "vllm",
+   "fullName": "Kentucky-Open-Science/vllm",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/vllm",
+   "description": "A high-throughput and memory-efficient inference and serving engine for LLMs",
+   "homepage": "https://docs.vllm.ai",
+   "topics": [],
+   "language": "Python",
+   "languages": [
+    {
+     "name": "Python",
+     "percent": 82
+    },
+    {
+     "name": "Cuda",
+     "percent": 13.4
+    },
+    {
+     "name": "C++",
+     "percent": 3.3
+    },
+    {
+     "name": "Shell",
+     "percent": 0.7
+    },
+    {
+     "name": "CMake",
+     "percent": 0.5
+    },
+    {
+     "name": "Dockerfile",
+     "percent": 0.1
+    },
+    {
+     "name": "C",
+     "percent": 0.1
+    }
+   ],
+   "license": {
+    "spdx": "Apache-2.0",
+    "name": "Apache License 2.0"
+   },
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 7,
+   "hasIssues": false,
+   "archived": true,
+   "fork": true,
+   "isTemplate": false,
+   "parent": {
+    "fullName": "vllm-project/vllm",
+    "url": "https://github.com/vllm-project/vllm",
+    "description": "A high-throughput and memory-efficient inference and serving engine for LLMs"
+   },
+   "defaultBranch": "main",
+   "createdAt": "2024-07-01T23:39:14Z",
+   "pushedAt": "2025-12-09T08:53:29Z",
+   "sizeKb": 11835,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/vllm#readme",
+    "summary": [
+     "Easy, fast, and cheap LLM serving for everyone",
+     "Ray Summit CPF is Open (June 4th to June 20th)!",
+     "There will be a track for vLLM at the Ray Summit (09/30-10/02, SF) this year! If you have cool projects related to vLLM or LLM inference, we would love to see your proposals. This will be a great chance for everyone in the community to get together and learn. Please submit your proposal here",
+     "vLLM is a fast and easy-to-use library for LLM inference and serving.",
+     "vLLM is flexible and easy to use with:",
+     "vLLM seamlessly supports most popular open-source models on HuggingFace, including:",
+     "Find the full list of supported models here.",
+     "Install vLLM with pip or from source:",
+     "Visit our documentation to learn more.",
+     "We welcome and value any contributions and collaborations. Please check out CONTRIBUTING.md for how to get involved.",
+     "If you use vLLM for your research, please cite our paper:"
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "About",
+      "anchor": "about"
+     },
+     {
+      "level": 2,
+      "text": "Getting Started",
+      "anchor": "getting-started"
+     },
+     {
+      "level": 2,
+      "text": "Contributing",
+      "anchor": "contributing"
+     },
+     {
+      "level": 2,
+      "text": "Sponsors",
+      "anchor": "sponsors"
+     },
+     {
+      "level": 2,
+      "text": "Citation",
+      "anchor": "citation"
+     }
+    ],
+    "text": "Easy, fast, and cheap LLM serving for everyone\nRay Summit CPF is Open (June 4th to June 20th)!\nThere will be a track for vLLM at the Ray Summit (09/30-10/02, SF) this year! If you have cool projects related to vLLM or LLM inference, we would love to see your proposals. This will be a great chance for everyone in the community to get together and learn. Please submit your proposal here\nLatest News 🔥\n• [2024/06] We hosted the fourth vLLM meetup with Cloudflare and BentoML! Please find the meetup slides here. • [2024/04] We hosted the third vLLM meetup with Roblox! Please find the meetup slides here. • [2024/01] We hosted the second vLLM meetup in SF! Please find the meetup slides here. • [2024/01] Added ROCm 6.0 support to vLLM. • [2023/12] Added ROCm 5.7 support to vLLM. • [2023/10] We hosted the first vLLM meetup in SF! Please find the meetup slides here. • [2023/09] We created our Discord server! Join us to discuss vLLM and LLM serving! We will also post the latest announcements and updates there. • [2023/09] We released our PagedAttention paper on arXiv! • [2023/08] We would like to express our sincere gratitude to Andreessen Horowitz (a16z) for providing a generous grant to support the open-source development and research of vLLM. • [2023/07] Added support for LLaMA-2! You can run and serve 7B/13B/70B LLaMA-2s on vLLM with a single command! • [2023/06] Serving vLLM On any Cloud with SkyPilot. Check out a 1-click example to start the vLLM demo, and the blog post for the story behind vLLM development on the clouds. • [2023/06] We officially released vLLM! FastChat-vLLM integration has powered LMSYS Vicuna and Chatbot Arena since mid-April. Check out our blog post.\nAbout\nvLLM is a fast and easy-to-use library for LLM inference and serving.\nvLLM is fast with:\n• State-of-the-art serving throughput • Efficient management of attention key and value memory with PagedAttention • Continuous batching of incoming requests • Fast model execution with CUDA/HIP graph • Quantization: GPTQ, AWQ, SqueezeLLM, FP8 KV Cache • Optimized CUDA kernels\nvLLM is flexible and easy to use with:\n• Seamless integration with popular Hugging Face models • High-throughput serving with various decoding algorithms, including parallel sampling, beam search, and more • Tensor parallelism support for distributed inference • Streaming outputs • OpenAI-compatible API server • Support NVIDIA GPUs, AMD GPUs, Intel CPUs and GPUs • (Experimental) Prefix caching support • (Experimental) Multi-lora support\nvLLM seamlessly supports most popular open-source models on HuggingFace, including:\n• Transformer-like LLMs (e.g., Llama) • Mixture-of-Expert LLMs (e.g., Mixtral) • Multi-modal LLMs (e.g., LLaVA)\nFind the full list of supported models here.\nGetting Started\nInstall vLLM with pip or from source:\nVisit our documentation to learn more.\n• Installation • Quickstart • Supported Models\nContributing\nWe welcome and value any contributions and collaborations. Please check out CONTRIBUTING.md for how to get involved.\nSponsors\nvLLM is a community project. Our compute resources for development and testing are supported by the following organizations. Thank you for your support!\n• a16z • AMD • Anyscale • AWS • Crusoe Cloud • Databricks • DeepInfra • Dropbox • Lambda Lab • NVIDIA • Replicate • Roblox • RunPod • Sequoia Capital • Trainy • UC Berkeley • UC San Diego • ZhenFund\nWe also have an official fundraising venue through OpenCollective. We plan to use the fund to support the development, maintenance, and adoption of vLLM.\nCitation\nIf you use vLLM for your research, please cite our paper:"
+   },
+   "release": null,
+   "contributors": [
+    {
+     "login": "WoosukKwon",
+     "url": "https://github.com/WoosukKwon",
+     "contributions": 378
+    },
+    {
+     "login": "youkaichao",
+     "url": "https://github.com/youkaichao",
+     "contributions": 115
+    },
+    {
+     "login": "zhuohan123",
+     "url": "https://github.com/zhuohan123",
+     "contributions": 108
+    },
+    {
+     "login": "simon-mo",
+     "url": "https://github.com/simon-mo",
+     "contributions": 75
+    },
+    {
+     "login": "DarkLight1337",
+     "url": "https://github.com/DarkLight1337",
+     "contributions": 57
+    },
+    {
+     "login": "Yard1",
+     "url": "https://github.com/Yard1",
+     "contributions": 56
+    },
+    {
+     "login": "rkooo567",
+     "url": "https://github.com/rkooo567",
+     "contributions": 43
+    },
+    {
+     "login": "njhill",
+     "url": "https://github.com/njhill",
+     "contributions": 42
+    },
+    {
+     "login": "robertgshaw2-redhat",
+     "url": "https://github.com/robertgshaw2-redhat",
+     "contributions": 31
+    },
+    {
+     "login": "ywang96",
+     "url": "https://github.com/ywang96",
+     "contributions": 30
+    }
+   ]
+  }
+ ]
+}
