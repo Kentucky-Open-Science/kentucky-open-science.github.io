@@ -1,7 +1,6 @@
 /* =========================================================
-   THE WEB ARCHIVE PROJECT - SHARED STYLESHEET v1.04
-   (c) 1999-2003 GeoCities Holdings, a Subsidiary of NetCorp
-   Best viewed at 800x600 in Netscape Navigator 4.0+
+   KENTUCKY OPEN SCIENCE WIKI - SHARED STYLESHEET
+   The late-1990s portal look is intentional. Keep it; make it accessible.
    ========================================================= */
 
 :root {
@@ -452,3 +451,148 @@ a:hover { color: var(--red); background: #fff7a8; }
   .main { padding: 14px; }
   .main h1 { font-size: 22px; }
 }
+
+/* ===== Reflow helpers (WCAG 1.4.10) ===== */
+/* Grid items default to min-width:auto, which lets wide content (tables) push
+   the whole column past a narrow viewport. */
+.layout > * { min-width: 0; }
+
+/* Wrap a data table in this to let it scroll inside its own box instead of the
+   page. Use a <section> with tabindex="0" and aria-labelledby so
+   keyboard and screen-reader users can reach and name it. */
+.table-scroll { overflow-x: auto; max-width: 100%; }
+.table-scroll:focus { outline: 3px solid var(--orange); outline-offset: 2px; }
+
+/* ===== WIKI: search forms ===== */
+.search-form label {
+  display: block;
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.search-form input[type="search"] {
+  font-family: inherit;
+  font-size: 13px;
+  border: 2px inset #aaa;
+  background: #ffffff;
+  color: var(--ink);
+  width: 100%;
+  padding: 4px;
+}
+.search-form button {
+  background: #c0c0c0;
+  border: 2px outset #fff;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 3px 12px;
+  margin-top: 6px;
+  cursor: pointer;
+  color: black;
+}
+.search-form button:active { border-style: inset; }
+.search-hero {
+  background: #f5f0d8;
+  border: 2px inset #999;
+  padding: 12px 14px;
+  margin: 16px 0;
+}
+.search-hero input[type="search"] { max-width: 420px; }
+.search-filters {
+  border: 1px solid var(--khaki);
+  margin: 10px 0 0;
+  padding: 4px 10px 8px;
+  font-size: 12px;
+}
+.search-filters legend { font-weight: bold; padding: 0 4px; }
+.search-filters label {
+  display: inline-block;
+  font-weight: normal;
+  margin: 0 14px 0 0;
+}
+.search-status {
+  font-style: italic;
+  color: var(--muted);
+  min-height: 1.4em;
+  margin: 0 0 6px;
+}
+
+/* ===== WIKI: project lists ===== */
+.project-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.project-item {
+  border-bottom: 1px dotted var(--rule);
+  padding: 8px 0;
+}
+.project-item[hidden], .area[hidden] { display: none; }
+.project-name { font-weight: bold; font-size: 14px; }
+.project-meta { font-size: 11px; color: var(--muted); margin-left: 4px; }
+.project-desc { margin: 3px 0 0; font-size: 12px; }
+.project-desc mark { background: #fff7a8; color: inherit; }
+.flag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border: 1px solid black;
+  vertical-align: 1px;
+}
+.flag-archived { background: #dddddd; color: #222; }
+.flag-fork { background: var(--khaki); color: black; }
+.flag-template { background: #cfe3ff; color: black; }
+.area-blurb {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 12px;
+  margin: -4px 0 6px;
+}
+.main h2 .count { font-size: 14px; color: var(--muted); font-weight: normal; }
+.jump { font-size: 12px; }
+.area-list { padding-left: 18px; }
+.area-list li { margin-bottom: 6px; }
+.topic-cloud {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.topic-cloud li { font-size: 11px; color: var(--muted); }
+.topic-cloud a {
+  display: inline-block;
+  background: #fdfdfa;
+  border: 2px outset var(--khaki);
+  padding: 2px 8px;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+/* ===== WIKI: project pages ===== */
+.breadcrumb { font-size: 11px; margin: 0 0 8px; }
+.status-note { font-size: 12px; }
+.source-note { font-size: 11px; color: var(--muted); font-style: italic; }
+.toc { font-size: 12px; columns: 2; column-gap: 24px; }
+.toc .toc-3 { margin-left: 14px; }
+.contributors { columns: 2; font-size: 12px; }
+.specs th[scope="col"], .specs thead th { white-space: nowrap; }
+.specs tr > th:first-child:not([scope]) { width: 30%; }
+.specs caption { text-align: left; font-style: italic; color: var(--muted); padding: 4px 0; }
+.main code {
+  font-family: "Courier New", Courier, monospace;
+  background: #f4f4ec;
+  padding: 0 3px;
+}
+.clone {
+  background: black;
+  color: #29ff29;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  padding: 8px 10px;
+  border: 2px inset #555;
+  white-space: pre;
+}
+.clone code { background: transparent; color: inherit; padding: 0; }

@@ -1,0 +1,138 @@
+name: "KOS task"
+description: "Submit a self-contained task for the Kentucky Open Science task board (SWE-bench-shaped: snapshot + problem + tests)."
+title: "[Task] "
+labels: ["kos:task", "kos:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for submitting a task. A maintainer validates the acceptance criteria and then flips the label from `kos:triage` to `kos:ready`, at which point anyone can `/claim` it.
+        Rules and the state machine: [docs/KOS-TASK-BOARD.md](https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/blob/main/docs/KOS-TASK-BOARD.md). Every field maps to a SWE-bench task field so agents get a familiar shape.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What is wrong or missing, who it affects, and what "done" looks like in plain language. Link the standard it serves if there is one (e.g. WCAG 2.1 SC 2.4.1).
+      placeholder: "Keyboard users cannot skip the banner and navigation on any page. Every page needs a visible-on-focus 'Skip to main content' link as its first focusable element (WCAG 2.4.1)."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deliverable
+    attributes:
+      label: Deliverable
+      description: What the solver hands back.
+      options:
+        - "Pull request to this repository"
+        - "Remediation package (fixed files + report) attached to the task"
+    validations:
+      required: true
+
+  - type: input
+    id: snapshot
+    attributes:
+      label: Repository snapshot
+      description: Branch or commit the solver starts from (SWE-bench base_commit). Default is the tip of main at claim time.
+      value: "main"
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Files, pages, or components in scope, and anything explicitly out of scope (keeps two tasks from colliding).
+      placeholder: |
+        In scope: src/styles.css, src/pages/index.html (marquee only)
+        Out of scope: rewording any copy; other pages
+    validations:
+      required: true
+
+  - type: textarea
+    id: fail_to_pass
+    attributes:
+      label: FAIL_TO_PASS
+      description: Test IDs that fail today and must pass when the task is done, one per line. Copy them from `npm test` output or tests/known-failures.json. The acceptance gate checks every one.
+      placeholder: |
+        content/skip-link
+        a11y/index.html/bypass
+    validations:
+      required: true
+
+  - type: textarea
+    id: pass_to_pass
+    attributes:
+      label: PASS_TO_PASS
+      description: Tests that must keep passing. Leave `*` for "everything else in the suite" (recommended).
+      value: "*"
+    validations:
+      required: true
+
+  - type: textarea
+    id: how_to_test
+    attributes:
+      label: How to run the tests
+      description: Exact commands. For this repository the defaults are enough.
+      value: |
+        npm ci
+        npx playwright install --with-deps chromium
+        npm test
+    validations:
+      required: true
+
+  - type: textarea
+    id: human_review
+    attributes:
+      label: Human acceptance checklist
+      description: Anything the tests cannot verify that the reviewer will check by hand (visual quality, wording, "no unrelated changes").
+      placeholder: |
+        - The skip link is visually hidden until focused, then clearly visible
+        - No other content moved
+    validations:
+      required: true
+
+  - type: textarea
+    id: hints
+    attributes:
+      label: Hints and pointers
+      description: Optional. Where to look, prior art, gotchas (SWE-bench hints_text).
+      placeholder: "The nav is duplicated verbatim in every page; keep the markup identical across pages."
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size
+      description: Rough effort. A maintainer applies the matching kos:size label; it sets the points.
+      options:
+        - "S — one agent session, a few files (10 points)"
+        - "M — a few sessions, several files (25 points)"
+        - "L — multi-session, cross-cutting (60 points)"
+    validations:
+      required: true
+
+  - type: input
+    id: bounty
+    attributes:
+      label: Bounty (optional)
+      description: Leave blank for points only. If a cash bounty is offered, say who pays and how; the maintainer will confirm before the task becomes ready.
+      placeholder: "none"
+
+  - type: input
+    id: submitter
+    attributes:
+      label: Submitting organization / contact (optional)
+      description: Who benefits from this task (a city, a lab, a department) and how to reach them for questions.
+      placeholder: "City of Example, KY — webmaster@example.gov"
+
+  - type: checkboxes
+    id: attest
+    attributes:
+      label: Submitter attestations
+      options:
+        - label: The acceptance criteria above are machine-checkable, or the human checklist names a reviewer who will check them.
+          required: true
+        - label: This task contains no secrets, credentials, or private personal data, and the solver will not need any to complete it.
+          required: true
+        - label: I understand the solver may use AI coding agents and that all work is reviewed by a human before merge.
+          required: true

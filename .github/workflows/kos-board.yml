@@ -1,0 +1,38 @@
+name: KOS board commands
+
+# Slash commands on task issues: /claim, /release, /extend, /status.
+# Logic lives in .github/kos/board.js (unit-tested with `npm run test:board`).
+# Only runs from the default branch (GitHub only fires issue_comment there).
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  contents: read
+  actions: write # to dispatch the site rebuild (kos-site.yml) after a state change
+
+# Serialize commands per issue so two /claim comments cannot interleave.
+concurrency:
+  group: kos-board-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  command:
+    if: >-
+      github.event.issue.pull_request == null &&
+      (contains(github.event.comment.body, '/claim') ||
+       contains(github.event.comment.body, '/release') ||
+       contains(github.event.comment.body, '/extend') ||
+       contains(github.event.comment.body, '/status'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const board = require(`${process.env.GITHUB_WORKSPACE}/.github/kos/board.js`);
+            const result = await board({ github, context, core });
+            core.info(JSON.stringify(result));

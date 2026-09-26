@@ -1,0 +1,102 @@
+name: KOS site
+
+# Builds the wiki (tools/build.js) from src/ plus fresh data and deploys it to
+# GitHub Pages. Runs:
+#   - on every push to main (a merged change goes live),
+#   - nightly (project pages track their repositories; the refreshed data
+#     snapshots are committed so the repository records what was published),
+#   - when a task changes: the board bots dispatch it with projects=false, and
+#     label changes made by people trigger it through the `issues` event,
+#   - by hand from the Actions tab.
+#
+# SECURITY: never runs code from a pull request. Project data comes only from
+# PUBLIC repositories (tools/fetch-projects.js filters twice).
+#
+# Requires Settings -> Pages -> Source: "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+    inputs:
+      projects:
+        description: "Re-read every public repository (false = reuse data/projects.json)"
+        type: boolean
+        default: true
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, assigned, unassigned, deleted]
+
+concurrency:
+  group: kos-site
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.event_name != 'issues' || contains(github.event.issue.labels.*.name, 'kos:task')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write # nightly data commit
+      issues: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Refresh project data (public repositories only)
+        if: github.event_name != 'issues' && (github.event_name != 'workflow_dispatch' || inputs.projects)
+        # On an API hiccup, fall back to the committed snapshot rather than not deploying.
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node tools/fetch-projects.js
+
+      - name: Refresh task-board data
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node .github/kos/leaderboard.js
+
+      - name: Build
+        run: node tools/build.js
+
+      - name: Commit refreshed data (nightly)
+        if: github.event_name == 'schedule'
+        run: |
+          git config user.name "kos-board[bot]"
+          git config user.email "kos-board@users.noreply.github.com"
+          git add data/projects.json data/board.json
+          if git diff --cached --quiet; then
+            echo "data unchanged"
+          else
+            git commit -m "data: refresh project and task-board snapshots"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

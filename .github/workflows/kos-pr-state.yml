@@ -1,0 +1,36 @@
+name: KOS PR state
+
+# Moves a task between leased / submitted / accepted as its pull request is
+# opened, closed, or merged. Logic in .github/kos/pr-state.js.
+#
+# SECURITY: this uses pull_request_target so it has write permissions on PRs
+# from forks. It therefore checks out the BASE branch only (the default for
+# pull_request_target) and never runs code from the PR. Keep it that way.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, edited, closed, ready_for_review]
+
+permissions:
+  issues: write
+  pull-requests: write
+  actions: write # to dispatch the site rebuild (bounty board, leaderboard)
+  contents: read
+
+concurrency:
+  group: kos-pr-state-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  transition:
+    if: contains(github.event.pull_request.body, '#')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4 # base branch — do not add `ref: pull_request.head.sha`
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const prState = require(`${process.env.GITHUB_WORKSPACE}/.github/kos/pr-state.js`);
+            const result = await prState({ github, context, core });
+            core.info(JSON.stringify(result));
