@@ -68,18 +68,25 @@ Two rules do most of the work:
    gh repo fork Kentucky-Open-Science/kentucky-open-science.github.io --clone
    cd kentucky-open-science.github.io && npm ci && npx playwright install --with-deps chromium
    ```
-2. **Pick a task** from the [open tasks](https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues?q=is%3Aissue+is%3Aopen+label%3Akos%3Aready) and **claim it** by commenting `/claim` on the issue. Within a minute the bot assigns you and posts the expiry time. If it refuses, it says why.
+2. **Pick a task** on the [bounty board](https://kentucky-open-science.github.io/bounties.html) (or from the [open issues](https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues?q=is%3Aissue+is%3Aopen+label%3Akos%3Aready)) and **claim it** by commenting `/claim` on the issue. Within a minute the bot assigns you and posts the expiry time. If it refuses, it says why. On the bounty board, clicking a task gives you a prompt that makes your coding agent do this step and the next ones for you.
 3. **Do the work** on a branch named `kos/<task-number>-<slug>` from the current `main`. `npm test` is the acceptance suite; the task's `FAIL_TO_PASS` IDs must go green and you must delete exactly those IDs from `tests/known-failures.json`.
-4. **Open the PR** using the template. Fill the `KOS-Task: #N` line, the provenance fields (model, harness, rough usage), and tick every attestation — including the one that says a human read the whole diff. That attestation is the product; do not sign it for your agent.
+4. **Open the PR** using the template. Fill the `KOS-Task: #N` line, the provenance fields (model, harness, rough usage), and tick every attestation — including the one that says a human read the whole diff. That attestation is the product; do not sign it for your agent. (If your agent opened the PR for you, tick the boxes on the PR page on GitHub; the gate re-runs.)
 5. **Respond to review.** When it merges you get the task's points; the issue closes itself.
 
 Need more time? `/extend` once. Can't finish? `/release` promptly so someone else can.
 
 ### Letting your agent drive
 
+The easiest way: open the [bounty board](https://kentucky-open-science.github.io/bounties.html),
+click a task, press **Copy prompt**, and paste it into your agent (Claude Code,
+Codex, Cursor, …) in any folder. The prompt names the task, forks and clones the
+repository if needed, claims the task, states the rules, and stops for your
+review before a pull request is opened. Maintainers edit its wording in
+`src/claim-prompt.txt`.
+
 The repository's `AGENTS.md` (and `CLAUDE.md`, which imports it) teaches agents
-the rules above. A prompt that works with Claude Code or Codex from inside your
-clone:
+the same rules. A prompt that works with Claude Code or Codex from inside your
+clone, for any open task:
 
 > Claim the next available KOS task and complete it. Use `gh issue list --label kos:ready` to find one, comment `/claim`, wait until `gh issue view <n> --json assignees` shows me as the assignee, then follow AGENTS.md: branch, implement, `npm test`, shrink `tests/known-failures.json` by exactly the FAIL_TO_PASS IDs, and open the PR with the template filled in. Stop before opening the PR and show me the diff.
 

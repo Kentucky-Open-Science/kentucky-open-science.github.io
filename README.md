@@ -64,6 +64,8 @@ src/layout.html            page shell: head, banner, navigation, footer (every p
 src/pages/*.html           hand-written pages (home, about)
 src/templates/*.js         data-driven pages (project directory, project pages, bounty board, leaderboard)
 src/styles.css, search.js  the stylesheet and the project search
+src/claim.js               the bounty board's task dialog (copyable agent prompt)
+src/claim-prompt.txt       the wording of that prompt; {{placeholders}} are filled per task
 src/site.json              navigation, research areas, site settings
 tools/                     build.js, fetch-projects.js, markdown.js, template.js
 data/                      nightly snapshots (generated; do not edit by hand)

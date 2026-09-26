@@ -34,7 +34,7 @@
 
   function tokenize(q) {
     return lower(q)
-      .split(/[^a-z0-9À-￿]+/)
+      .split(/[^a-z0-9\u00c0-\uffff]+/)
       .filter(Boolean);
   }
 
@@ -189,7 +189,7 @@
       return;
     }
     var res = tokenize(q).map(function (t) {
-      return { token: t, word: new RegExp('(^|[^a-z0-9À-￿])' + escapeRe(t)) };
+      return { token: t, word: new RegExp('(^|[^a-z0-9\u00c0-\uffff])' + escapeRe(t)) };
     });
     var list = index
       .filter(function (e) { return allowed(e.p); })
