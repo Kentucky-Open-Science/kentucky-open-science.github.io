@@ -1,6 +1,10 @@
 'use strict';
 // bounties.html: the task board as a page. Data comes from data/board.json,
 // which .github/kos/leaderboard.js collects from the repository's issues.
+//
+// Each open task's link opens a dialog (src/claim.js) with a ready-to-paste
+// prompt for the volunteer's coding agent, built from src/claim-prompt.txt.
+// Without JavaScript the links simply go to the GitHub issue.
 
 const { esc, day, plural } = require('./common');
 
@@ -9,7 +13,18 @@ function taskTitle(t) {
 }
 
 function taskLink(t) {
-  return `<a href="${esc(t.url)}">#${t.number} ${taskTitle(t)}</a>`;
+  return `<a href="${esc(t.url)}" data-task="${t.number}">#${t.number} ${taskTitle(t)}</a>`;
+}
+
+/** Everything src/claim.js needs, as JSON that is safe inside <script>. */
+function claimData(model) {
+  const { board, config, site } = model;
+  const tasks = {};
+  for (const t of board.tasks) {
+    tasks[t.number] = { number: t.number, title: t.title.replace(/^\[Task\]\s*/i, ''), url: t.url, state: t.state, size: t.size, points: t.points, holder: t.holder, expires: t.expires, pr: t.pr };
+  }
+  const data = { repo: site.repo, leaseHours: config.lease.hours, prompt: model.claimPrompt, tasks };
+  return JSON.stringify(data).replace(/</g, '\\u003c'); // so no </script> in the data can end the block early
 }
 
 function table(caption, head, rows) {
@@ -109,8 +124,10 @@ ${table('The most recent accepted tasks', ['Task', 'Solved by', 'Points', 'Merge
 
     <h2 id="how">How it works</h2>
     <ol>
-      <li><strong>Pick a task</strong> from the list below and comment
-        <code>/claim</code> on its GitHub issue. The board assigns it to you for
+      <li><strong>Pick a task</strong> from the list below. Clicking it gives you a
+        prompt to paste into your coding agent: the agent claims the task by
+        commenting <code>/claim</code> on its GitHub issue, follows the board&rsquo;s
+        rules, and stops for your review. The task is yours for
         ${config.lease.hours} hours. One task per person at a time.</li>
       <li><strong>Fix it</strong> in your fork. <code>npm test</code> runs the same
         checks the board uses; each task names the tests that must go from
@@ -135,6 +152,24 @@ ${sections.join('\n\n')}
 
     <p class="source-note">Board data as of ${esc(board.generated.replace('T', ' ').slice(0, 16))} UTC.
     The live state is always on <a href="${repoUrl}/issues?q=${encodeURIComponent(`is:issue label:${L.task}`)}">GitHub</a>.</p>
+
+    <dialog id="claim-dialog" class="claim-dialog" aria-labelledby="claim-title">
+      <div class="claim-titlebar">
+        <h2 id="claim-title">Claim a task</h2>
+        <button type="button" class="claim-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="claim-body">
+        <p class="claim-meta" id="claim-meta"></p>
+        <label for="claim-prompt">Paste this prompt into your coding agent (Claude Code, Codex, Cursor, &hellip;):</label>
+        <textarea id="claim-prompt" readonly rows="14" spellcheck="false"></textarea>
+        <div class="claim-actions">
+          <button type="button" class="claim-button" id="claim-copy" autofocus>Copy prompt</button>
+          <a class="claim-button" id="claim-issue">Open issue on GitHub</a>
+        </div>
+        <p class="claim-status" id="claim-status" role="status"></p>
+      </div>
+    </dialog>
+    <script type="application/json" id="claim-data">${claimData(model)}</script>
   </main>
 </div>`;
 }

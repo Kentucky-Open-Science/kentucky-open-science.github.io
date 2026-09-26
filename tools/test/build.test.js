@@ -72,6 +72,17 @@ test('a full build from the fixtures produces every page and a search index', ()
     const home = fs.readFileSync(path.join(out, 'index.html'), 'utf8');
     assert.match(home, /<title>Wiki home &mdash; Kentucky Open Science<\/title>/);
     assert.ok(!/\{\{/.test(home), 'no unrendered template tokens');
+
+    // The bounty board embeds the claim prompt and every open task for src/claim.js.
+    const bounties = fs.readFileSync(path.join(out, 'bounties.html'), 'utf8');
+    const block = bounties.match(/<script type="application\/json" id="claim-data">([\s\S]*?)<\/script>/);
+    assert.ok(block, 'claim-data block');
+    assert.ok(!block[1].includes('<'), 'no raw "<" inside the JSON block');
+    const claim = JSON.parse(block[1]);
+    const board = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'board.json'), 'utf8'));
+    assert.deepEqual(Object.keys(claim.tasks).map(Number).sort((a, b) => a - b), board.tasks.map((t) => t.number).sort((a, b) => a - b));
+    assert.match(claim.prompt, /\/claim/);
+    for (const t of board.tasks) assert.ok(bounties.includes(`data-task="${t.number}"`), `task link #${t.number}`);
   } finally {
     fs.rmSync(out, { recursive: true, force: true });
   }
