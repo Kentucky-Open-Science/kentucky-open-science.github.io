@@ -46,7 +46,7 @@ ${langs}
     </div>
   </aside>
 
-  <main class="main">
+  <main class="main" id="main">
     <h1>Project directory</h1>
     <p class="lede">
       All ${plural(stats.total, 'public repository', 'public repositories')} in the
