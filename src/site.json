@@ -1,0 +1,72 @@
+{
+  "$comment": "Site settings for the KOS wiki. Maintainers edit this file; tools/build.js reads it. Project facts come from data/projects.json (refreshed from GitHub), never from here.",
+  "org": "Kentucky-Open-Science",
+  "siteTitle": "Kentucky Open Science",
+  "siteUrl": "https://kentucky-open-science.github.io/",
+  "repo": "Kentucky-Open-Science/kentucky-open-science.github.io",
+  "mission": "",
+  "nav": [
+    { "id": "home", "href": "index.html", "label": "Home" },
+    { "id": "projects", "href": "projects.html", "label": "Projects" },
+    { "id": "bounties", "href": "bounties.html", "label": "Bounty Board" },
+    { "id": "leaderboard", "href": "leaderboard.html", "label": "Leaderboard" },
+    { "id": "about", "href": "about.html", "label": "About" }
+  ],
+  "recentDays": 14,
+  "categories": [
+    {
+      "id": "ai",
+      "name": "Language models & AI tooling",
+      "blurb": "Large language models, agent tooling, and services for using them.",
+      "topics": ["large-language-models", "nlp", "llm", "agents"],
+      "projects": ["LLM-Wiki-Setup", "free-claude-code", "proxy-shield", "N-PEER", "FuturitiPOC", "langchain-caai", "CAAI-NAIRR-Pilot-Jupyter-Notebooks"]
+    },
+    {
+      "id": "imaging",
+      "name": "Medical imaging & digital pathology",
+      "blurb": "CT, whole-slide pathology images, endoscopy, and ECG.",
+      "topics": ["medical-imaging", "digital-pathology", "computed-tomography", "ecg"],
+      "projects": ["endoscopy-depth-prediction", "BDSA_Setup_Documentation", "DSA_OAuth_changes"]
+    },
+    {
+      "id": "neuro",
+      "name": "Neuroscience & EEG",
+      "blurb": "EEG signal processing and seizure detection.",
+      "topics": ["eeg", "neuroscience"],
+      "projects": []
+    },
+    {
+      "id": "robotics",
+      "name": "Robotics, drones & sensing",
+      "blurb": "Robots, drones, LiDAR, IoT, and the sensor data they collect.",
+      "topics": ["robotics", "sensors", "drone", "lidar", "iot"],
+      "projects": []
+    },
+    {
+      "id": "vision",
+      "name": "Computer vision",
+      "blurb": "Object detection and video analysis.",
+      "topics": ["computer-vision", "object-detection"],
+      "projects": []
+    },
+    {
+      "id": "informatics",
+      "name": "Research & clinical informatics",
+      "blurb": "REDCap modules and tools for research and hospital data.",
+      "topics": ["redcap", "clinical-informatics"],
+      "projects": ["CMS-Star-Rankings"]
+    },
+    {
+      "id": "other",
+      "name": "Other projects",
+      "blurb": "Everything that does not fit an area yet. Add GitHub topics to a repository to file it.",
+      "topics": [],
+      "projects": []
+    }
+  ],
+  "forksCategory": {
+    "id": "forks",
+    "name": "Forks of other projects",
+    "blurb": "Upstream projects KOS has forked to adapt, patch, or deploy. Their READMEs describe the upstream project unless noted."
+  }
+}

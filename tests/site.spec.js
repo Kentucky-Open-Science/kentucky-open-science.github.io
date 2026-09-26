@@ -4,8 +4,11 @@
 //
 // Test IDs:
 //   links/<page>    every internal link resolves; no placeholder href="#" links
-//   motion/<page>   with prefers-reduced-motion: reduce, nothing keeps animating (WCAG 2.2.2 / 2.3.3)
+//   motion/<page>   with prefers-reduced-motion: reduce, nothing keeps animating (WCAG 2.3.3)
+//   pause/<page>    moving/blinking content longer than 5 s can be paused or stopped (WCAG 2.2.2)
+//   linktext/<page> link text says where a link goes; same text, same destination (WCAG 2.4.4)
 //   focus/<page>    every element reached with Tab shows a visible focus indicator (WCAG 2.4.7)
+//   reflow/<page>   no horizontal scrolling at 320 CSS px (WCAG 1.4.10)
 //   content/*       acceptance tests for content tasks (see each test's comment)
 'use strict';
 
@@ -34,8 +37,10 @@ for (const pageName of PAGES) {
         continue;
       }
       if (/^(https?:|mailto:|tel:)/i.test(href)) continue; // external: not checked offline
-      const [file, fragment] = href.split('#');
-      const target = file ? file : pageName;
+      const [fileAndQuery, fragment] = href.split('#');
+      const file = fileAndQuery.split('?')[0];
+      // Resolve relative to the page's own directory (pages can live in projects/).
+      const target = file ? path.posix.normalize(path.posix.join(path.posix.dirname(pageName), file)) : pageName;
       if (!siteFileExists(target)) {
         problems.push(`broken link "${text}" -> ${href} (no such file: ${target})`);
         continue;
@@ -79,6 +84,74 @@ for (const pageName of PAGES) {
       running.join('\n'),
       `animations still running on ${pageName} with prefers-reduced-motion: reduce`,
     ).toBe('');
+  });
+}
+
+// ---------------------------------------------------------------------------
+// pause/<page>  (WCAG 2.2.2 Pause, Stop, Hide, Level A)
+// Anything that moves, blinks, or scrolls for more than five seconds must have
+// a way to pause, stop, or hide it — independent of prefers-reduced-motion.
+// Passes when, after activating a control named "pause"/"stop" (if the page
+// has one), no animation is left running that lasts longer than 5 seconds.
+// ---------------------------------------------------------------------------
+for (const pageName of PAGES) {
+  const id = `pause/${pageName}`;
+  test(id, async ({ page }) => {
+    applyBaseline(id);
+    await page.goto(pageName);
+    const control = page.getByRole('button', { name: /pause|stop/i }).or(page.getByRole('checkbox', { name: /pause|stop/i })).or(page.getByRole('switch', { name: /pause|stop/i }));
+    const hasControl = (await control.count()) > 0;
+    if (hasControl) await control.first().click();
+    await page.waitForTimeout(200);
+    const running = await page.evaluate(() =>
+      document
+        .getAnimations()
+        .filter((a) => a.playState === 'running')
+        .filter((a) => {
+          const t = a.effect ? a.effect.getComputedTiming() : { endTime: Infinity };
+          return !Number.isFinite(Number(t.endTime)) || Number(t.endTime) > 5000;
+        })
+        .map((a) => {
+          const el = /** @type {KeyframeEffect} */ (a.effect).target;
+          // @ts-ignore animationName exists on CSSAnimation
+          return `${el ? el.tagName.toLowerCase() + (el.className ? '.' + String(el.className).split(' ').join('.') : '') : '?'}: ${a.animationName || a.constructor.name}`;
+        }),
+    );
+    expect(
+      running.join('\n'),
+      `animations longer than 5 s still running on ${pageName} ${hasControl ? 'after using the pause control' : '(no pause/stop control found)'}`,
+    ).toBe('');
+  });
+}
+
+// ---------------------------------------------------------------------------
+// linktext/<page>  (WCAG 2.4.4 Link Purpose (In Context), Level A)
+// Screen-reader users often navigate by a list of links, out of context. Links
+// with the same text must lead to the same place, and link text may not be a
+// generic phrase such as "More Info" or "click here".
+// ---------------------------------------------------------------------------
+const GENERIC_LINK_TEXT = /^(more( info(rmation)?)?|read more|learn more|click here|here|link|details|go)$/i;
+for (const pageName of PAGES) {
+  const id = `linktext/${pageName}`;
+  test(id, async ({ page }) => {
+    applyBaseline(id);
+    await page.goto(pageName);
+    const links = await page.$$eval('a[href]', (as) =>
+      as.map((a) => ({ name: (a.getAttribute('aria-label') || a.textContent || '').replace(/\s+/g, ' ').trim(), href: a.href })),
+    );
+    const problems = [];
+    const byName = new Map();
+    for (const { name, href } of links) {
+      if (!name) problems.push(`link with no text -> ${href}`);
+      else if (GENERIC_LINK_TEXT.test(name)) problems.push(`generic link text "${name}" -> ${href}`);
+      const key = name.toLowerCase();
+      if (!byName.has(key)) byName.set(key, new Set());
+      byName.get(key).add(href);
+    }
+    for (const [name, hrefs] of byName) {
+      if (name && hrefs.size > 1 && !GENERIC_LINK_TEXT.test(name)) problems.push(`"${name}" links to ${hrefs.size} different places: ${[...hrefs].join(', ')}`);
+    }
+    expect([...new Set(problems)].join('\n'), `link text on ${pageName}`).toBe('');
   });
 }
 
@@ -236,25 +309,102 @@ test('content/site-title', async ({ page }) => {
 });
 
 // content/projects-page
-// A projects.html page must exist, be listed in tests/pages.json (so it is
-// covered by every other check), be linked from the primary nav of every
-// page, and link to at least five repositories in the Kentucky-Open-Science
-// GitHub organization.
+// projects.html must exist, be listed in tests/pages.json (so it is covered by
+// every other check), be linked from the primary nav of every page, and link
+// to a wiki page for every project in the data; every project page must link
+// to its repository in the Kentucky-Open-Science GitHub organization.
 test('content/projects-page', async ({ page }) => {
   const id = 'content/projects-page';
   applyBaseline(id);
   const problems = [];
+  const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'projects.json'), 'utf8'));
   if (!siteFileExists('projects.html')) problems.push('projects.html does not exist');
   if (!PAGES.includes('projects.html')) problems.push('projects.html is not listed in tests/pages.json');
   for (const pageName of PAGES) {
     const html = readSiteFile(pageName);
-    if (!/<nav[\s\S]*?href=["']projects\.html["'][\s\S]*?<\/nav>/i.test(html)) problems.push(`${pageName}: primary <nav> has no link to projects.html`);
+    if (!/<nav[\s\S]*?href=["'](\.\.\/)*projects\.html["'][\s\S]*?<\/nav>/i.test(html)) problems.push(`${pageName}: primary <nav> has no link to projects.html`);
   }
   if (siteFileExists('projects.html')) {
     await page.goto('projects.html');
-    const repoLinks = await page.$$eval('a[href]', (as, org) => as.map((a) => a.href).filter((h) => h.startsWith(org) && h.length > org.length), ORG_URL);
-    if (new Set(repoLinks).size < 5) problems.push(`projects.html links to ${new Set(repoLinks).size} org repositories (need >= 5)`);
+    const hrefs = new Set(await page.$$eval('#catalog a[href]', (as) => as.map((a) => a.getAttribute('href'))));
+    for (const p of fixture.projects) {
+      const rel = `projects/${encodeURIComponent(p.name)}.html`;
+      if (!hrefs.has(rel)) problems.push(`projects.html does not link to ${rel}`);
+      if (!siteFileExists(`projects/${p.name}.html`)) {
+        problems.push(`no page for ${p.name}`);
+        continue;
+      }
+      if (!readSiteFile(`projects/${p.name}.html`).includes(`href="${ORG_URL}${p.name}"`)) problems.push(`projects/${p.name}.html does not link to ${ORG_URL}${p.name}`);
+    }
   }
+  expect(problems.join('\n')).toBe('');
+});
+
+// content/no-private-repos
+// PRIVACY GUARD. The wiki must only ever describe public repositories. Checks
+// the committed snapshot (data/projects.json, deployed nightly) and the fixture.
+test('content/no-private-repos', async () => {
+  const id = 'content/no-private-repos';
+  applyBaseline(id);
+  const problems = [];
+  for (const rel of ['data/projects.json', 'tests/fixtures/projects.json']) {
+    const data = JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
+    for (const p of data.projects) {
+      if (p.visibility !== 'public') problems.push(`${rel}: ${p.name} has visibility "${p.visibility}"`);
+      if (!String(p.url).startsWith(ORG_URL)) problems.push(`${rel}: ${p.name} is not in the organization (${p.url})`);
+    }
+  }
+  expect(problems.join('\n')).toBe('');
+});
+
+// content/search
+// The project search on projects.html finds projects by name, topic, and
+// README text, reports the number of matches in a live status message, and
+// says so when nothing matches.
+test('content/search', async ({ page }) => {
+  const id = 'content/search';
+  applyBaseline(id);
+  await page.goto('projects.html');
+  const box = page.getByRole('searchbox', { name: 'Search projects' });
+  const status = page.locator('#search-status');
+  const results = page.locator('#search-results');
+
+  await box.fill('dale');
+  await expect(status).toContainText('match');
+  await expect(results.locator('a.project-name').first()).toHaveText('DALE-CT');
+
+  await box.fill('robotics');
+  await expect(results.locator('a.project-name', { hasText: 'Temi-VOC-Datasets' })).toBeVisible();
+
+  await box.fill('LeJEPA'); // only in DALE-CT's README text
+  await expect(results.locator('a.project-name', { hasText: 'DALE-CT' })).toBeVisible();
+
+  await box.fill('zzqqxx-no-such-project');
+  await expect(status).toContainText('No projects match');
+
+  await box.fill('');
+  await expect(page.locator('#catalog')).toBeVisible();
+
+  await page.goto('projects.html?q=vllm');
+  await expect(results.locator('a.project-name').first()).toHaveText('vllm');
+});
+
+// content/bounty-board
+// bounties.html lists every task that is open to claim, links each to its
+// GitHub issue, and shows its points; the home page links to the board.
+test('content/bounty-board', async ({ page }) => {
+  const id = 'content/bounty-board';
+  applyBaseline(id);
+  const problems = [];
+  const board = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'board.json'), 'utf8'));
+  await page.goto('bounties.html');
+  const text = await page.locator('main').innerText();
+  for (const t of board.tasks.filter((x) => x.state === 'ready')) {
+    const link = page.locator(`main a[href="${t.url}"]`);
+    if ((await link.count()) === 0) problems.push(`no link to ready task #${t.number}`);
+    if (!text.includes(String(t.points))) problems.push(`points for #${t.number} not shown`);
+  }
+  if (!/href="bounties\.html"/.test(readSiteFile('index.html'))) problems.push('index.html does not link to bounties.html');
   expect(problems.join('\n')).toBe('');
 });
 
@@ -278,6 +428,31 @@ test('content/skip-link', async ({ page }) => {
     });
     if (!first) problems.push(`${pageName}: nothing focusable`);
     else if (!/skip/i.test(first.text) || !first.targetsMain) problems.push(`${pageName}: first Tab stop is "${first.text}" (${first.href}), not a skip link to <main>`);
+  }
+  expect(problems.join('\n')).toBe('');
+});
+
+// content/current-page
+// The top navigation shows the current section visually (orange tab). The same
+// information must be available to assistive technology (WCAG 1.3.1): exactly
+// one link in the primary <nav> carries aria-current, and on the section's own
+// page (index, projects, bounties, leaderboard, about) its value is "page".
+test('content/current-page', async ({ page }) => {
+  const id = 'content/current-page';
+  applyBaseline(id);
+  const problems = [];
+  for (const pageName of PAGES) {
+    await page.goto(pageName);
+    const marked = await page.$$eval('body > nav a[aria-current]:not([aria-current="false"])', (as) =>
+      as.map((a) => ({ href: a.getAttribute('href'), value: a.getAttribute('aria-current') })),
+    );
+    if (marked.length !== 1) {
+      problems.push(`${pageName}: ${marked.length} nav links have aria-current (need exactly 1)`);
+      continue;
+    }
+    if (!pageName.includes('/') && (marked[0].href !== pageName || marked[0].value !== 'page')) {
+      problems.push(`${pageName}: aria-current is on ${marked[0].href} ("${marked[0].value}"), expected aria-current="page" on the link to ${pageName}`);
+    }
   }
   expect(problems.join('\n')).toBe('');
 });

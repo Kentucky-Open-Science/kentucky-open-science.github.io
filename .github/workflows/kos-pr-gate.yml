@@ -38,10 +38,13 @@ jobs:
 
       - run: npm ci
 
+      - name: Unit tests (board bots, site builder)
+        run: npm run test:unit
+
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run the suite
+      - name: Run the suite (builds _site-test/ from src/ + tests/fixtures/ first)
         id: suite
         run: npm test
         continue-on-error: true

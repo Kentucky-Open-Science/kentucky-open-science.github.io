@@ -12,21 +12,56 @@
     "leased": "kos:leased",
     "submitted": "kos:submitted",
     "accepted": "kos:accepted",
-    "sizes": { "S": "kos:size-S", "M": "kos:size-M", "L": "kos:size-L" },
+    "sizes": {
+      "S": "kos:size-S",
+      "M": "kos:size-M",
+      "L": "kos:size-L"
+    },
     "definitions": {
-      "kos:task": { "color": "1c3a78", "description": "A KOS task-board task (see docs/KOS-TASK-BOARD.md)" },
-      "kos:triage": { "color": "d4c5f9", "description": "Task submitted; acceptance criteria not yet validated by a maintainer" },
-      "kos:ready": { "color": "0e8a16", "description": "Claimable: comment /claim to lease this task" },
-      "kos:leased": { "color": "fbca04", "description": "Leased to the assignee until the expiry in the lease comment" },
-      "kos:submitted": { "color": "1d76db", "description": "A pull request from the lease holder is under review" },
-      "kos:accepted": { "color": "5319e7", "description": "Merged and credited on the leaderboard" },
-      "kos:size-S": { "color": "c2e0c6", "description": "Small: roughly one agent session (10 points)" },
-      "kos:size-M": { "color": "bfd4f2", "description": "Medium: a few sessions (25 points)" },
-      "kos:size-L": { "color": "f9d0c4", "description": "Large: multi-session, multi-file (60 points)" }
+      "kos:task": {
+        "color": "1c3a78",
+        "description": "A KOS task-board task (see docs/KOS-TASK-BOARD.md)"
+      },
+      "kos:triage": {
+        "color": "d4c5f9",
+        "description": "Task submitted; acceptance criteria not yet validated by a maintainer"
+      },
+      "kos:ready": {
+        "color": "0e8a16",
+        "description": "Claimable: comment /claim to lease this task"
+      },
+      "kos:leased": {
+        "color": "fbca04",
+        "description": "Leased to the assignee until the expiry in the lease comment"
+      },
+      "kos:submitted": {
+        "color": "1d76db",
+        "description": "A pull request from the lease holder is under review"
+      },
+      "kos:accepted": {
+        "color": "5319e7",
+        "description": "Merged and credited on the leaderboard"
+      },
+      "kos:size-S": {
+        "color": "c2e0c6",
+        "description": "Small: roughly one agent session (10 points)"
+      },
+      "kos:size-M": {
+        "color": "bfd4f2",
+        "description": "Medium: a few sessions (25 points)"
+      },
+      "kos:size-L": {
+        "color": "f9d0c4",
+        "description": "Large: multi-session, multi-file (60 points)"
+      }
     }
   },
   "points": {
-    "bySize": { "S": 10, "M": 25, "L": 60 },
+    "bySize": {
+      "S": 10,
+      "M": 25,
+      "L": 60
+    },
     "default": 10,
     "reviewerShare": 0.25
   },
@@ -34,9 +69,8 @@
     "resultsFile": "reports/kos-results.json",
     "baselineFile": "tests/known-failures.json"
   },
-  "leaderboard": {
-    "dataFile": "data/leaderboard.json",
-    "pageFile": "leaderboard.html",
-    "siteTitle": "Kentucky Open Science"
+  "board": {
+    "dataFile": "data/board.json",
+    "siteWorkflow": "kos-site.yml"
   }
 }

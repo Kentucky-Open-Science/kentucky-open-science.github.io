@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 // Minimal static file server for the test harness. No dependencies.
-// Serves the repository root (the site) on PORT (default 4173).
+// Serves a built site directory (default _site/, or --dir <dir>) on PORT (default 4173).
 'use strict';
 
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
+const dirArg = process.argv.indexOf('--dir');
+const ROOT = path.resolve(__dirname, '..', dirArg >= 0 ? process.argv[dirArg + 1] : '_site');
 const PORT = Number(process.env.PORT || 4173);
 
 const TYPES = {
@@ -30,6 +31,10 @@ const TYPES = {
 
 const server = http.createServer((req, res) => {
   let urlPath = decodeURIComponent((req.url || '/').split('?')[0].split('#')[0]);
+  if (urlPath === '/__health') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    return res.end('ok');
+  }
   if (urlPath.endsWith('/')) urlPath += 'index.html';
   const filePath = path.normalize(path.join(ROOT, urlPath));
   if (!filePath.startsWith(ROOT)) {

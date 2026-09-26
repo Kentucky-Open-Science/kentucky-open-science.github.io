@@ -14,7 +14,7 @@ on:
 permissions:
   issues: write
   pull-requests: write
-  actions: write # to dispatch the leaderboard rebuild after a merge
+  actions: write # to dispatch the site rebuild (bounty board, leaderboard)
   contents: read
 
 concurrency:

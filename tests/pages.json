@@ -1,8 +1,9 @@
 [
   "index.html",
-  "tech.html",
-  "pop-culture.html",
-  "about.html",
-  "guestbook.html",
-  "leaderboard.html"
+  "projects.html",
+  "projects/DALE-CT.html",
+  "projects/vllm.html",
+  "bounties.html",
+  "leaderboard.html",
+  "about.html"
 ]
