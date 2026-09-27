@@ -1,14 +1,137 @@
 {
-  "generated": "2026-09-26T23:02:34.007Z",
+  "generated": "2026-09-27T12:11:30.086Z",
   "repo": "Kentucky-Open-Science/kentucky-open-science.github.io",
   "status": {
-    "ready": 0,
+    "ready": 9,
     "leased": 0,
     "submitted": 0,
     "triage": 0
   },
-  "accepted": 0,
-  "tasks": [],
-  "leaderboard": [],
-  "completions": []
+  "accepted": 1,
+  "tasks": [
+    {
+      "number": 3,
+      "title": "[Task] Honor prefers-reduced-motion (Kentucky shimmer, marquee, blinking badges)",
+      "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/3",
+      "state": "ready",
+      "size": "S",
+      "points": 10,
+      "holder": null,
+      "expires": null,
+      "pr": null
+    },
+    {
+      "number": 4,
+      "title": "[Task] Let visitors pause the moving and blinking content (WCAG 2.2.2)",
+      "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/4",
+      "state": "ready",
+      "size": "M",
+      "points": 25,
+      "holder": null,
+      "expires": null,
+      "pr": null
+    },
+    {
+      "number": 5,
+      "title": "[Task] Put the announcements marquee in a named landmark",
+      "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/5",
+      "state": "ready",
+      "size": "S",
+      "points": 10,
+      "holder": null,
+      "expires": null,
+      "pr": null
+    },
+    {
+      "number": 6,
+      "title": "[Task] Replace the placeholder Web Rings links on the home page",
+      "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/6",
+      "state": "ready",
+      "size": "S",
+      "points": 10,
+      "holder": null,
+      "expires": null,
+      "pr": null
+    },
+    {
+      "number": 7,
+      "title": "[Task] Make every link's text say where it goes",
+      "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/7",
+      "state": "ready",
+      "size": "M",
+      "points": 25,
+      "holder": null,
+      "expires": null,
+      "pr": null
+    },
+    {
+      "number": 8,
+      "title": "[Task] Tell assistive technology which page is current in the navigation",
+      "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/8",
+      "state": "ready",
+      "size": "S",
+      "points": 10,
+      "holder": null,
+      "expires": null,
+      "pr": null
+    },
+    {
+      "number": 9,
+      "title": "[Task] Make project pages reflow at 320 px (WCAG 1.4.10)",
+      "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/9",
+      "state": "ready",
+      "size": "S",
+      "points": 10,
+      "holder": null,
+      "expires": null,
+      "pr": null
+    },
+    {
+      "number": 10,
+      "title": "[Task] Make the bounty board's tables reflow at 320 px (WCAG 1.4.10)",
+      "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/10",
+      "state": "ready",
+      "size": "S",
+      "points": 10,
+      "holder": null,
+      "expires": null,
+      "pr": null
+    },
+    {
+      "number": 11,
+      "title": "[Task] Add a custom 404 page",
+      "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/11",
+      "state": "ready",
+      "size": "S",
+      "points": 10,
+      "holder": null,
+      "expires": null,
+      "pr": null
+    }
+  ],
+  "leaderboard": [
+    {
+      "login": "armstrongsam25",
+      "points": 10,
+      "tasks": 1,
+      "reviews": 0,
+      "last": "2026-09-27T00:54:18Z",
+      "rank": 1
+    }
+  ],
+  "completions": [
+    {
+      "task": 2,
+      "title": "[Task] Add a skip-to-content link to every page",
+      "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/issues/2",
+      "solver": "armstrongsam25",
+      "size": "S",
+      "points": 10,
+      "reviewers": [],
+      "reviewerPoints": 3,
+      "pr": 13,
+      "prUrl": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io/pull/13",
+      "mergedAt": "2026-09-27T00:54:18Z"
+    }
+  ]
 }

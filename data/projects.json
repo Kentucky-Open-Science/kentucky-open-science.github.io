@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-26T23:02:33.253Z",
+ "generated": "2026-09-27T12:11:29.527Z",
  "org": {
   "login": "Kentucky-Open-Science",
   "name": "Kentucky Open Science",
@@ -3563,21 +3563,25 @@
    "topics": [
     "kentucky-open-science"
    ],
-   "language": "HTML",
+   "language": "JavaScript",
    "languages": [
     {
-     "name": "HTML",
+     "name": "JavaScript",
      "percent": 80.9
     },
     {
      "name": "CSS",
-     "percent": 19.1
+     "percent": 11.1
+    },
+    {
+     "name": "HTML",
+     "percent": 8
     }
    ],
    "license": null,
    "stars": 0,
    "forks": 0,
-   "openIssues": 0,
+   "openIssues": 9,
    "hasIssues": true,
    "archived": false,
    "fork": false,
@@ -3585,15 +3589,56 @@
    "parent": null,
    "defaultBranch": "main",
    "createdAt": "2026-04-29T13:40:31Z",
-   "pushedAt": "2026-05-01T18:47:24Z",
-   "sizeKb": 16,
-   "readme": null,
+   "pushedAt": "2026-09-27T02:16:47Z",
+   "sizeKb": 315,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io#readme",
+    "summary": [
+     "This repository is two things:",
+     "The site is the board's first customer: it is being brought to WCAG 2.1 AA (the standard adopted by the ADA Title II web rule) one claimed task at a time, in public. The retro 1990s look is deliberate and stays; the accessibility problems that come with it are the tasks.",
+     "The KOS site workflow refreshes both data files, builds, and deploys to GitHub Pages on every push to main, nightly, and whenever a task changes state. The nightly run commits the refreshed data so the repository records what was published.",
+     "Only public repositories are ever read or published: the fetcher asks GitHub for public repositories and re-checks every entry, and the test suite fails if the committed data contains anything else (content/no-private-repos)."
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "How the site is built",
+      "anchor": "how-the-site-is-built"
+     },
+     {
+      "level": 2,
+      "text": "Run it locally",
+      "anchor": "run-it-locally"
+     },
+     {
+      "level": 2,
+      "text": "Run the checks",
+      "anchor": "run-the-checks"
+     },
+     {
+      "level": 2,
+      "text": "Claim a task",
+      "anchor": "claim-a-task"
+     },
+     {
+      "level": 2,
+      "text": "Submit a task",
+      "anchor": "submit-a-task"
+     },
+     {
+      "level": 2,
+      "text": "Layout",
+      "anchor": "layout"
+     }
+    ],
+    "text": "This repository is two things:\n• The KOS wiki at kentucky-open-science.github.io: a searchable page for every public repository in the Kentucky-Open-Science organization, generated from GitHub data and rebuilt every night. • The pilot of the KOS task board: organizations post small, testable programming tasks, and volunteers complete them with the AI-agent hours they would otherwise lose at the end of the week. The board is this repository's issues; the rules are in docs/KOS-TASK-BOARD.md; open tasks are on the bounty board and the score is on the leaderboard.\nThe site is the board's first customer: it is being brought to WCAG 2.1 AA (the standard adopted by the ADA Title II web rule) one claimed task at a time, in public. The retro 1990s look is deliberate and stays; the accessibility problems that come with it are the tasks.\nHow the site is built\nThe KOS site workflow refreshes both data files, builds, and deploys to GitHub Pages on every push to main, nightly, and whenever a task changes state. The nightly run commits the refreshed data so the repository records what was published.\nOnly public repositories are ever read or published: the fetcher asks GitHub for public repositories and re-checks every entry, and the test suite fails if the committed data contains anything else (content/no-private-repos).\nTo fix what a project page says, change the repository on GitHub (its description, topics, or README). Research areas are assigned from GitHub topics; the mapping is in src/site.json.\nRun it locally\nRun the checks\nnpm test builds the site into _site-test/ from frozen fixtures in tests/fixtures/, not from the nightly data, so test results change only when the site's code changes. Every test has a stable ID; tests/known-failures.json lists the ones expected to fail today, and it shrinks as tasks are completed.\nClaim a task\nOpen the bounty board or the claimable issues, comment /claim, and follow the volunteer guide. Coding agents get their instructions from AGENTS.md.\nSubmit a task\nUse the KOS task issue template. A task needs a problem statement, a scope, and the IDs of tests that fail now and must pass when it is done. If no test exists yet, that is the first thing to write.\nLayout"
+   },
    "release": null,
    "contributors": [
     {
      "login": "armstrongsam25",
      "url": "https://github.com/armstrongsam25",
-     "contributions": 1
+     "contributions": 15
     },
     {
      "login": "codybum",
