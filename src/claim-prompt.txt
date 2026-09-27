@@ -19,7 +19,8 @@ The board runs on GitHub issues and bots. Follow these steps and rules exactly: 
 3. Claim the task.
    - Check that it is open: gh issue view {{number}} --repo {{repo}} --json labels,assignees
      If it is not labeled kos:ready, stop and tell me who holds it.
-   - Claim it: gh issue comment {{number}} --repo {{repo}} --body "/claim"
+   - Claim it: echo /claim | gh issue comment {{number}} --repo {{repo}} --body-file -
+     Post every slash command this way, piped in through echo: Git Bash on Windows turns a --body argument that starts with "/" into a file path, and the bot ignores that.
    - A bot answers within a minute or two. Check the issue again until it is labeled kos:leased and assigned to me. If the bot refuses (for example because I already hold another task), stop and tell me what it said.
    - The lease lasts {{leaseHours}} hours; when it expires the task goes back to the pool. To get {{leaseHours}} more hours, comment /extend (allowed once). If we cannot finish, comment /release so someone else can. One task per person at a time.
 
@@ -32,10 +33,10 @@ The board runs on GitHub issues and bots. Follow these steps and rules exactly: 
    - Run npm test until it passes. Every FAIL_TO_PASS test ID in the issue must pass, and you must delete exactly those IDs from tests/known-failures.json. Never add IDs to that file (AGENTS.md describes the one exception, for new pages). Do not edit tests/fixtures/, add dependencies, change unrelated files, or include secrets.
 
 5. Stop for my review.
-   - Commit, then push the branch to my fork: git push -u origin {{branch}}
+   - Commit, then push the branch: git push -u origin {{branch}} (origin is my fork, or {{repo}} itself if I can push there)
    - Draft the pull request description from .github/PULL_REQUEST_TEMPLATE.md: "KOS-Task: #{{number}}", a short summary, the Provenance fields (your model, the tool you are running in, and roughly how much usage this took), and the FAIL_TO_PASS IDs. Leave every attestation box unticked.
    - Show me the full diff and the description, then wait. I have to read the diff myself.
 
 6. Only when I say so, open the pull request:
      gh pr create --repo {{repo}} --base main --head <my GitHub login>:{{branch}} --title "{{title}}" --body-file <the description file>
-   Give me the link. I will tick the attestation boxes on GitHub myself, which re-runs the gate. If the gate reports a problem, fix it and push again.
+   (If origin is {{repo}} itself rather than my fork, use --head {{branch}}.) Give me the link. I will tick the attestation boxes on GitHub myself, which re-runs the gate. If the gate reports a problem, fix it and push again.

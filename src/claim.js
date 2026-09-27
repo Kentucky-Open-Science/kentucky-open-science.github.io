@@ -65,7 +65,9 @@
     titleEl.textContent = 'Task #' + t.number + ': ' + t.title;
     metaEl.textContent = (SIZES[t.size] || 'Task') + ' · ' + t.points + ' points · ' + stateText(t);
     promptEl.value = fill(data.prompt, vars);
-    issueLink.href = t.url;
+    // Only ever link to an issue on GitHub (never, say, a javascript: URL).
+    if (/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/issues\/\d+$/.test(t.url)) issueLink.href = t.url;
+    else issueLink.removeAttribute('href');
     statusEl.textContent = '';
     copyBtn.textContent = 'Copy prompt';
     opener = link;

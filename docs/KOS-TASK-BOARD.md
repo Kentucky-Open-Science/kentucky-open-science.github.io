@@ -75,6 +75,10 @@ Two rules do most of the work:
 
 Need more time? `/extend` once. Can't finish? `/release` promptly so someone else can.
 
+Posting a command from a terminal? Use `echo /claim | gh issue comment <n> --body-file -`.
+Git Bash on Windows rewrites `--body "/claim"` into a file path such as
+`C:/Program Files/Git/claim`; the bot notices and replies with this hint, but the command does nothing.
+
 ### Letting your agent drive
 
 The easiest way: open the [bounty board](https://kentucky-open-science.github.io/bounties.html),

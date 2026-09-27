@@ -17,7 +17,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { execSync } = require('node:child_process');
+const { execFileSync } = require('node:child_process');
 const lib = require('./lib');
 
 const ROOT = path.resolve(__dirname, '..', '..');
@@ -41,8 +41,10 @@ async function ghGet(url) {
 
 function baseFile(rel) {
   const ref = process.env.KOS_BASE_REF || 'origin/main';
+  // A plain ref name only (no options, no revision syntax), and no shell.
+  if (!/^[A-Za-z0-9][\w./-]*$/.test(ref) || ref.includes('..')) throw new Error(`KOS_BASE_REF is not a plain git ref: ${ref}`);
   try {
-    return JSON.parse(execSync(`git show ${ref}:${rel}`, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }));
+    return JSON.parse(execFileSync('git', ['show', `${ref}:${rel}`], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }));
   } catch {
     return null;
   }
