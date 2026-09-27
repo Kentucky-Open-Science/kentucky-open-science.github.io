@@ -75,6 +75,22 @@ test('ignores comments on non-tasks, bots, and non-commands', async () => {
   assert.equal(gh2.__comments.length, 0);
 });
 
+test('a /claim that Git Bash turned into a path gets a hint instead of silence', async () => {
+  const issue = makeIssue(2, { labels: [L.task, L.ready] });
+  const gh = fakeGithub({ issues: [issue] });
+  const r = await board({ github: gh, context: context({ issue, comment: comment('ann', 'Y:/Program Files/Git/claim') }), core, now: NOW });
+  assert.equal(r.handled, true);
+  assert.equal(r.ok, false);
+  assert.match(lastComment(gh), /@ann .*`\/claim`/);
+  assert.match(lastComment(gh), /echo \/claim \| gh issue comment 2 --repo o\/r --body-file -/);
+  assert.ok(gh.__store.get(2).labels.has(L.ready), 'the task is not leased');
+  // Not a task: stay silent.
+  const other = makeIssue(9, { labels: ['bug'] });
+  const gh2 = fakeGithub({ issues: [other] });
+  assert.equal((await board({ github: gh2, context: context({ issue: other, comment: comment('ann', 'Y:/Program Files/Git/claim') }), core })).handled, false);
+  assert.equal(gh2.__comments.length, 0);
+});
+
 // ---------------------------------------------------------------------------
 // /release and /extend
 // ---------------------------------------------------------------------------

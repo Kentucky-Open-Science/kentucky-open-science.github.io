@@ -129,12 +129,19 @@ async function upsertLabels() {
 
 async function seedTasks() {
   const seeds = JSON.parse(fs.readFileSync(path.join(__dirname, 'seed-tasks.json'), 'utf8'));
+  const baseline = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', config.tests.baselineFile), 'utf8'));
   const existing = await paginate(`${API}/issues?state=all&labels=${encodeURIComponent(config.labels.task)}&per_page=100`);
   const titles = new Set(existing.filter((i) => !i.pull_request).map((i) => i.title));
   const stateLabel = STATE === 'triage' ? config.labels.triage : config.labels.ready;
   for (const t of seeds) {
     if (titles.has(t.title)) {
       console.log(`skip (exists): ${t.title}`);
+      continue;
+    }
+    // A task must name tests that fail today; anything not in the baseline already passes.
+    const passing = t.failToPass.filter((id) => !baseline.includes(id));
+    if (passing.length) {
+      console.log(`skip (FAIL_TO_PASS not in ${config.tests.baselineFile}: ${passing.join(', ')}): ${t.title}`);
       continue;
     }
     const labels = [config.labels.task, stateLabel, config.labels.sizes[t.size]];

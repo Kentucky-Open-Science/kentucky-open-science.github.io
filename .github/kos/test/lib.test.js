@@ -82,6 +82,12 @@ test('commands and task references', () => {
   assert.equal(lib.parseCommand('  /Extend please'), 'extend');
   assert.equal(lib.parseCommand('I would like to /claim this'), null);
   assert.equal(lib.parseCommand('/claimed'), null);
+  assert.equal(lib.parseMangledCommand('Y:/Program Files/Git/claim'), 'claim');
+  assert.equal(lib.parseMangledCommand('C:/msys64/extend\n'), 'extend');
+  assert.equal(lib.parseMangledCommand('C:\\Program Files\\Git\\release'), 'release');
+  assert.equal(lib.parseMangledCommand('/claim'), null);
+  assert.equal(lib.parseMangledCommand('see C:/src/claim.js'), null);
+  assert.equal(lib.parseMangledCommand('C:/Program Files/Git/claim\nplease'), null);
   assert.equal(lib.parseTaskRef('KOS-Task: #12\n\nCloses #7'), 12);
   assert.equal(lib.parseTaskRef('KOS-Task: 12'), 12);
   assert.equal(lib.parseTaskRef('KOS-Task: #<!-- task number -->\n\nFixes #7'), 7);
@@ -109,6 +115,14 @@ test('provenance parsing: a filled template passes', () => {
   assert.equal(p.model, 'Claude Opus 5.5');
   assert.equal(p.harness, 'Claude Code 2.1');
   assert.equal(p.usage, '~1 session');
+});
+
+test('provenance parsing: placeholder comments never count as values', () => {
+  const p = lib.parseProvenance('- Model(s): Claude Opus 5.5 <!-- e.g. GPT-5.2 -->\n- Harness: <!-- by hand --!>\n- Approx. usage: <!-- e.g.\nlots -->');
+  assert.equal(p.model, 'Claude Opus 5.5');
+  assert.deepEqual(p.missing, ['Harness']);
+  assert.equal(p.usage, '');
+  assert.deepEqual(lib.parseProvenance('- Model(s): <!-- never closed\n- Harness: x').missing, ['Model(s)']);
 });
 
 test('splitTestId handles pages in subdirectories', () => {

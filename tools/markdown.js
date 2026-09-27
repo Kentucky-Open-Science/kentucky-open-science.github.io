@@ -17,16 +17,29 @@ function decodeEntities(s) {
   });
 }
 
+/** Apply a removal until nothing changes, so pieces cannot recombine ("<scr<b>ipt>"). */
+function removeAll(s, re) {
+  let prev;
+  do {
+    prev = s;
+    s = s.replace(re, '');
+  } while (s !== prev);
+  return s;
+}
+
 /** Strip inline Markdown/HTML from one line or paragraph, leaving readable text. */
 function inlineText(s) {
-  return decodeEntities(
+  const noTags = removeAll(
     s
       .replace(/!\[[^\]]*\]\([^)]*\)/g, '') // images
       .replace(/!\[[^\]]*\]\[[^\]]*\]/g, '') // reference images
       .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // links
       .replace(/\[([^\]]*)\]\[[^\]]*\]/g, '$1') // reference links
-      .replace(/<(https?:\/\/[^>\s]+)>/g, '$1') // autolinks
-      .replace(/<\/?[a-z][^>]*>/gi, '') // inline HTML tags
+      .replace(/<(https?:\/\/[^>\s]+)>/g, '$1'), // autolinks
+    /<\/?[a-z][^>]*>/gi, // inline HTML tags
+  );
+  return decodeEntities(
+    noTags
       .replace(/`+([^`]*)`+/g, '$1') // code spans
       .replace(/(\*\*|__)(.+?)\1/g, '$2') // bold
       .replace(/(^|[\s(])[*_]([^*_\s][^*_]*?)[*_](?=[\s).,;:!?]|$)/g, '$1$2') // italics
@@ -58,10 +71,7 @@ function githubSlug(text, seen) {
  * @returns {{type:'heading'|'para'|'list'|'quote', level?:number, text:string}[]}
  */
 function blocks(md) {
-  const lines = String(md || '')
-    .replace(/\r\n?/g, '\n')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .split('\n');
+  const lines = removeAll(String(md || '').replace(/\r\n?/g, '\n'), /<!--[\s\S]*?-->/g).split('\n');
   const out = [];
   let buf = [];
   let kind = null;
