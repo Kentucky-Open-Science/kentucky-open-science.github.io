@@ -38,6 +38,12 @@ test('README summary skips the title, badges, code, and tables', () => {
   assert.ok(!s.text.includes('secret-sauce'), 'code blocks are not indexed');
 });
 
+test('README tags and comments cannot re-form after stripping', () => {
+  const s = summarize('Split tags <scr<b>ipt>like this</script> and <!<!-- -->-- hidden --> comments are removed from the summary text.');
+  assert.ok(!/<script|<!--/i.test(s.text), s.text);
+  assert.ok(!s.text.includes('hidden'), s.text);
+});
+
 test('GitHub heading anchors, including duplicates', () => {
   const seen = new Map();
   assert.equal(githubSlug('🚀 Quick Start!', seen), '-quick-start');

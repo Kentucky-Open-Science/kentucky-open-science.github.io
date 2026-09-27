@@ -187,6 +187,24 @@ function parseTaskRef(prBody) {
 }
 
 /**
+ * Remove HTML comments (the template's placeholders), including ones that span
+ * lines or end with "--!>". An unterminated comment runs to the end of the text.
+ */
+function stripHtmlComments(text) {
+  let out = '';
+  let i = 0;
+  for (;;) {
+    const start = text.indexOf('<!--', i);
+    if (start < 0) return out + text.slice(i);
+    out += text.slice(i, start);
+    const ends = [text.indexOf('-->', start + 4), text.indexOf('--!>', start + 4)].filter((e) => e >= 0);
+    if (!ends.length) return out;
+    const end = Math.min(...ends);
+    i = end + (text.startsWith('-->', end) ? 3 : 4);
+  }
+}
+
+/**
  * Provenance fields from the PR template. Returns { model, harness, usage,
  * attestations: {label: bool}, missing: [...] }.
  */
@@ -194,8 +212,7 @@ function parseProvenance(prBody) {
   const body = (prBody || '').replace(/\r\n/g, '\n');
   const field = (name) => {
     const m = body.match(new RegExp(`^\\s*[-*]?\\s*\\*{0,2}${name}\\*{0,2}\\s*:\\s*(.*)$`, 'im'));
-    const v = m ? m[1].trim() : '';
-    return /^(<!--.*-->)?$/.test(v) ? '' : v;
+    return m ? stripHtmlComments(m[1]).trim() : '';
   };
   const attestations = {};
   for (const m of body.matchAll(/^\s*[-*]\s*\[( |x|X)\]\s*(.+?)\s*$/gm)) {
