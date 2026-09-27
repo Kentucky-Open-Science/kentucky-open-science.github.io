@@ -17,7 +17,7 @@ board, labels are the state, GitHub Actions are the referee.
 2. [For volunteers: claiming and completing a task](#for-volunteers)
 3. [For submitters: writing a task](#for-submitters)
 4. [For maintainers: triage, review, operations](#for-maintainers)
-5. [Points, leaderboard, and bounties](#points-leaderboard-and-bounties)
+5. [Points and the leaderboard](#points-and-the-leaderboard)
 6. [What the pilot measures](#what-the-pilot-measures)
 7. [Security model](#security-model)
 
@@ -155,13 +155,12 @@ points (and reviewer credit to approvers), and closes the issue.
 - **Fork PRs from first-time contributors** need a maintainer to click "Approve and run" once (Settings → Actions → "Fork pull request workflows"). Set it to require approval only for first-time contributors, not for everyone, or the pilot will feel slow.
 - **Tests for the bots and the builder:** `npm run test:unit` runs the unit tests for the lease logic (with a fake GitHub API) and the site builder. The acceptance workflow runs them on every PR.
 
-## Points, leaderboard, and bounties
+## Points and the leaderboard
 
 - Points are fixed at acceptance from the size label: S = 10, M = 25, L = 60 (see config). The record is written into the task itself, so history does not change if the config does.
 - Each reviewer who approved the merged PR earns 25 % of the task's points. Review time is the scarce resource; this makes it visible.
 - Expired or released leases earn nothing and cost nothing.
 - The [leaderboard](https://kentucky-open-science.github.io/leaderboard.html) and the [bounty board](https://kentucky-open-science.github.io/bounties.html) are regenerated automatically and live on the KOS site.
-- A submitter may attach a cash bounty to a task. Because a task has exactly one solver there is nothing to split: the whole bounty goes to whoever completes it. Bounty handling waits until KOS has a legal entity; until then, points only.
 
 ## What the pilot measures
 

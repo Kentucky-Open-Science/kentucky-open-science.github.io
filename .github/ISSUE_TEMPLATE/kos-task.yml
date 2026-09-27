@@ -112,13 +112,6 @@ body:
       required: true
 
   - type: input
-    id: bounty
-    attributes:
-      label: Bounty (optional)
-      description: Leave blank for points only. If a cash bounty is offered, say who pays and how; the maintainer will confirm before the task becomes ready.
-      placeholder: "none"
-
-  - type: input
     id: submitter
     attributes:
       label: Submitting organization / contact (optional)
