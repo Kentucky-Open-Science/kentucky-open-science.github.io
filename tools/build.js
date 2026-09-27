@@ -12,7 +12,8 @@
 //   src/layout.html          page shell: <head>, banner, nav, footer
 //   src/partials/*.html      shared blocks ({{> name}})
 //   src/pages/*.html         hand-written pages (front matter + body)
-//   src/templates/*.js       data-driven pages: projects, project, bounties, leaderboard
+//   src/templates/*.js       data-driven pages: projects, project, bounties, leaderboard;
+//                            crawlers.js writes robots.txt, sitemap.xml, and llms.txt
 //   src/styles.css, src/search.js, src/claim.js
 //   src/claim-prompt.txt     the prompt the bounty board hands to volunteers' agents
 //   src/site.json            nav, research areas, site settings
@@ -28,6 +29,7 @@ const { renderProjects } = require('../src/templates/projects');
 const { renderProject } = require('../src/templates/project');
 const { renderBounties } = require('../src/templates/bounties');
 const { renderLeaderboard } = require('../src/templates/leaderboard');
+const { robotsTxt, sitemapXml, llmsTxt } = require('../src/templates/crawlers');
 
 const ROOT = path.resolve(__dirname, '..');
 const SRC = path.join(ROOT, 'src');
@@ -206,6 +208,9 @@ function build() {
   }
   for (const file of ['styles.css', 'search.js', 'claim.js']) fs.copyFileSync(path.join(SRC, file), path.join(OUT, file));
   fs.writeFileSync(path.join(OUT, 'search-index.json'), JSON.stringify(searchIndex(model)));
+  fs.writeFileSync(path.join(OUT, 'robots.txt'), robotsTxt(model.site));
+  fs.writeFileSync(path.join(OUT, 'sitemap.xml'), sitemapXml(model.site, pages.map(([rel]) => rel)));
+  fs.writeFileSync(path.join(OUT, 'llms.txt'), llmsTxt(model));
   fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
   if (!QUIET) console.log(`built ${pages.length} pages (${model.projects.length} projects) -> ${path.relative(ROOT, OUT) || '.'}`);
   return { pages: pages.map(([rel]) => rel), model };

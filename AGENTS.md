@@ -11,7 +11,7 @@ launched you. Follow this file exactly; the acceptance gate enforces it.
 - **Edit the sources in `src/`, never the output.** `_site/` and `_site-test/` are build output and are not committed.
   - `src/layout.html`: the shell every page shares (head, banner, navigation, footer).
   - `src/pages/*.html`: hand-written pages (front matter + body). Every file here becomes a page.
-  - `src/templates/*.js`: data-driven pages: `projects.js` (directory), `project.js` (one page per repository), `bounties.js`, `leaderboard.js`, `home.js` (home page fragments), `common.js` (navigation and shared pieces).
+  - `src/templates/*.js`: data-driven pages: `projects.js` (directory), `project.js` (one page per repository), `bounties.js`, `leaderboard.js`, `home.js` (home page fragments), `common.js` (navigation and shared pieces), `crawlers.js` (`robots.txt`, `sitemap.xml`, and `llms.txt`, which lists the open tasks for AI agents).
   - `src/styles.css`, `src/search.js`, `src/site.json`.
 - `data/*.json` is refreshed by bots. Never edit it by hand.
 - The retro late-1990s theme is intentional. Accessibility fixes must keep the look unless the task says to change it.

@@ -63,6 +63,7 @@ Use the **KOS task** issue template. A task needs a problem statement, a scope, 
 src/layout.html            page shell: head, banner, navigation, footer (every page)
 src/pages/*.html           hand-written pages (home, about)
 src/templates/*.js         data-driven pages (project directory, project pages, bounty board, leaderboard)
+src/templates/crawlers.js  robots.txt, sitemap.xml, and llms.txt (open tasks, for AI agents)
 src/styles.css, search.js  the stylesheet and the project search
 src/claim.js               the bounty board's task dialog (copyable agent prompt)
 src/claim-prompt.txt       the wording of that prompt; {{placeholders}} are filled per task

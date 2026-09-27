@@ -15,9 +15,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, PAGES, applyBaseline, readSiteFile, siteFileExists } = require('./helpers');
+const { ROOT, SITE, PAGES, applyBaseline, readSiteFile, siteFileExists } = require('./helpers');
 
 const ORG_URL = 'https://github.com/Kentucky-Open-Science/';
+// The published address; robots.txt, sitemap.xml, and llms.txt use absolute URLs.
+const SITE_URL = JSON.parse(fs.readFileSync(path.join(ROOT, 'src', 'site.json'), 'utf8')).siteUrl;
 
 // ---------------------------------------------------------------------------
 // links/<page>
@@ -521,4 +523,87 @@ test('content/readme', async () => {
   const p = path.join(ROOT, 'README.md');
   expect(fs.existsSync(p), 'README.md exists').toBe(true);
   expect(fs.readFileSync(p, 'utf8')).toMatch(/npm test/);
+});
+
+// content/robots-txt
+// robots.txt lets every crawler in, names the sitemap by its absolute URL, and
+// points AI agents to llms.txt.
+test('content/robots-txt', async () => {
+  const id = 'content/robots-txt';
+  applyBaseline(id);
+  const problems = [];
+  if (!siteFileExists('robots.txt')) problems.push('robots.txt does not exist');
+  else {
+    const robots = readSiteFile('robots.txt');
+    const rules = robots.split('\n').map((l) => l.replace(/#.*/, '').trim()).filter(Boolean);
+    if (!rules.some((l) => /^user-agent:\s*\*$/i.test(l))) problems.push('no "User-agent: *" group');
+    for (const l of rules.filter((r) => /^disallow:\s*\S/i.test(r))) problems.push(`"${l}" keeps crawlers out of part of the site`);
+    if (!rules.includes(`Sitemap: ${SITE_URL}sitemap.xml`)) problems.push(`no "Sitemap: ${SITE_URL}sitemap.xml" line`);
+    if (!robots.includes('/llms.txt')) problems.push('robots.txt does not point to /llms.txt');
+  }
+  expect(problems.join('\n')).toBe('');
+});
+
+// content/sitemap
+// sitemap.xml lists every page of the site by its absolute URL (the home page
+// as the site root), except 404.html, and nothing that is not a page.
+test('content/sitemap', async () => {
+  const id = 'content/sitemap';
+  applyBaseline(id);
+  const problems = [];
+  if (!siteFileExists('sitemap.xml')) problems.push('sitemap.xml does not exist');
+  else {
+    const xml = readSiteFile('sitemap.xml');
+    if (!xml.includes('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')) problems.push('no sitemaps.org <urlset>');
+    const listed = new Set();
+    for (const [, loc] of xml.matchAll(/<loc>([^<]*)<\/loc>/g)) {
+      if (!loc.startsWith(SITE_URL)) {
+        problems.push(`${loc} is not under ${SITE_URL}`);
+        continue;
+      }
+      const rel = decodeURIComponent(loc.slice(SITE_URL.length)) || 'index.html';
+      listed.add(rel);
+      if (!rel.endsWith('.html') || !siteFileExists(rel)) problems.push(`${loc} is not a page of the site`);
+    }
+    const builtPages = (dir, prefix = '') =>
+      fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+        e.isDirectory() ? builtPages(path.join(dir, e.name), `${prefix}${e.name}/`) : e.name.endsWith('.html') ? [prefix + e.name] : [],
+      );
+    for (const rel of builtPages(SITE)) {
+      if (rel === '404.html' && listed.has(rel)) problems.push('404.html is in the sitemap');
+      if (rel !== '404.html' && !listed.has(rel)) problems.push(`${rel} is missing from the sitemap`);
+    }
+  }
+  expect(problems.join('\n')).toBe('');
+});
+
+// content/llms-txt
+// llms.txt (https://llmstxt.org/) summarizes the site for AI agents: an H1, a
+// one-line summary, every task open to claim (and no other) with a link to its
+// issue and its points, and links to the board and its rules. It addresses the
+// person behind the agent, so it must ask agents not to claim or submit a task
+// without them.
+test('content/llms-txt', async () => {
+  const id = 'content/llms-txt';
+  applyBaseline(id);
+  const problems = [];
+  if (!siteFileExists('llms.txt')) problems.push('llms.txt does not exist');
+  else {
+    const md = readSiteFile('llms.txt');
+    const lines = md.split('\n');
+    if (lines[0] !== '# Kentucky Open Science') problems.push('the first line is not "# Kentucky Open Science"');
+    if (!lines.some((l) => /^> \S/.test(l))) problems.push('no "> summary" line');
+    const board = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'board.json'), 'utf8'));
+    for (const t of board.tasks) {
+      const line = lines.find((l) => l.includes(`](${t.url})`));
+      if (t.state !== 'ready') {
+        if (line) problems.push(`#${t.number} is listed, but it is ${t.state}, not open to claim`);
+      } else if (!line) problems.push(`task #${t.number} is open to claim but not listed`);
+      else if (!line.includes(`${t.points} points`)) problems.push(`the points for #${t.number} are not shown`);
+    }
+    if (!md.includes(`](${SITE_URL}bounties.html)`)) problems.push('no link to the bounty board');
+    if (!md.includes('/blob/main/AGENTS.md)')) problems.push('no link to AGENTS.md');
+    if (!/don['’]t claim or submit a task without them/i.test(md)) problems.push('llms.txt no longer asks agents not to claim or submit a task without their human');
+  }
+  expect(problems.join('\n')).toBe('');
 });

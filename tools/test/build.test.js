@@ -1,6 +1,6 @@
 'use strict';
-// Unit tests for the site builder: README handling, templating, and a full
-// build from the test fixtures.
+// Unit tests for the site builder: README handling, templating, the files for
+// crawlers and agents, and a full build from the test fixtures.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -9,6 +9,7 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const { summarize, githubSlug } = require('../markdown');
 const { render, esc, frontMatter } = require('../template');
+const { robotsTxt, sitemapXml, llmsTxt } = require('../../src/templates/crawlers');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 
@@ -64,12 +65,34 @@ test('front matter', () => {
   assert.equal(body, '<p>hi</p>\n');
 });
 
+test('llms.txt lists only tasks open to claim, in order, with link text that cannot break', () => {
+  const site = { siteTitle: 'Kentucky Open Science', org: 'Kentucky-Open-Science', repo: 'o/r', siteUrl: 'https://example.org/' };
+  const task = (number, state, title, points = 10) => ({ number, state, title, url: `https://github.com/o/r/issues/${number}`, size: 'S', points });
+  const md = llmsTxt({ site, board: { tasks: [task(9, 'ready', '[Task] Fix [the] a\\b link'), task(3, 'ready', '[Task] First', 1), task(5, 'leased', '[Task] Taken')] } });
+  assert.match(md, /^# Kentucky Open Science\n\n> /);
+  assert.deepEqual(
+    md.split('\n').filter((l) => l.startsWith('- [#')),
+    ['- [#3 First](https://github.com/o/r/issues/3): size S, 1 point', '- [#9 Fix \\[the\\] a\\\\b link](https://github.com/o/r/issues/9): size S, 10 points'],
+  );
+  assert.match(llmsTxt({ site, board: { tasks: [] } }), /^- None right now\. New tasks appear on the \[bounty board\]\(https:\/\/example\.org\/bounties\.html\)\.$/m);
+});
+
+test('robots.txt and sitemap.xml use absolute URLs; the sitemap starts at the root and skips 404.html', () => {
+  const site = { siteTitle: 'KOS', siteUrl: 'https://example.org' }; // no trailing slash on purpose
+  assert.match(robotsTxt(site), /^Sitemap: https:\/\/example\.org\/sitemap\.xml$/m);
+  const xml = sitemapXml(site, ['about.html', 'index.html', '404.html', 'projects/a b&c.html']);
+  assert.deepEqual(
+    [...xml.matchAll(/<loc>([^<]*)<\/loc>/g)].map((m) => m[1]),
+    ['https://example.org/', 'https://example.org/about.html', 'https://example.org/projects/a%20b%26c.html'],
+  );
+});
+
 test('a full build from the fixtures produces every page and a search index', () => {
   const out = fs.mkdtempSync(path.join(os.tmpdir(), 'kos-site-'));
   try {
     execFileSync(process.execPath, [path.join(ROOT, 'tools', 'build.js'), '--data', 'tests/fixtures', '--out', out, '--quiet'], { cwd: ROOT });
     const fixture = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'projects.json'), 'utf8'));
-    for (const page of ['index.html', 'projects.html', 'bounties.html', 'leaderboard.html', 'about.html', 'styles.css', 'search.js']) {
+    for (const page of ['index.html', 'projects.html', 'bounties.html', 'leaderboard.html', 'about.html', 'styles.css', 'search.js', 'robots.txt', 'sitemap.xml', 'llms.txt']) {
       assert.ok(fs.existsSync(path.join(out, page)), page);
     }
     for (const p of fixture.projects) assert.ok(fs.existsSync(path.join(out, 'projects', `${p.name}.html`)), p.name);
