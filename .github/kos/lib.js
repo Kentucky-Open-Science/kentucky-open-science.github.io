@@ -165,6 +165,16 @@ function parseCommand(commentBody) {
 }
 
 /**
+ * A slash command that a Windows shell rewrote into a file path: Git Bash
+ * (MSYS) turns `gh issue comment 2 --body "/claim"` into the comment
+ * "C:/Program Files/Git/claim". Returns the command that was meant, or null.
+ */
+function parseMangledCommand(commentBody) {
+  const m = (commentBody || '').trim().match(/^[A-Za-z]:[\\/](?:.*[\\/])?(claim|release|extend|status)$/i);
+  return m ? m[1].toLowerCase() : null;
+}
+
+/**
  * Task number referenced by a PR body: prefers an explicit "KOS-Task: #N" line,
  * otherwise the first "Closes/Fixes/Resolves #N".
  */
@@ -254,6 +264,7 @@ module.exports = {
   isExpired,
   fmt,
   parseCommand,
+  parseMangledCommand,
   parseTaskRef,
   parseProvenance,
 };
