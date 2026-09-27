@@ -117,6 +117,14 @@ test('provenance parsing: a filled template passes', () => {
   assert.equal(p.usage, '~1 session');
 });
 
+test('provenance parsing: placeholder comments never count as values', () => {
+  const p = lib.parseProvenance('- Model(s): Claude Opus 5.5 <!-- e.g. GPT-5.2 -->\n- Harness: <!-- by hand --!>\n- Approx. usage: <!-- e.g.\nlots -->');
+  assert.equal(p.model, 'Claude Opus 5.5');
+  assert.deepEqual(p.missing, ['Harness']);
+  assert.equal(p.usage, '');
+  assert.deepEqual(lib.parseProvenance('- Model(s): <!-- never closed\n- Harness: x').missing, ['Model(s)']);
+});
+
 test('splitTestId handles pages in subdirectories', () => {
   assert.deepEqual(lib.splitTestId('a11y/projects/DALE-CT.html/list'), { prefix: 'a11y', page: 'projects/DALE-CT.html', rule: 'list' });
   assert.deepEqual(lib.splitTestId('motion/index.html'), { prefix: 'motion', page: 'index.html', rule: '' });

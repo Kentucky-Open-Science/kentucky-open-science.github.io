@@ -32,8 +32,8 @@ for (const pageName of PAGES) {
     );
     const problems = [];
     for (const { href, text } of hrefs) {
-      if (href === '#' || href === '' || href.startsWith('javascript:')) {
-        problems.push(`placeholder link "${text}" (href="${href}")`);
+      if (href === '#' || href === '' || /^\s*(javascript|data|vbscript):/i.test(href)) {
+        problems.push(`placeholder or script link "${text}" (href="${href}")`);
         continue;
       }
       if (/^(https?:|mailto:|tel:)/i.test(href)) continue; // external: not checked offline
