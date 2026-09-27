@@ -81,9 +81,13 @@ remove its ID from the file. That is deliberate:
 ```bash
 gh issue list --label kos:ready                      # claimable tasks
 gh issue view <n>                                    # read a task
-gh issue comment <n> --body "/claim"                 # claim it
+echo /claim | gh issue comment <n> --body-file -     # claim it (/extend, /release the same way)
 npm run serve                                        # look at the site at http://127.0.0.1:4173/
 npx playwright test -g "a11y/index.html"             # one page's axe checks
 npx playwright test -g "content/"                    # content acceptance tests
 npm run test:unit                                    # unit tests for the bots and the builder
 ```
+
+Post slash commands through `echo` as above, never as `--body "/claim"`: Git Bash
+on Windows rewrites an argument that starts with `/` into a file path
+(`C:/Program Files/Git/claim`), and the bot ignores it.

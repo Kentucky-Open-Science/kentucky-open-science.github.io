@@ -22,7 +22,27 @@ async function board({ github, context, core, config = lib.CONFIG, now = new Dat
   if (comment.user && comment.user.type === 'Bot') return { handled: false, reason: 'bot comment' };
 
   const cmd = lib.parseCommand(comment.body);
-  if (!cmd) return { handled: false, reason: 'no command' };
+  if (!cmd) {
+    // Say so when a shell mangled the command, instead of staying silent.
+    const meant = lib.parseMangledCommand(comment.body);
+    if (!meant || !lib.isTask(issue.labels, config)) return { handled: false, reason: 'no command' };
+    const where = `${context.repo.owner}/${context.repo.repo}`;
+    await github.rest.issues.createComment({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      issue_number: issue.number,
+      body: [
+        `@${comment.user.login} that looks like \`/${meant}\` after your shell turned it into a file path (Git Bash on Windows does this to arguments that start with \`/\`), so nothing happened. Post it again with:`,
+        '',
+        '```',
+        `echo /${meant} | gh issue comment ${issue.number} --repo ${where} --body-file -`,
+        '```',
+        '',
+        `or type \`/${meant}\` in a comment here on GitHub.`,
+      ].join('\n'),
+    });
+    return { handled: true, cmd: meant, ok: false, reason: 'command mangled by the shell' };
+  }
   if (!lib.isTask(issue.labels, config)) return { handled: false, reason: 'not a task' };
 
   const repo = { owner: context.repo.owner, repo: context.repo.repo };

@@ -20,10 +20,27 @@ test('every seed task has the required fields and a valid size', () => {
   }
 });
 
-test('every FAIL_TO_PASS ID of a seed task is currently in the baseline', () => {
-  const missing = [];
-  for (const t of seeds) for (const id of t.failToPass) if (!baseline.includes(id)) missing.push(`${t.title}: ${id}`);
-  assert.deepEqual(missing, []);
+// A completed task's IDs leave the baseline for good, so this only checks that
+// every ID names a real test. (bootstrap.js refuses to file a seed task whose
+// IDs are not in the baseline, i.e. not failing today.)
+test('every FAIL_TO_PASS ID of a seed task names a test in the suite', () => {
+  const pages = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'pages.json'), 'utf8'));
+  const siteSpec = fs.readFileSync(path.join(ROOT, 'tests', 'site.spec.js'), 'utf8');
+  const perPage = new Set(['html', 'links', 'motion', 'pause', 'linktext', 'focus', 'reflow']);
+  const unknown = [];
+  for (const t of seeds) {
+    for (const id of t.failToPass) {
+      const { prefix, page, rule } = lib.splitTestId(id);
+      const known =
+        prefix === 'content'
+          ? siteSpec.includes(`test('${id}'`)
+          : prefix === 'a11y' || prefix === 'a11y-bp'
+            ? pages.includes(page) && /^[a-z0-9-]+$/.test(rule)
+            : perPage.has(prefix) && pages.includes(page) && !rule;
+      if (!known) unknown.push(`${t.title}: ${id}`);
+    }
+  }
+  assert.deepEqual(unknown, []);
 });
 
 test('every baselined failure is covered by exactly one seed task', () => {

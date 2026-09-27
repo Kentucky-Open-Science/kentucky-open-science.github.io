@@ -82,6 +82,12 @@ test('commands and task references', () => {
   assert.equal(lib.parseCommand('  /Extend please'), 'extend');
   assert.equal(lib.parseCommand('I would like to /claim this'), null);
   assert.equal(lib.parseCommand('/claimed'), null);
+  assert.equal(lib.parseMangledCommand('Y:/Program Files/Git/claim'), 'claim');
+  assert.equal(lib.parseMangledCommand('C:/msys64/extend\n'), 'extend');
+  assert.equal(lib.parseMangledCommand('C:\\Program Files\\Git\\release'), 'release');
+  assert.equal(lib.parseMangledCommand('/claim'), null);
+  assert.equal(lib.parseMangledCommand('see C:/src/claim.js'), null);
+  assert.equal(lib.parseMangledCommand('C:/Program Files/Git/claim\nplease'), null);
   assert.equal(lib.parseTaskRef('KOS-Task: #12\n\nCloses #7'), 12);
   assert.equal(lib.parseTaskRef('KOS-Task: 12'), 12);
   assert.equal(lib.parseTaskRef('KOS-Task: #<!-- task number -->\n\nFixes #7'), 7);
