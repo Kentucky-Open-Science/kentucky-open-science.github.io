@@ -117,7 +117,7 @@ ${links.join('\n')}
     </div>
 ${topicPanel}  </aside>
 
-  <main class="main">
+  <main class="main" id="main">
     <p class="breadcrumb"><a href="${root}projects.html">Projects</a> &raquo; <a href="${areaHref(area, root)}">${esc(area.name)}</a> &raquo; ${esc(p.name)}</p>
     <h1>${esc(p.name)}</h1>
 ${lede}
