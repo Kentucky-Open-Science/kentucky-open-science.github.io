@@ -73,7 +73,9 @@ for (const pageName of PAGES) {
         .map((a) => {
           const effect = /** @type {KeyframeEffect} */ (a.effect);
           const el = effect && effect.target;
-          const tag = el ? el.tagName.toLowerCase() + (el.className ? '.' + String(el.className).split(' ').join('.') : '') : '?';
+          // getAttribute, not className: on SVG elements className is an object.
+          const cls = el && el.getAttribute('class');
+          const tag = el ? el.tagName.toLowerCase() + (cls ? '.' + cls.split(' ').join('.') : '') : '?';
           const timing = effect ? effect.getTiming() : {};
           // @ts-ignore animationName exists on CSSAnimation
           return `${tag}: ${a.animationName || a.constructor.name} (iterations=${timing.iterations})`;
@@ -113,8 +115,9 @@ for (const pageName of PAGES) {
         })
         .map((a) => {
           const el = /** @type {KeyframeEffect} */ (a.effect).target;
+          const cls = el && el.getAttribute('class');
           // @ts-ignore animationName exists on CSSAnimation
-          return `${el ? el.tagName.toLowerCase() + (el.className ? '.' + String(el.className).split(' ').join('.') : '') : '?'}: ${a.animationName || a.constructor.name}`;
+          return `${el ? el.tagName.toLowerCase() + (cls ? '.' + cls.split(' ').join('.') : '') : '?'}: ${a.animationName || a.constructor.name}`;
         }),
     );
     expect(

@@ -92,45 +92,22 @@ a:hover { color: var(--red); background: #fff7a8; }
   font-style: italic;
 }
 
-/* ===== SPINNING GLOBE (pure CSS, no GIF) ===== */
-.globe {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 30% 30%, #b8e0ff 0%, #2a6dba 45%, #0d214a 100%),
-    #1c3a78;
-  position: relative;
-  overflow: hidden;
-  box-shadow: inset -6px -8px 14px rgba(0,0,0,0.45),
-              inset 4px 4px 8px rgba(255,255,255,0.35),
-              0 2px 4px var(--shadow);
+/* ===== SHIMMERING KENTUCKY (inline SVG in layout.html, no GIF) =====
+   A glossy map of the state; every 4 s a glint sweeps across it from left to
+   right. At rest (and with the animation removed) the glint sits off the map. */
+.ky-mark {
+  width: 112px;
+  height: 50.5px;               /* 112 x the viewBox's 45.1/100 */
   flex-shrink: 0;
+  filter: drop-shadow(0 2px 2px var(--shadow));
 }
-.globe::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 40% 25% at 25% 35%, #4a9c4a 30%, transparent 60%),
-    radial-gradient(ellipse 30% 20% at 65% 55%, #5cb85c 30%, transparent 60%),
-    radial-gradient(ellipse 25% 18% at 50% 78%, #4a9c4a 30%, transparent 60%),
-    radial-gradient(ellipse 20% 15% at 80% 30%, #5cb85c 30%, transparent 60%);
-  border-radius: 50%;
-  animation: globe-spin 4s linear infinite;
+.ky-mark .ky-shimmer {
+  transform: skewX(-20deg);
+  animation: ky-shimmer 4s ease-in-out infinite;
 }
-@keyframes globe-spin {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.globe::after {
-  /* gloss highlight */
-  content: "";
-  position: absolute;
-  top: 6px; left: 10px;
-  width: 18px; height: 14px;
-  background: radial-gradient(ellipse at center, rgba(255,255,255,0.6), transparent 70%);
-  border-radius: 50%;
+@keyframes ky-shimmer {
+  0%, 55%   { transform: translateX(0) skewX(-20deg); }
+  85%, 100% { transform: translateX(150px) skewX(-20deg); }
 }
 
 /* ===== TOP NAV ===== */

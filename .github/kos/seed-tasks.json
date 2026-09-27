@@ -13,9 +13,9 @@
     "hints": "Every page is rendered through `src/layout.html`, so the link is written once. `grep -rn \"<main\" src` finds the six places that open `<main>` (the leaderboard template already has `id=\"main\"`). `npm test` rebuilds the site before it runs; to look at the result yourself, `npm run build && npm run serve`."
   },
   {
-    "title": "[Task] Honor prefers-reduced-motion (globe, marquee, blinking badges)",
+    "title": "[Task] Honor prefers-reduced-motion (Kentucky shimmer, marquee, blinking badges)",
     "size": "S",
-    "problem": "Three CSS animations run forever: the spinning globe in the banner on every page (`globe-spin`), the scrolling announcement marquee on the home page (`marquee-scroll`), and the blinking UPDATED! badges on the home page (`blink`). People who have asked their operating system to reduce motion (often because motion makes them dizzy or nauseous) still get all three. Honoring the `prefers-reduced-motion` media query is the standard technique (WCAG C39) for SC 2.3.3 Animation from Interactions.\n\nDone means: with reduced motion emulated, `document.getAnimations()` reports no running animations on any page. Paused or removed animations both satisfy this.",
+    "problem": "Three CSS animations run forever: the shimmer that sweeps across the map of Kentucky in the banner on every page (`ky-shimmer`), the scrolling announcement marquee on the home page (`marquee-scroll`), and the blinking UPDATED! badges on the home page (`blink`). People who have asked their operating system to reduce motion (often because motion makes them dizzy or nauseous) still get all three. Honoring the `prefers-reduced-motion` media query is the standard technique (WCAG C39) for SC 2.3.3 Animation from Interactions.\n\nDone means: with reduced motion emulated, `document.getAnimations()` reports no running animations on any page. Paused or removed animations both satisfy this.",
     "scope": "In scope: `src/styles.css` only, as a `@media (prefers-reduced-motion: reduce)` block.\nOut of scope: a pause button for everyone else (separate task), the marquee's markup (separate task), and any change for users who have not asked for reduced motion.",
     "failToPass": [
       "motion/index.html",
@@ -36,7 +36,7 @@
   {
     "title": "[Task] Let visitors pause the moving and blinking content (WCAG 2.2.2)",
     "size": "M",
-    "problem": "WCAG 2.1 SC 2.2.2 (Pause, Stop, Hide, Level A) says that anything that moves, blinks, or scrolls automatically for more than five seconds alongside other content needs a way for the user to pause, stop, or hide it. This site has three such things: the spinning globe in the banner (every page), the scrolling marquee (home page), and the blinking UPDATED! badges (home page). The reduced-motion task only helps people who have set an operating-system preference; 2.2.2 requires a control that works for everyone.\n\nDone means: on every page, after activating a control named \"Pause\" or \"Stop\" (a button, checkbox, or switch), no animation that lasts longer than five seconds is still running. (An animation that ends within five seconds needs no control.)",
+    "problem": "WCAG 2.1 SC 2.2.2 (Pause, Stop, Hide, Level A) says that anything that moves, blinks, or scrolls automatically for more than five seconds alongside other content needs a way for the user to pause, stop, or hide it. This site has three such things: the shimmer that sweeps across the map of Kentucky in the banner (every page), the scrolling marquee (home page), and the blinking UPDATED! badges (home page). The reduced-motion task only helps people who have set an operating-system preference; 2.2.2 requires a control that works for everyone.\n\nDone means: on every page, after activating a control named \"Pause\" or \"Stop\" (a button, checkbox, or switch), no animation that lasts longer than five seconds is still running. (An animation that ends within five seconds needs no control.)",
     "scope": "In scope: `src/layout.html` (a site-wide control, for example in the banner), `src/styles.css`, and a small script (a new `src/site.js` copied into the build by `tools/build.js`, or an inline `<script>` in the layout).\nOut of scope: the `prefers-reduced-motion` media query (separate task) and the marquee's markup or landmark (separate task).",
     "failToPass": [
       "pause/index.html",
@@ -53,7 +53,7 @@
       "The control fits the retro look.",
       "Optional: the choice is remembered across pages (for example in localStorage)."
     ],
-    "hints": "The test looks for a button, checkbox, or switch whose accessible name matches /pause|stop/i and clicks the first one. A class on `<html>` that sets `animation-play-state: paused` on `.globe::before`, `.marquee span`, and `.badge-new` is the simplest pause. `tools/build.js` copies static files by name (`styles.css`, `search.js`); add yours there if you create one. If the marquee task is in flight at the same time, coordinate on the issue: both touch the home page's marquee area."
+    "hints": "The test looks for a button, checkbox, or switch whose accessible name matches /pause|stop/i and clicks the first one. A class on `<html>` that sets `animation-play-state: paused` on `.ky-shimmer`, `.marquee span`, and `.badge-new` is the simplest pause. `tools/build.js` copies static files by name (`styles.css`, `search.js`); add yours there if you create one. If the marquee task is in flight at the same time, coordinate on the issue: both touch the home page's marquee area."
   },
   {
     "title": "[Task] Put the announcements marquee in a named landmark",
