@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-02T12:47:44.455Z",
+ "generated": "2026-10-03T11:47:44.950Z",
  "org": {
   "login": "Kentucky-Open-Science",
   "name": "Kentucky Open Science",
@@ -2721,7 +2721,7 @@
     "spdx": "MIT",
     "name": "MIT License"
    },
-   "stars": 0,
+   "stars": 1,
    "forks": 0,
    "openIssues": 0,
    "hasIssues": true,
@@ -3589,8 +3589,8 @@
    "parent": null,
    "defaultBranch": "main",
    "createdAt": "2026-04-29T13:40:31Z",
-   "pushedAt": "2026-10-01T13:29:16Z",
-   "sizeKb": 306,
+   "pushedAt": "2026-10-02T12:47:46Z",
+   "sizeKb": 307,
    "readme": {
     "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io#readme",
     "summary": [
