@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-05T14:53:58.994Z",
+ "generated": "2026-10-06T13:24:57.052Z",
  "org": {
   "login": "Kentucky-Open-Science",
   "name": "Kentucky Open Science",
@@ -3589,8 +3589,8 @@
    "parent": null,
    "defaultBranch": "main",
    "createdAt": "2026-04-29T13:40:31Z",
-   "pushedAt": "2026-10-04T12:30:29Z",
-   "sizeKb": 309,
+   "pushedAt": "2026-10-05T14:54:02Z",
+   "sizeKb": 310,
    "readme": {
     "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io#readme",
     "summary": [
