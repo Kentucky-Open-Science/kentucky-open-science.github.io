@@ -18,7 +18,7 @@ src/                 layout, pages, templates, styles, search
 _site/               the published site (not committed)
 ```
 
-The **KOS site** workflow refreshes both data files, builds, and deploys to GitHub Pages on every push to `main`, nightly, and whenever a task changes state. The nightly run commits the refreshed data so the repository records what was published.
+The **KOS site** workflow refreshes both data files, builds, and deploys to GitHub Pages once a week (Mondays 06:17 UTC), and commits the refreshed data so the repository records what was published. Pushes to `main` and task changes go live on the next weekly run; run the workflow by hand from the Actions tab to publish sooner.
 
 Only public repositories are ever read or published: the fetcher asks GitHub for public repositories and re-checks every entry, and the test suite fails if the committed data contains anything else (`content/no-private-repos`).
 
@@ -41,7 +41,7 @@ npm test             # acceptance suite: WCAG 2.1 A/AA, HTML validity, links, mo
 npm run test:unit    # board bots and site builder
 ```
 
-`npm test` builds the site into `_site-test/` from **frozen fixtures** in `tests/fixtures/`, not from the nightly data, so test results change only when the site's code changes. Every test has a stable ID; `tests/known-failures.json` lists the ones expected to fail today, and it shrinks as tasks are completed.
+`npm test` builds the site into `_site-test/` from **frozen fixtures** in `tests/fixtures/`, not from the weekly data, so test results change only when the site's code changes. Every test has a stable ID; `tests/known-failures.json` lists the ones expected to fail today, and it shrinks as tasks are completed.
 
 | Command | What it does |
 | --- | --- |
@@ -69,7 +69,7 @@ src/claim.js               the bounty board's task dialog (copyable agent prompt
 src/claim-prompt.txt       the wording of that prompt; {{placeholders}} are filled per task
 src/site.json              navigation, research areas, site settings
 tools/                     build.js, fetch-projects.js, markdown.js, template.js
-data/                      nightly snapshots (generated; do not edit by hand)
+data/                      weekly snapshots (generated; do not edit by hand)
 tests/                     acceptance suite, fixtures, and the known-failures baseline
 .github/workflows/         site build/deploy, board commands, lease expiry, PR state, acceptance gate
 .github/kos/               the board bots (plain Node, unit-tested), config, seed tasks, bootstrap

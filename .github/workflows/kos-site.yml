@@ -1,13 +1,11 @@
 name: KOS site
 
 # Builds the wiki (tools/build.js) from src/ plus fresh data and deploys it to
-# GitHub Pages. Runs:
-#   - on every push to main (a merged change goes live),
-#   - nightly (project pages track their repositories; the refreshed data
-#     snapshots are committed so the repository records what was published),
-#   - when a task changes: the board bots dispatch it with projects=false, and
-#     label changes made by people trigger it through the `issues` event,
-#   - by hand from the Actions tab.
+# GitHub Pages. Runs ONCE A WEEK only (Mondays 06:17 UTC): project pages track
+# their repositories, the bounty board and leaderboard are refreshed, and the
+# data snapshots are committed so the repository records what was published.
+# Pushes to main and task changes do not trigger it; they go live on the next
+# weekly run. To publish sooner, run it by hand from the Actions tab.
 #
 # SECURITY: never runs code from a pull request. Project data comes only from
 # PUBLIC repositories (tools/fetch-projects.js filters twice).
@@ -15,18 +13,14 @@ name: KOS site
 # Requires Settings -> Pages -> Source: "GitHub Actions".
 
 on:
-  push:
-    branches: [main]
   schedule:
-    - cron: "17 6 * * *"
+    - cron: "17 6 * * 1" # weekly, Monday 06:17 UTC
   workflow_dispatch:
     inputs:
       projects:
         description: "Re-read every public repository (false = reuse data/projects.json)"
         type: boolean
         default: true
-  issues:
-    types: [opened, edited, closed, reopened, labeled, unlabeled, assigned, unassigned, deleted]
 
 concurrency:
   group: kos-site
@@ -34,11 +28,10 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name != 'issues' || contains(github.event.issue.labels.*.name, 'kos:task')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      contents: write # nightly data commit
+      contents: write # weekly data commit
       issues: read
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +43,7 @@ jobs:
           node-version: 22
 
       - name: Refresh project data (public repositories only)
-        if: github.event_name != 'issues' && (github.event_name != 'workflow_dispatch' || inputs.projects)
+        if: github.event_name != 'workflow_dispatch' || inputs.projects
         # On an API hiccup, fall back to the committed snapshot rather than not deploying.
         continue-on-error: true
         env:
@@ -67,7 +60,7 @@ jobs:
       - name: Build
         run: node tools/build.js
 
-      - name: Commit refreshed data (nightly)
+      - name: Commit refreshed data (weekly)
         if: github.event_name == 'schedule'
         run: |
           git config user.name "kos-board[bot]"

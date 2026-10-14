@@ -1,6 +1,6 @@
 'use strict';
 // Build the site the tests run against: src/ rendered with the frozen data in
-// tests/fixtures/ (not the nightly snapshots in data/), so test results change
+// tests/fixtures/ (not the weekly snapshots in data/), so test results change
 // only when the site's code changes.
 const { execFileSync } = require('node:child_process');
 const path = require('node:path');

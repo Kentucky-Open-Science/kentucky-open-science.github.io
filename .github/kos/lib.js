@@ -230,11 +230,14 @@ function parseProvenance(prBody) {
 
 // ---------------------------------------------------------------------------
 // Site refresh: the bounty board and leaderboard pages are rebuilt by the site
-// workflow. Label changes made with the Actions token do not trigger other
-// workflows, so the bots dispatch it explicitly after a state change.
+// workflow, which runs on a weekly schedule. Set config.board.siteWorkflow to
+// the workflow file (e.g. "kos-site.yml") to have the bots dispatch an
+// immediate rebuild after every state change; null (the default) leaves the
+// board to the weekly run.
 // ---------------------------------------------------------------------------
 
 async function refreshSite({ github, context, core }, config = CONFIG) {
+  if (!config.board.siteWorkflow) return false;
   const ref = (context.payload && context.payload.repository && context.payload.repository.default_branch) || 'main';
   try {
     // projects=false: only the board changed; reuse the committed project snapshot

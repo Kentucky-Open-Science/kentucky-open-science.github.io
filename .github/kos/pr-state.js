@@ -94,8 +94,8 @@ async function prState({ github, context, core, config = lib.CONFIG, now = new D
       await swap([L.leased, L.submitted, L.ready], L.accepted);
       await github.rest.issues.update({ ...repo, issue_number: taskNumber, body, state: 'closed', state_reason: 'completed' });
       const reviewerNote = reviewers.length ? ` Reviewer credit (+${accepted.reviewerPoints} each): ${reviewers.map((r) => '@' + r).join(', ')}.` : '';
-      await sayIssue(`🏆 Accepted via #${pr.number}. **+${points} points** to @${author} (size ${size || 'unspecified'}).${reviewerNote} The leaderboard updates within a few minutes.`);
-      // Rebuild the bounty board and leaderboard now rather than waiting for the nightly run.
+      await sayIssue(`🏆 Accepted via #${pr.number}. **+${points} points** to @${author} (size ${size || 'unspecified'}).${reviewerNote} The leaderboard updates on the next weekly site rebuild.`);
+      // Rebuild the bounty board and leaderboard now rather than waiting for the weekly run.
       await lib.refreshSite({ github, context, core }, config);
       return { handled: true, ok: true, transition: `${state}->accepted`, accepted };
     }

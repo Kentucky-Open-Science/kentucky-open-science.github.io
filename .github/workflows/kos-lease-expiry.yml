@@ -3,7 +3,7 @@ name: KOS lease expiry
 # Hourly sweep: warn holders whose lease is about to expire, return expired
 # leases to the pool. Logic in .github/kos/expiry.js.
 # Note: GitHub pauses scheduled workflows in repositories with no commits for
-# 60 days; the nightly data commit from kos-site.yml keeps this one alive,
+# 60 days; the weekly data commit from kos-site.yml keeps this one alive,
 # or run it by hand.
 
 on:
@@ -14,7 +14,7 @@ on:
 permissions:
   issues: write
   contents: read
-  actions: write # to dispatch the site rebuild (kos-site.yml) after a lease expires
+  actions: write # to dispatch a site rebuild if config.board.siteWorkflow is set
 
 concurrency:
   group: kos-lease-expiry

@@ -209,7 +209,7 @@ test('merged PR accepts the task, awards points and reviewer credit, closes it',
   assert.equal(acc.reviewerPoints, 6);
   assert.equal(lib.readMarker(issue.body, 'lease'), null);
   assert.match(lastComment(gh), /\+25 points\*\* to @ann/);
-  assert.equal(gh.__dispatched[gh.__dispatched.length - 1].workflow_id, 'kos-site.yml');
+  assert.equal(gh.__dispatched.length, 0, 'the board refreshes on the weekly site run, not per change');
 });
 
 test('PR closed without merge returns the task to leased with a fresh clock', async () => {
@@ -233,17 +233,27 @@ test('PRs that reference no task are ignored', async () => {
 // Site refresh + board data
 // ---------------------------------------------------------------------------
 
-test('a successful /claim asks the site workflow to rebuild the bounty board', async () => {
+test('by default a /claim does not rebuild the site (the board refreshes weekly)', async () => {
   const issue = makeIssue(5, { labels: [L.task, L.ready, L.sizes.S] });
   const gh = fakeGithub({ issues: [issue] });
   await board({ github: gh, context: context({ issue, comment: comment('ann', '/claim') }), core, now: NOW });
+  assert.ok(issue.labels.has(L.leased));
+  assert.equal(gh.__dispatched.length, 0);
+});
+
+const DISPATCHING = { ...lib.CONFIG, board: { ...lib.CONFIG.board, siteWorkflow: 'kos-site.yml' } };
+
+test('with siteWorkflow set, a successful /claim asks the site workflow to rebuild the bounty board', async () => {
+  const issue = makeIssue(5, { labels: [L.task, L.ready, L.sizes.S] });
+  const gh = fakeGithub({ issues: [issue] });
+  await board({ github: gh, context: context({ issue, comment: comment('ann', '/claim') }), core, config: DISPATCHING, now: NOW });
   assert.deepEqual(gh.__dispatched.map((d) => d.workflow_id), ['kos-site.yml']);
 });
 
 test('a refused /claim does not rebuild the site', async () => {
   const issue = makeIssue(5, { labels: [L.task, L.triage] });
   const gh = fakeGithub({ issues: [issue] });
-  await board({ github: gh, context: context({ issue, comment: comment('ann', '/claim') }), core, now: NOW });
+  await board({ github: gh, context: context({ issue, comment: comment('ann', '/claim') }), core, config: DISPATCHING, now: NOW });
   assert.equal(gh.__dispatched.length, 0);
 });
 

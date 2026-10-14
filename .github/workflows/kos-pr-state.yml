@@ -14,7 +14,7 @@ on:
 permissions:
   issues: write
   pull-requests: write
-  actions: write # to dispatch the site rebuild (bounty board, leaderboard)
+  actions: write # to dispatch a site rebuild if config.board.siteWorkflow is set
   contents: read
 
 concurrency:

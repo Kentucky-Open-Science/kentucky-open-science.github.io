@@ -71,6 +71,6 @@
   },
   "board": {
     "dataFile": "data/board.json",
-    "siteWorkflow": "kos-site.yml"
+    "siteWorkflow": null
   }
 }

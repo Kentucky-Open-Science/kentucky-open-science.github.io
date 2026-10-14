@@ -120,7 +120,7 @@ motion, focus visibility, dead links — so most accessibility tasks can cite
 existing IDs. Add a page to `tests/pages.json` and it gets the full matrix.
 
 The suite tests the site built from frozen fixtures (`tests/fixtures/`), not
-from the nightly data, so a task's tests fail and pass because of code changes
+from the weekly data, so a task's tests fail and pass because of code changes
 only. A task that needs different fixture data must say so in its scope.
 
 Good tasks are small enough to finish in one lease (S or M), touch a bounded set
@@ -150,7 +150,7 @@ points (and reviewer credit to approvers), and closes the issue.
 
 - **Labels and seed tasks:** `GITHUB_TOKEN=<token> node .github/kos/bootstrap.js` creates the labels (idempotent) and files the tasks in `.github/kos/seed-tasks.json` that do not already exist. Use `--dry-run` first.
 - **Lease sweep:** runs hourly ("KOS lease expiry"); run it by hand from the Actions tab if you disabled schedules. GitHub pauses cron in repositories with no commits for 60 days.
-- **Site, bounty board, and leaderboard:** the "KOS site" workflow (`kos-site.yml`) refreshes `data/projects.json` (public repositories) and `data/board.json` (tasks and points), builds, and deploys to GitHub Pages. It runs on every push to `main`, nightly, when a person changes a task's labels, and when the bots dispatch it after `/claim`, `/release`, `/extend`, a lease expiry, or a PR transition. The nightly run commits the refreshed data; if you enable branch protection, allow the `github-actions` bot to push or drop that step. Pages must be set to deploy from GitHub Actions (Settings → Pages → Source).
+- **Site, bounty board, and leaderboard:** the "KOS site" workflow (`kos-site.yml`) refreshes `data/projects.json` (public repositories) and `data/board.json` (tasks and points), builds, and deploys to GitHub Pages. It runs once a week only (Mondays 06:17 UTC), so claims, releases, lease expiries, and PR transitions show on the published board after the next weekly run; run it by hand from the Actions tab to publish sooner. To go back to rebuilding after every state change, set `board.siteWorkflow` to `"kos-site.yml"` in `.github/kos/config.json`. The weekly run commits the refreshed data; if you enable branch protection, allow the `github-actions` bot to push or drop that step. Pages must be set to deploy from GitHub Actions (Settings → Pages → Source).
 - **Config:** `.github/kos/config.json` — lease hours, extensions, warning window, points, label names.
 - **Fork PRs from first-time contributors** need a maintainer to click "Approve and run" once (Settings → Actions → "Fork pull request workflows"). Set it to require approval only for first-time contributors, not for everyone, or the pilot will feel slow.
 - **Tests for the bots and the builder:** `npm run test:unit` runs the unit tests for the lease logic (with a fake GitHub API) and the site builder. The acceptance workflow runs them on every PR.

@@ -347,7 +347,7 @@ test('content/projects-page', async ({ page }) => {
 
 // content/no-private-repos
 // PRIVACY GUARD. The wiki must only ever describe public repositories. Checks
-// the committed snapshot (data/projects.json, deployed nightly) and the fixture.
+// the committed snapshot (data/projects.json, deployed weekly) and the fixture.
 test('content/no-private-repos', async () => {
   const id = 'content/no-private-repos';
   applyBaseline(id);
