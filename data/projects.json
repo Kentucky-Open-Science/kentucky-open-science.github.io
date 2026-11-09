@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-02T16:00:24.055Z",
+ "generated": "2026-11-09T16:26:49.558Z",
  "org": {
   "login": "Kentucky-Open-Science",
   "name": "Kentucky Open Science",
@@ -3589,8 +3589,8 @@
    "parent": null,
    "defaultBranch": "main",
    "createdAt": "2026-04-29T13:40:31Z",
-   "pushedAt": "2026-10-26T13:08:46Z",
-   "sizeKb": 323,
+   "pushedAt": "2026-11-02T16:00:27Z",
+   "sizeKb": 324,
    "readme": {
     "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io#readme",
     "summary": [
@@ -4132,13 +4132,13 @@
    "parent": null,
    "defaultBranch": "main",
    "createdAt": "2024-11-06T15:53:50Z",
-   "pushedAt": "2025-05-27T13:10:53Z",
-   "sizeKb": 150,
+   "pushedAt": "2026-11-05T20:23:12Z",
+   "sizeKb": 161,
    "readme": {
     "url": "https://github.com/Kentucky-Open-Science/llm-basics#readme",
     "summary": [
-     "This repository contains simple examples showing how to use the OpenAI API to communicate with LLM Factory Endpoints for various AI tasks.",
-     "Run each script after configuring to test different capabilities of the LLM Factory API."
+     "Simple, self-contained examples showing how to use an OpenAI-compatible API for various AI tasks. The scripts work with OpenAI directly or any other OpenAI-compatible endpoint (vLLM, LLM Factory, etc.) — just point config.ini at your server and pick your model IDs.",
+     "Run each script after configuring to test different capabilities of the API."
     ],
     "headings": [
      {
@@ -4152,14 +4152,14 @@
       "anchor": "example-scripts"
      }
     ],
-    "text": "This repository contains simple examples showing how to use the OpenAI API to communicate with LLM Factory Endpoints for various AI tasks.\nSetup Instructions\n• Retrieve your API key from LLM Factory: https://llm-factory.ai.uky.edu/api-keys • Copy config.ini.example to config.ini and add your API key to the openai_api_key field • Choose the model ID you would like to use\nExample Scripts\n• chat_completions_test.py - Chat with a language model • embeddings_test.py - Create vector embeddings from text • transcriptions_test.py - Generate transcriptions from audio files • vision_test.py - Process images with multimodal models • tools_test.py - Use tool-augmented language models • simple_rag.py - Implement a basic RAG (Retrieval-Augmented Generation) system\nRun each script after configuring to test different capabilities of the LLM Factory API."
+    "text": "Simple, self-contained examples showing how to use an OpenAI-compatible API for various AI tasks. The scripts work with OpenAI directly or any other OpenAI-compatible endpoint (vLLM, LLM Factory, etc.) — just point config.ini at your server and pick your model IDs.\nSetup Instructions\n• Install the dependencies:\n• Copy config.ini.example to config.ini • Add your API key to the [API] section (LLM Factory keys are issued at https://llm-factory.ai.uky.edu/api-keys) • The [MODELS] section ships with the models currently served by the example LLM Factory endpoint (https://api-llm-factory.ai.uky.edu/v1). Using a different OpenAI-compatible server? Update the base URL and model IDs — run python test_models_endpoint.py to list what it offers (each entry includes a task field indicating what the model is for).\nExample Scripts\n• chat_completions_test.py - Chat with a language model • stream_test.py - Stream chat responses token by token • tools_test.py - Use tool-augmented language models (function calling) • vision_test.py - Process images with multimodal models • embeddings_test.py - Create vector embeddings from text • simple_rag.py - Implement a basic RAG (Retrieval-Augmented Generation) system with FAISS • transcriptions_test.py - Generate transcriptions from audio files (uses the included fitnessgram.mp3 sample) • test_tts.py - Generate speech from text (writes test_.mp3 files) • test_models_endpoint.py - List the models available on the configured server • decisions_test.py - Probe the decisions endpoints (/v1/systemone Nimble / TypeSafe System One and /v1/decisions OpenAI Decisions format) and report whether they work on the configured server • quota_test.py - Probe rate-limit/quota behavior (HTTP 429s, Retry-After and X-RateLimit headers, /quotas/me) if your server implements it\nRun each script after configuring to test different capabilities of the API."
    },
    "release": null,
    "contributors": [
     {
      "login": "mitchklusty",
      "url": "https://github.com/mitchklusty",
-     "contributions": 12
+     "contributions": 13
     }
    ]
   },
