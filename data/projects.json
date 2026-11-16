@@ -1,11 +1,11 @@
 {
- "generated": "2026-11-09T16:26:49.558Z",
+ "generated": "2026-11-16T15:52:01.408Z",
  "org": {
   "login": "Kentucky-Open-Science",
   "name": "Kentucky Open Science",
   "url": "https://github.com/Kentucky-Open-Science",
   "description": "",
-  "publicRepos": 72
+  "publicRepos": 55
  },
  "projects": [
   {
@@ -607,151 +607,6 @@
    ]
   },
   {
-   "name": "azure-redcap-paas",
-   "fullName": "Kentucky-Open-Science/azure-redcap-paas",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/azure-redcap-paas",
-   "description": "Automated deployment of REDCap with Azure Blob storage as the storage back-end",
-   "homepage": "",
-   "topics": [],
-   "language": null,
-   "languages": [
-    {
-     "name": "Bicep",
-     "percent": 50.8
-    },
-    {
-     "name": "HCL",
-     "percent": 25.6
-    },
-    {
-     "name": "Pascal",
-     "percent": 13.8
-    },
-    {
-     "name": "Shell",
-     "percent": 4.6
-    },
-    {
-     "name": "PowerShell",
-     "percent": 3.4
-    },
-    {
-     "name": "HTML",
-     "percent": 0.9
-    },
-    {
-     "name": "PHP",
-     "percent": 0.8
-    }
-   ],
-   "license": {
-    "spdx": "MIT",
-    "name": "MIT License"
-   },
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": false,
-   "archived": false,
-   "fork": true,
-   "isTemplate": false,
-   "parent": {
-    "fullName": "microsoft/azure-redcap-paas",
-    "url": "https://github.com/microsoft/azure-redcap-paas",
-    "description": "Automated deployment of REDCap with Azure Blob storage as the storage back-end"
-   },
-   "defaultBranch": "main",
-   "createdAt": "2024-09-06T15:40:56Z",
-   "pushedAt": "2024-06-17T13:25:34Z",
-   "sizeKb": 2722,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/azure-redcap-paas#readme",
-    "summary": [
-     "This repository provides you with the necessary resources and guidance to deploy the REDCap application on Microsoft’s Azure cloud platform. This allows you to leverage the power of cloud computing for your research data management needs.",
-     "This template automates the deployment of the REDCap solution into Azure using managed PaaS resources. The template assumes you are deploying a version of REDCap that supports direct connection to Azure Blob Storage. If you deploy an older version, deployment will succeed but you will need to manually provision NFS storage in Azure, and delete the new storage account. For NFS, consider:",
-     "To deploy the REDCap source to Azure App Service, you must supply your REDCap Community site credentials. The deployment automation will use them to pull the REDCap source directly from the community site.",
-     "Execute the following command from the /home directory:"
-    ],
-    "headings": [
-     {
-      "level": 2,
-      "text": "Overview",
-      "anchor": "overview"
-     },
-     {
-      "level": 2,
-      "text": "Deployment Options",
-      "anchor": "deployment-options"
-     },
-     {
-      "level": 2,
-      "text": "Details",
-      "anchor": "details"
-     },
-     {
-      "level": 2,
-      "text": "Setup",
-      "anchor": "setup"
-     },
-     {
-      "level": 2,
-      "text": "Post-Setup",
-      "anchor": "post-setup"
-     },
-     {
-      "level": 2,
-      "text": "Note about REDCap \"Easy Upgade\"",
-      "anchor": "note-about-redcap-easy-upgade"
-     },
-     {
-      "level": 2,
-      "text": "Resources",
-      "anchor": "resources"
-     },
-     {
-      "level": 2,
-      "text": "Contributing",
-      "anchor": "contributing"
-     }
-    ],
-    "text": "Overview\nThis repository provides you with the necessary resources and guidance to deploy the REDCap application on Microsoft’s Azure cloud platform. This allows you to leverage the power of cloud computing for your research data management needs.\nThis template automates the deployment of the REDCap solution into Azure using managed PaaS resources. The template assumes you are deploying a version of REDCap that supports direct connection to Azure Blob Storage. If you deploy an older version, deployment will succeed but you will need to manually provision NFS storage in Azure, and delete the new storage account. For NFS, consider:\nDeployment Options\n• ### Manual deployment\n• For manual deployment process, please navigate here\n• ### CI/CD Deployment with GitHub\n• Information pending\n• ### CI/CD Deployment with Azure DevOps\n• Information pending\nDetails\nThis template automates the deployment of the REDCap solution into Azure using managed PaaS resources. The template assumes you are deploying a version of REDCap that supports direct connection to Azure Blob Storage. If you deploy an older version, deployment will succeed but you will need to manually provision NFS storage in Azure, and delete the new storage account. For NFS, consider:\n• https://learn.microsoft.com/azure/azure-netapp-files/ • https://azuremarketplace.microsoft.com/marketplace/apps/softnas.buurst_nas • https://learn.microsoft.com/samples/azure/azure-quickstart-templates/nfs-ha-cluster-ubuntu/\nTo deploy the REDCap source to Azure App Service, you must supply your REDCap Community site credentials. The deployment automation will use them to pull the REDCap source directly from the community site.\nNOTE: These values will be stored within the Azure App Service as configuration settings. Once your deployment has succeeded, you should navigate to your Azure App Service resource and delete or clear the values so that they aren't stored here.\nhttps://projectredcap.org/wp-content/resources/REDCapTechnicalOverview.pdf\n• The template deploys the following: • Azure Web App • Azure DB for MySQL (1) • Azure Storage Account • Key Vault • Private DNS zones • Virtual Network • Application Insights\n(1) Review https://learn.microsoft.com/azure/mysql/flexible-server/concepts-service-tiers-storage for details on available features, regions, and pricing models for Azure DB for MySQL.\nSetup\nThis template will automatically deploy the resources necessary to run REDCap in Azure using PaaS (Platform-as-a-Service) features.\nIMPORTANT: The \"Workload Name\" you choose will be re-used as part of the storage, website, and MySQL database name. Make sure you don't use characters that will be rejected.\nAfter the template is deployed, deployment automation will download the REDCap ZIP file you specify, and install it in your web app. It will then automatically update the database connection information in the app.\nNOTE: The database will not be initialized; therefore, REDCap will not be usable until then. See the Post-Setup section below on how to initialize the database.\nWith the download and unzipping of REDCap application, the entire operation will take between 12-16 minutes.\nIf you need to connect to the MySQL database using the MySQL client, you will need to deploy a Virtual Machine with Bastion or AVD to the virtual network to run the client.\nThe database user name defaults to sqladmin and the password is a random string of 25 characters. The password is stored in Key Vault.\nPost-Setup\nAfter the deployment and installation of REDCap has completed, you will need to configure some database settings manually. The application gets deployed via Kudu which calls the deploy.sh script. After deployment, the postbuild.sh script will call REDCap's built-in capability to deploy the database schema. However, the configuration of the attachment storage to Azure Storage requires executing SQL statements that cannot be automated at this time. There is an install.sh file that contains the statements to be executed.\nOnce the source control deployment of REDCap has completed, you will need to SSH into the running container:\nExecute the following command from the /home directory:\nOnce you regain access to the console, you can navigate to the root of your app service and confirm everything shows green on the REDCap Configuration Check page - with the exception of CronJob status which you may have to manually invoke. If anything displays on that page in red or yellow, it is recommended that you perform a \"Restart\" of the Azure \"App Service\". This needs to be done due to the fact that some necessary server environment settings get changed after the initial deployment, but restarting the App Service will load the service with the intended settings.\nNote about REDCap \"Easy Upgade\"\nThe \"Easy Upgrade\" feature in REDCap 8.11.0 and later is currently not supported when deploying a REDCap instance on Azure. Support for \"Easy Upgrade\" on Azure is expected to come at a later time in a future REDCap release.\nResources\n• App Services overview https://learn.microsoft.com/azure/app-service/overview • Application Settings https://learn.microsoft.com/azure/app-service/configure-common?tabs=portal • Web Jobs (background tasks) overview https://learn.microsoft.com/azure/app-service/webjobs-create • Project Kudu (App Service back end management and deployment engine) https://github.com/projectkudu/kudu/wiki • Explanation of how isolation occurs in Azure Web Apps https://github.com/projectkudu/kudu/wiki/Azure-Web-App-sandbox • Adding custom domain names https://learn.microsoft.com/azure/app-service/app-service-web-tutorial-custom-domain • TLS/SSL Certificates https://learn.microsoft.com/azure/app-service/configure-ssl-certificate • Updating PHP configurations https://learn.microsoft.com/azure/app-service/configure-language-php?pivots=platform-linux#customize-phpini-settings • MySQL Flexible Server overview https://learn.microsoft.com/azure/mysql/flexible-server/overview • SendGrid overview https://docs.sendgrid.com/for-developers/partners/microsoft-azure-2021 • Blob storage overview https://learn.microsoft.com/azure/storage/blobs/storage-blobs-introduction • Azure Resource Manager (ARM) overview https://learn.microsoft.com/azure/azure-resource-manager/management/overview • Exchange Online SMTP Relay Configuration https://learn.microsoft.com/Exchange/mail-flow-best-practices/how-to-set-up-a-multifunction-device-or-application-to-send-email-using-microsoft-365-or-office-365\nContributing\nThis project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://opensource.microsoft.com/cla/.\nWhen you submit a pull request, a CLA-bot will automatically determine whether you need to provide a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repos using our CLA.\nThis project has adopted the Microsoft Open Source Code of Conduct. For more information see the Code of Conduct FAQ or contact opencode@microsoft.com with any additional questions or comments."
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "bretthackermsft",
-     "url": "https://github.com/bretthackermsft",
-     "contributions": 40
-    },
-    {
-     "login": "taylorr4",
-     "url": "https://github.com/taylorr4",
-     "contributions": 18
-    },
-    {
-     "login": "pauldotyu",
-     "url": "https://github.com/pauldotyu",
-     "contributions": 9
-    },
-    {
-     "login": "SvenAelterman",
-     "url": "https://github.com/SvenAelterman",
-     "contributions": 6
-    },
-    {
-     "login": "kalalvishal",
-     "url": "https://github.com/kalalvishal",
-     "contributions": 2
-    },
-    {
-     "login": "matheuscarboni",
-     "url": "https://github.com/matheuscarboni",
-     "contributions": 1
-    }
-   ]
-  },
-  {
    "name": "BDSA_Setup_Documentation",
    "fullName": "Kentucky-Open-Science/BDSA_Setup_Documentation",
    "visibility": "public",
@@ -1269,213 +1124,6 @@
      "login": "NCPE227",
      "url": "https://github.com/NCPE227",
      "contributions": 1
-    }
-   ]
-  },
-  {
-   "name": "CLASSify-Connect",
-   "fullName": "Kentucky-Open-Science/CLASSify-Connect",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/CLASSify-Connect",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "kentucky-open-science",
-    "medical-imaging",
-    "redcap",
-    "redcap-external-module",
-    "redcap-repo"
-   ],
-   "language": "PHP",
-   "languages": [
-    {
-     "name": "PHP",
-     "percent": 96.5
-    },
-    {
-     "name": "JavaScript",
-     "percent": 3.5
-    }
-   ],
-   "license": {
-    "spdx": "MIT",
-    "name": "MIT License"
-   },
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": false,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "master",
-   "createdAt": "2024-09-26T14:06:13Z",
-   "pushedAt": "2025-08-21T16:59:35Z",
-   "sizeKb": 5483,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/CLASSify-Connect#readme",
-    "summary": [
-     "CLASSify is a self-service machine learning platform developed by Aaron Mullen for the Center for Applied Artificial Intelligence located at the University of Kentucky. The platform supports numerous state-of-the-art machine learning models, synthetic data generation and balancing, and more.",
-     "CLASSifyConnect is an external module developed for REDCap projects which allows a user to directly submit REDCap form data to the CLASSify application without needing to manually download data. A new page is added to each project with the module enabled which allows the user to see their current uploaded jobs, as well as submit new jobs.",
-     "Once this step has been completed, you'll be directed over to the CLASSify site where you can finish configuring by selecting which models you want to run and which additional features you would like to use."
-    ],
-    "headings": [
-     {
-      "level": 2,
-      "text": "Overview",
-      "anchor": "overview"
-     },
-     {
-      "level": 3,
-      "text": "What is CLASSify?",
-      "anchor": "what-is-classify"
-     },
-     {
-      "level": 3,
-      "text": "What is CLASSifyConnect?",
-      "anchor": "what-is-classifyconnect"
-     },
-     {
-      "level": 3,
-      "text": "Getting Access to CLASSify",
-      "anchor": "getting-access-to-classify"
-     },
-     {
-      "level": 3,
-      "text": "How does it work?",
-      "anchor": "how-does-it-work"
-     },
-     {
-      "level": 2,
-      "text": "Setting Up CLASSifyConnect",
-      "anchor": "setting-up-classifyconnect"
-     },
-     {
-      "level": 2,
-      "text": "Contact",
-      "anchor": "contact"
-     }
-    ],
-    "text": "Overview\nWhat is CLASSify?\nCLASSify is a self-service machine learning platform developed by Aaron Mullen for the Center for Applied Artificial Intelligence located at the University of Kentucky. The platform supports numerous state-of-the-art machine learning models, synthetic data generation and balancing, and more.\nWhat is CLASSifyConnect?\nCLASSifyConnect is an external module developed for REDCap projects which allows a user to directly submit REDCap form data to the CLASSify application without needing to manually download data. A new page is added to each project with the module enabled which allows the user to see their current uploaded jobs, as well as submit new jobs.\nGetting Access to CLASSify\nIn order to use this module, you will need to first be given access to the CLASSify machine learning platform. This is currently done on an application basis. Applications are filed using the CAAI Collaboration Intake Form. Make sure to adequately describe your project and intent as resources are alotted carefully.\nHow does it work?\nVisiting the new page on the left-hand side of your REDCap project view, you will see two large buttons and a data table. Simply select the + button labelled Upload REDCap Forms(s). Here you can select which of your forms you would like to concatenate into a single large CSV type data source which can be sent to CLASSify.\nOnce those have been selected and a filename has been entered, you will see a list of data columns from your project, as well as a dropdown for selecting your classifier column. Check the data types to ensure that they were automatically detected as the appropriate field. Uncheck any fields you don't want to include in your upload, including fields that may introduce faulty bias, like record identifier fields. The default record_id field of REDCap is automatically removed for your convenience.\nOnce this step has been completed, you'll be directed over to the CLASSify site where you can finish configuring by selecting which models you want to run and which additional features you would like to use.\nSetting Up CLASSifyConnect\nFirstly, as with all external modules, your REDCap administrator must approve of and install the module into your REDCap instance. Additionally, it will need to be enabled on your individual project by a project administrator. The steps for enabling modules are documented here:\nOnce this step has been completed, you will need to configure elements of the External Module settings in order to appropriately make connections to the CLASSify API. This requires an API key acquired from the account page of CLASSify once you have been allowed access. This key is then used for ALL requests made in your project. Do not share this key with anyone you are not comfortable making requests on your behalf.\nOnce you have your API key, you may go to the External Modules tab on the left-hand side of REDCap and select Manage. Provided that you have enabled the module, you can then input your API key in the approved field, and save your configuration. Now the module is ready for work.\nContact\nIssues can be reported ideally by pull request on this project's Github Page or additionally I can be reached by email."
-   },
-   "release": {
-    "name": "CLASSifyConnect_v1.0.1",
-    "tag": "1.0.1",
-    "url": "https://github.com/Kentucky-Open-Science/CLASSify-Connect/releases/tag/1.0.1",
-    "publishedAt": "2025-08-21T16:21:16Z"
-   },
-   "contributors": [
-    {
-     "login": "NCPE227",
-     "url": "https://github.com/NCPE227",
-     "contributions": 62
-    }
-   ]
-  },
-  {
-   "name": "clinical-trial-ranking-interface",
-   "fullName": "Kentucky-Open-Science/clinical-trial-ranking-interface",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/clinical-trial-ranking-interface",
-   "description": "An LLM-based system which retrieves clinical trials from clinicaltrials.gov and matches them to patient data.",
-   "homepage": "",
-   "topics": [],
-   "language": "Python",
-   "languages": [
-    {
-     "name": "Python",
-     "percent": 54
-    },
-    {
-     "name": "JavaScript",
-     "percent": 36
-    },
-    {
-     "name": "CSS",
-     "percent": 9.1
-    },
-    {
-     "name": "HTML",
-     "percent": 0.9
-    }
-   ],
-   "license": null,
-   "stars": 1,
-   "forks": 0,
-   "openIssues": 12,
-   "hasIssues": false,
-   "archived": false,
-   "fork": true,
-   "isTemplate": false,
-   "parent": {
-    "fullName": "NCPE227/BMI-Retrieval-Assistant",
-    "url": "https://github.com/NCPE227/BMI-Retrieval-Assistant",
-    "description": "An LLM-based retrieval assistant for biomedical information. This application uses UK's LLM Factory platform in association with a RAG database to create a fact-based retrieval system."
-   },
-   "defaultBranch": "main",
-   "createdAt": "2025-02-13T17:10:15Z",
-   "pushedAt": "2026-03-30T11:02:23Z",
-   "sizeKb": 15166,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/clinical-trial-ranking-interface#readme",
-    "summary": [
-     "The longest process is building the database, so I would recommend starting that before going through the other steps as they can be done synchronously.",
-     "As long as you are in the root directory of this project, you should be able to run the following command in the terminal: pip install -r requirements.txt which will be all you need for the next step.",
-     "I would recommend using Neo4J Desktop as it was by far the easiest way to create a database for the purposes of this project. The current code assumes that your database is set up to use a standard port configuration for neo4j. This is shown in the config.json.",
-     "If you'd like to use another version of the Annual Baseline, you need to change the file name at line 67 in create_neo4j.py.",
-     "Additionally, the project is licensed under the provisions of the GNU 3.0 license."
-    ],
-    "headings": [
-     {
-      "level": 2,
-      "text": "Software Required",
-      "anchor": "software-required"
-     },
-     {
-      "level": 2,
-      "text": "Setup",
-      "anchor": "setup"
-     },
-     {
-      "level": 3,
-      "text": "1. Install Python Packages",
-      "anchor": "1-install-python-packages"
-     },
-     {
-      "level": 3,
-      "text": "2. Setting Up Neo4J",
-      "anchor": "2-setting-up-neo4j"
-     },
-     {
-      "level": 3,
-      "text": "3. Building the React App",
-      "anchor": "3-building-the-react-app"
-     },
-     {
-      "level": 3,
-      "text": "4. Start the LLM Server",
-      "anchor": "4-start-the-llm-server"
-     },
-     {
-      "level": 2,
-      "text": "That's It!",
-      "anchor": "thats-it"
-     },
-     {
-      "level": 2,
-      "text": "Data Source",
-      "anchor": "data-source"
-     }
-    ],
-    "text": "Software Required\n• Neo4J • Python • Node.js\nSetup\nThe longest process is building the database, so I would recommend starting that before going through the other steps as they can be done synchronously.\n1. Install Python Packages\nAs long as you are in the root directory of this project, you should be able to run the following command in the terminal: pip install -r requirements.txt which will be all you need for the next step.\n2. Setting Up Neo4J\nI would recommend using Neo4J Desktop as it was by far the easiest way to create a database for the purposes of this project. The current code assumes that your database is set up to use a standard port configuration for neo4j. This is shown in the config.json.\nOnce you have a database built, check that your config will match your desired database setup. Once that's true, then the create_neo4j.py file can be run to ingest pubmed24n0001.xml provided you have added it to the repository. It can be found here: https://ftp.ncbi.nlm.nih.gov/pubmed/baseline/\nIf you'd like to use another version of the Annual Baseline, you need to change the file name at line 67 in create_neo4j.py.\nThis part will need to run for quite a while as it builds all the many nodes and edges based on this data. My current version required 2.38 GB of space for the data to be stored.\n3. Building the React App\nSo long as you have Node.js installed, the setup for this app will be easy. CD into the PubMed Search Frontend directory. Run npm install to initialize the required node modules. To run the frontend service you must run this command: npm run dev.\n4. Start the LLM Server\nTo start the python server, all you need to do is run server.py. You will not be able to access any LLM services without configuring the config.json file to ensure that it has the correct API endpoint and service for your solution. Additionally, you'll need to ensure that your API key is correct for the service of your choice.\nThat's It!\nYup, the instructions above should have left you with a functional site that lets you ask your LLM solution to quiz your database for information related to your queries. All code in this repository is provided as-is. You're welcome to point out errors as you see them, but given this project is exploratory responses may not be guaranteed.\nAdditionally, the project is licensed under the provisions of the GNU 3.0 license.\nData Source\nThis project's database is built using the XML for the most recent version of the PubMed Annual Baseline. https://ftp.ncbi.nlm.nih.gov/pubmed/baseline/"
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "NCPE227",
-     "url": "https://github.com/NCPE227",
-     "contributions": 12
     }
    ]
   },
@@ -2470,209 +2118,6 @@
    ]
   },
   {
-   "name": "flighttracker-pub-service-validator",
-   "fullName": "Kentucky-Open-Science/flighttracker-pub-service-validator",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/flighttracker-pub-service-validator",
-   "description": "This repo holds the documentation for REDCap's External Module Framework",
-   "homepage": "",
-   "topics": [],
-   "language": null,
-   "languages": [
-    {
-     "name": "PHP",
-     "percent": 87.2
-    },
-    {
-     "name": "HTML",
-     "percent": 7
-    },
-    {
-     "name": "JavaScript",
-     "percent": 5.7
-    }
-   ],
-   "license": {
-    "spdx": null,
-    "name": "Other"
-   },
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": false,
-   "archived": false,
-   "fork": true,
-   "isTemplate": false,
-   "parent": {
-    "fullName": "vanderbilt-redcap/external-module-framework-docs",
-    "url": "https://github.com/vanderbilt-redcap/external-module-framework-docs",
-    "description": "This repo holds the documentation for REDCap's External Module Framework"
-   },
-   "defaultBranch": "main",
-   "createdAt": "2024-09-16T16:29:12Z",
-   "pushedAt": "2024-09-03T16:35:57Z",
-   "sizeKb": 424,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/flighttracker-pub-service-validator#readme",
-    "summary": [
-     "You've reached the official documentation for REDCap's External Module Framework! This framework can be used to create External Modules, the recommended way to programmatically extend REDCap's base functionality. These docs and the External Module Framework itself are both very much a community effort. If/when you notice room for improvement, feel free to create an issue. It is also highly encouraged to fork this repo, make any changes you desire, then go to the Pull Requests tab from your fork and select New pull request to submit them for review.",
-     "If you're brand new to module development, see the beginner's guide.",
-     "Contributions (new features, bugfixes, etc.) to the External Module Framework code repo are welcome too! To gain access to that repo, email your GitHub username to mark.mcever@vumc.org. Once you have access, read the that repo's constribution instructions."
-    ],
-    "headings": [
-     {
-      "level": 3,
-      "text": "How to contribute to this documentation",
-      "anchor": "how-to-contribute-to-this-documentation"
-     },
-     {
-      "level": 3,
-      "text": "How to contribute to the development of the EM Framework itself",
-      "anchor": "how-to-contribute-to-the-development-of-the-em-framework-itself"
-     },
-     {
-      "level": 3,
-      "text": "Documentation Backstory",
-      "anchor": "documentation-backstory"
-     }
-    ],
-    "text": "You've reached the official documentation for REDCap's External Module Framework! This framework can be used to create External Modules, the recommended way to programmatically extend REDCap's base functionality. These docs and the External Module Framework itself are both very much a community effort. If/when you notice room for improvement, feel free to create an issue. It is also highly encouraged to fork this repo, make any changes you desire, then go to the Pull Requests tab from your fork and select New pull request to submit them for review.\nIf you're brand new to module development, see the beginner's guide.\nIf you have already created a module and wish to share it with the REDCap community, you may submit it to the REDCap External Modules Submission Survey. If your module gets approved after submission, it will become available for download by any REDCap administrator from the REDCap Repo.\nHow to contribute to this documentation\nThese docs (and the External Module Framework itself) are very much a community effort. If/when you notice room for improvement, feel free to create an issue. It is also highly encouraged to fork this repo, make any changes you desire, then go to the Pull Requests tab from your fork and select New pull request.\nHow to contribute to the development of the EM Framework itself\nContributions (new features, bugfixes, etc.) to the External Module Framework code repo are welcome too! To gain access to that repo, email your GitHub username to mark.mcever@vumc.org. Once you have access, read the that repo's constribution instructions.\nDocumentation Backstory\nThis documentation was moved from the private REDCap Core & External Module Framework repos to this public repo to make it possible to share universal links to specific parts of the documentation, and to reduce barriers for community contribution. We considered hosting these docs at redcap.vumc.org/docs, but decided that using GitHub directly would be most likely to encourage contributions. A copy of these docs is also included in the External Module Framework repo via git-subrepo, to ensure that any find/replace actions also update the docs. Over time, we may want to consider moving other developer docs here from REDCap core."
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "mmcev106",
-     "url": "https://github.com/mmcev106",
-     "contributions": 190
-    },
-    {
-     "login": "paulj3",
-     "url": "https://github.com/paulj3",
-     "contributions": 5
-    },
-    {
-     "login": "AndrewPoppe",
-     "url": "https://github.com/AndrewPoppe",
-     "contributions": 3
-    },
-    {
-     "login": "123andy",
-     "url": "https://github.com/123andy",
-     "contributions": 2
-    },
-    {
-     "login": "tertek",
-     "url": "https://github.com/tertek",
-     "contributions": 1
-    },
-    {
-     "login": "grezniczek",
-     "url": "https://github.com/grezniczek",
-     "contributions": 1
-    },
-    {
-     "login": "knil-maloon",
-     "url": "https://github.com/knil-maloon",
-     "contributions": 1
-    }
-   ]
-  },
-  {
-   "name": "FlightTracker-Publication-Validator",
-   "fullName": "Kentucky-Open-Science/FlightTracker-Publication-Validator",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/FlightTracker-Publication-Validator",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "aviation",
-    "kentucky-open-science",
-    "redcap",
-    "redcap-external-module",
-    "redcap-repo"
-   ],
-   "language": "PHP",
-   "languages": [
-    {
-     "name": "PHP",
-     "percent": 55.5
-    },
-    {
-     "name": "JavaScript",
-     "percent": 33.5
-    },
-    {
-     "name": "CSS",
-     "percent": 11
-    }
-   ],
-   "license": {
-    "spdx": "MIT",
-    "name": "MIT License"
-   },
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": false,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "main",
-   "createdAt": "2024-10-25T15:21:28Z",
-   "pushedAt": "2026-08-21T14:07:17Z",
-   "sizeKb": 153,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/FlightTracker-Publication-Validator#readme",
-    "summary": [
-     "Once the module is enabled for a project, make sure to select Manage on the left-hand control panel for the project in the External Modules tab. Then select Configure for Flight Tracker Publication Validator - vx.x.x to begin the configuration process as follows.",
-     "Now with these steps enabled, a user should be able to access the survey and select which of their publications were made possible given a service request.",
-     "The Validator uses pre-filled form values and API linked projects to populate data dynamically for the end-user. The survey is intercepted using built-in hooks to provide customized options for each user based on their publications in Flight Tracker repositories. This was done with specific formatting in mind based on University of Kentucky's use case. Future additions are intended to make working with this module easier for other institutions."
-    ],
-    "headings": [
-     {
-      "level": 1,
-      "text": "Configuration",
-      "anchor": "configuration"
-     },
-     {
-      "level": 1,
-      "text": "How Does It Work?",
-      "anchor": "how-does-it-work"
-     },
-     {
-      "level": 1,
-      "text": "Reasoning Behind Survey Formatting",
-      "anchor": "reasoning-behind-survey-formatting"
-     },
-     {
-      "level": 1,
-      "text": "Contact",
-      "anchor": "contact"
-     },
-     {
-      "level": 1,
-      "text": "Future Content",
-      "anchor": "future-content"
-     }
-    ],
-    "text": "• Rename the folder to include a version number (for example: _v1.0.0) if it does not already have a version or it will not be recognized by REDCap.\nConfiguration\nOnce the module is enabled for a project, make sure to select Manage on the left-hand control panel for the project in the External Modules tab. Then select Configure for Flight Tracker Publication Validator - vx.x.x to begin the configuration process as follows.\n• Input the instrument name for the validation form. The project will otherwise assume the form is titled \"pub_validation\". • Add an API key for a cohort of Flight Tracker data. These cohorts were generated by University of Kentucky CCTS and are publications of users who made Service Requests to CCTS in that year. • Repeat step 2 for as many cohorts as you require. • Save the configuration\nNow with these steps enabled, a user should be able to access the survey and select which of their publications were made possible given a service request.\nHow Does It Work?\nThe Validator uses pre-filled form values and API linked projects to populate data dynamically for the end-user. The survey is intercepted using built-in hooks to provide customized options for each user based on their publications in Flight Tracker repositories. This was done with specific formatting in mind based on University of Kentucky's use case. Future additions are intended to make working with this module easier for other institutions.\nThe Services form all the fields to follow a similar format to what is provided. In place of 'year1' you could instead use the numerical year (say, 2019) and the project will know how to handle it. The UK ID field is named \"linkblue\", for other institutions using a different name for an identifier, you should change this field both in the code and in the form.\nCurrently, there are two surveys with specific formatting. These are included in the templates folder. These can be expanded to include additional years and doing so should not affect functionality. The Pub Validation form will require text box fields with the field name supported_pubs_xxxx where 'xxxx' would be publication year. Any other field in this form is suitable for change.\nWith these two forms in place, when a user moves to complete the Pub Validation form, they will be presented with a loading screen while API linked projects are queried for publications for the given user. These are then built into multiple choice panes for the researcher to select publications from. When the form is completed, these values are saved in a tab separated format so that they are easily processed for export via a custom CSV export view. This is accessible on the lefthand side of the project interface under External Modules on a page titled Custom CSV Export.\nReasoning Behind Survey Formatting\nThe hidden fields are used to convey data in a way that is easier to access and process when rewriting aspects of the page and collecting necessary data for display.\nThe hidden linkblue field is there for matching users to their data as all the data from the flighttracker databases need to be pulled and then matched. I am working out if I can just get 1 user's data to make it more lean.\nThe hidden years are there for me to have an easy way to collect which years I'm working with to filter only publications which occurred after that point and ones which have not yet been chosen.\nThe fields to hold data are formatted as paragraph boxes rather than multiple choice. This is due to the nature of how multiple choice is treated in redcap. Javascript is used to give the appearance of multiple choice input, but it is then loaded as an array of the citations selected into the paragraph box for easy usage later.\nContact\nIf you encounter issues or have feature requests, you can reach out to me by email or open a pull request on the project's github page.\nFuture Content\n• Additional configuration steps allowing for easier use by other institutions. •"
-   },
-   "release": {
-    "name": "FlightTrackerPublicationValidator_v1.0.0",
-    "tag": "1.0.0",
-    "url": "https://github.com/Kentucky-Open-Science/FlightTracker-Publication-Validator/releases/tag/1.0.0",
-    "publishedAt": "2026-04-03T17:09:59Z"
-   },
-   "contributors": [
-    {
-     "login": "NCPE227",
-     "url": "https://github.com/NCPE227",
-     "contributions": 35
-    }
-   ]
-  },
-  {
    "name": "free-claude-code",
    "fullName": "Kentucky-Open-Science/free-claude-code",
    "visibility": "public",
@@ -3265,190 +2710,6 @@
    ]
   },
   {
-   "name": "ignitenlp",
-   "fullName": "Kentucky-Open-Science/ignitenlp",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/ignitenlp",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "kentucky-open-science",
-    "nlp"
-   ],
-   "language": "Python",
-   "languages": [
-    {
-     "name": "Python",
-     "percent": 100
-    }
-   ],
-   "license": null,
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": true,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "master",
-   "createdAt": "2022-04-04T20:12:37Z",
-   "pushedAt": "2022-04-05T16:56:03Z",
-   "sizeKb": 12,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/ignitenlp#readme",
-    "summary": [
-     "In this example, we show how to use Ignite to finetune a transformer model:",
-     "Alternatively, install the all requirements using pip install -r requirements.txt.",
-     "Run the example on a single GPU:",
-     "If needed, please, adjust the batch size to your GPU device with --batch_size argument.",
-     "The default model is bert-base-uncased incase you need to change that use the --model argument, for details on which models can be used refer here",
-     "For details on accepted arguments:",
-     "Let's start training on a single node with 2 gpus:",
-     "Please, make sure to have Horovod installed before running.",
-     "Let's start training on a single node with 2 gpus:",
-     "For more details, see https://allegro.ai/clearml/docs/docs/examples/reporting/artifacts.html"
-    ],
-    "headings": [
-     {
-      "level": 2,
-      "text": "Requirements:",
-      "anchor": "requirements"
-     },
-     {
-      "level": 2,
-      "text": "Usage:",
-      "anchor": "usage"
-     },
-     {
-      "level": 3,
-      "text": "Distributed training",
-      "anchor": "distributed-training"
-     },
-     {
-      "level": 2,
-      "text": "ClearML fileserver",
-      "anchor": "clearml-fileserver"
-     }
-    ],
-    "text": "In this example, we show how to use Ignite to finetune a transformer model:\n• on 1 or more GPUs or TPUs • compute training/validation metrics • log learning rate, metrics etc • save the best model weights\nConfigurations:\n• [x] single GPU • [x] multi GPUs on a single node • [x] TPUs on Colab\nRequirements:\n• pytorch-ignite: pip install pytorch-ignite • transformers: pip install transformers • datasets: pip install datasets • tqdm: pip install tqdm • tensorboardx: pip install tensorboardX • python-fire: pip install fire • Optional: clearml: pip install clearml\nAlternatively, install the all requirements using pip install -r requirements.txt.\nUsage:\nRun the example on a single GPU:\nIf needed, please, adjust the batch size to your GPU device with --batch_size argument.\nThe default model is bert-base-uncased incase you need to change that use the --model argument, for details on which models can be used refer here\nExample:\nFor details on accepted arguments:\nDistributed training\nSingle node, multiple GPUs\nLet's start training on a single node with 2 gpus:\nUsing Horovod as distributed backend\nPlease, make sure to have Horovod installed before running.\nLet's start training on a single node with 2 gpus:\nColab or Kaggle kernels, on 8 TPUs\nClearML fileserver\nIf ClearML server is used (i.e. --with_clearml argument), the configuration to upload artifact must be done by modifying the ClearML configuration file ~/clearml.conf generated by clearml-init. According to the documentation, the output_uri argument can be configured in sdk.development.default_output_uri to fileserver uri. If server is self-hosted, ClearML fileserver uri is http://localhost:8081.\nFor more details, see https://allegro.ai/clearml/docs/docs/examples/reporting/artifacts.html"
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "codybum",
-     "url": "https://github.com/codybum",
-     "contributions": 9
-    }
-   ]
-  },
-  {
-   "name": "ignitevision",
-   "fullName": "Kentucky-Open-Science/ignitevision",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/ignitevision",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "computer-vision",
-    "kentucky-open-science"
-   ],
-   "language": "Python",
-   "languages": [
-    {
-     "name": "Python",
-     "percent": 99.2
-    },
-    {
-     "name": "Shell",
-     "percent": 0.8
-    }
-   ],
-   "license": null,
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": true,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "master",
-   "createdAt": "2021-09-17T16:53:54Z",
-   "pushedAt": "2025-10-06T17:07:24Z",
-   "sizeKb": 72,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/ignitevision#readme",
-    "summary": [
-     "In this example, we show how to use Ignite to train a neural network:",
-     "Alternatively, install the all requirements using pip install -r requirements.txt.",
-     "Run the example on a single GPU:",
-     "For details on accepted arguments:",
-     "If user would like to provide already downloaded dataset, the path can be setup in parameters as",
-     "Let's start training on a single node with 2 gpus:",
-     "Please, make sure to have Horovod installed before running.",
-     "Let's start training on a single node with 2 gpus:",
-     "Let's start training on two nodes with 2 gpus each. We assuming that master node can be connected as master, e.g. ping master.",
-     "Initial training with a stop on 1000 iteration (~11 epochs)",
-     "Resume from the latest checkpoint",
-     "Initial training on a single node with 2 gpus with a stop on 1000 iteration (~11 epochs):",
-     "Resume from the latest checkpoint",
-     "Similar commands can be adapted for other cases."
-    ],
-    "headings": [
-     {
-      "level": 2,
-      "text": "Requirements:",
-      "anchor": "requirements"
-     },
-     {
-      "level": 2,
-      "text": "Usage:",
-      "anchor": "usage"
-     },
-     {
-      "level": 3,
-      "text": "Distributed training",
-      "anchor": "distributed-training"
-     },
-     {
-      "level": 3,
-      "text": "Check resume training",
-      "anchor": "check-resume-training"
-     },
-     {
-      "level": 3,
-      "text": "Distributed training",
-      "anchor": "distributed-training-1"
-     },
-     {
-      "level": 2,
-      "text": "ClearML fileserver",
-      "anchor": "clearml-fileserver"
-     }
-    ],
-    "text": "In this example, we show how to use Ignite to train a neural network:\n• on 1 or more GPUs or TPUs • compute training/validation metrics • log learning rate, metrics etc • save the best model weights\nConfigurations:\n• [x] single GPU • [x] multi GPUs on a single node • [x] multi GPUs on multiple nodes • [x] TPUs on Colab\nRequirements:\n• pytorch-ignite: pip install pytorch-ignite • torchvision: pip install torchvision • tqdm: pip install tqdm • tensorboardx: pip install tensorboardX • python-fire: pip install fire • Optional: clearml: pip install clearml\nAlternatively, install the all requirements using pip install -r requirements.txt.\nUsage:\nRun the example on a single GPU:\nFor details on accepted arguments:\nIf user would like to provide already downloaded dataset, the path can be setup in parameters as\nDistributed training\nSingle node, multiple GPUs\nLet's start training on a single node with 2 gpus:\nUsing Horovod as distributed backend\nPlease, make sure to have Horovod installed before running.\nLet's start training on a single node with 2 gpus:\nColab, on 8 TPUs\nSame code can be run on TPUs:\nMultiple nodes, multiple GPUs\nLet's start training on two nodes with 2 gpus each. We assuming that master node can be connected as master, e.g. ping master.\n• Execute on master node\n• Execute on worker node\nCheck resume training\nSingle GPU\nInitial training with a stop on 1000 iteration (~11 epochs)\nResume from the latest checkpoint\nDistributed training\nSingle node, multiple GPUs\nInitial training on a single node with 2 gpus with a stop on 1000 iteration (~11 epochs):\nResume from the latest checkpoint\nSimilar commands can be adapted for other cases.\nClearML fileserver\nIf ClearML server is used (i.e. --with_clearml argument), the configuration to upload artifact must be done by modifying the ClearML configuration file ~/clearml.conf generated by clearml-init. According to the documentation, the output_uri argument can be configured in sdk.development.default_output_uri to fileserver uri. If server is self-hosted, ClearML fileserver uri is http://localhost:8081.\nFor more details, see https://allegro.ai/clearml/docs/docs/examples/reporting/artifacts.html"
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "codybum",
-     "url": "https://github.com/codybum",
-     "contributions": 24
-    },
-    {
-     "login": "armstrongsam25",
-     "url": "https://github.com/armstrongsam25",
-     "contributions": 1
-    },
-    {
-     "login": "snyk-bot",
-     "url": "https://github.com/snyk-bot",
-     "contributions": 1
-    }
-   ]
-  },
-  {
    "name": "isyntax2raw",
    "fullName": "Kentucky-Open-Science/isyntax2raw",
    "visibility": "public",
@@ -3589,8 +2850,8 @@
    "parent": null,
    "defaultBranch": "main",
    "createdAt": "2026-04-29T13:40:31Z",
-   "pushedAt": "2026-11-02T16:00:27Z",
-   "sizeKb": 324,
+   "pushedAt": "2026-11-09T16:26:52Z",
+   "sizeKb": 325,
    "readme": {
     "url": "https://github.com/Kentucky-Open-Science/kentucky-open-science.github.io#readme",
     "summary": [
@@ -3644,183 +2905,6 @@
      "login": "codybum",
      "url": "https://github.com/codybum",
      "contributions": 1
-    }
-   ]
-  },
-  {
-   "name": "kySTATS",
-   "fullName": "Kentucky-Open-Science/kySTATS",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/kySTATS",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "kentucky-open-science"
-   ],
-   "language": "Python",
-   "languages": [
-    {
-     "name": "Python",
-     "percent": 100
-    }
-   ],
-   "license": null,
-   "stars": 1,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": false,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "master",
-   "createdAt": "2024-05-17T13:34:42Z",
-   "pushedAt": "2024-05-22T13:21:07Z",
-   "sizeKb": 78,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/kySTATS#readme",
-    "summary": [],
-    "headings": [
-     {
-      "level": 2,
-      "text": "Task 1: Single File",
-      "anchor": "task-1-single-file"
-     },
-     {
-      "level": 1,
-      "text": "Example Code",
-      "anchor": "example-code"
-     },
-     {
-      "level": 2,
-      "text": "Smart Data Frame",
-      "anchor": "smart-data-frame"
-     },
-     {
-      "level": 2,
-      "text": "Smart Data Lake",
-      "anchor": "smart-data-lake"
-     },
-     {
-      "level": 2,
-      "text": "Agent",
-      "anchor": "agent"
-     }
-    ],
-    "text": "Task 1: Single File\nExample Code\nSmart Data Frame\n• desc: This is an example of a smart data frame • file: pandas_ai_sdf.py\n• desc: This is an example of a smart data frame /w KY STATS data • file:pandas_ai_sdf_KY.py\nSmart Data Lake\n• desc: This is an example of a smart data lake • file:pandas_ai_datalake.py\nAgent\n• desc: This is an example of a smart data lake • file:pandas_ai_agent.py\n• desc: This is an example of a smart data lake /w slipstream output • file:pandas_ai_agent_sl.py"
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "codybum",
-     "url": "https://github.com/codybum",
-     "contributions": 7
-    }
-   ]
-  },
-  {
-   "name": "langchain-caai",
-   "fullName": "Kentucky-Open-Science/langchain-caai",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/langchain-caai",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "kentucky-open-science"
-   ],
-   "language": "Python",
-   "languages": [
-    {
-     "name": "Python",
-     "percent": 100
-    }
-   ],
-   "license": {
-    "spdx": "Apache-2.0",
-    "name": "Apache License 2.0"
-   },
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": false,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "main",
-   "createdAt": "2024-06-23T22:57:54Z",
-   "pushedAt": "2024-07-04T16:26:48Z",
-   "sizeKb": 8,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/langchain-caai#readme",
-    "summary": [
-     "This library allows python applications to interface with the CAAI Embedding service."
-    ],
-    "headings": [
-     {
-      "level": 1,
-      "text": "Installing",
-      "anchor": "installing"
-     },
-     {
-      "level": 1,
-      "text": "Usage",
-      "anchor": "usage"
-     }
-    ],
-    "text": "This library allows python applications to interface with the CAAI Embedding service.\nInstalling\npip install langchain-caai\nUsage"
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "codybum",
-     "url": "https://github.com/codybum",
-     "contributions": 3
-    }
-   ]
-  },
-  {
-   "name": "LexTran_AIM_Grant",
-   "fullName": "Kentucky-Open-Science/LexTran_AIM_Grant",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/LexTran_AIM_Grant",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "kentucky-open-science"
-   ],
-   "language": "Python",
-   "languages": [
-    {
-     "name": "Python",
-     "percent": 100
-    }
-   ],
-   "license": null,
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": false,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "main",
-   "createdAt": "2024-07-29T19:04:55Z",
-   "pushedAt": "2024-09-05T15:50:28Z",
-   "sizeKb": 24,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/LexTran_AIM_Grant#readme",
-    "summary": [],
-    "headings": [],
-    "text": "Repo for LexTran AIM Grant"
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "amullen34",
-     "url": "https://github.com/amullen34",
-     "contributions": 11
     }
    ]
   },
@@ -4289,36 +3373,6 @@
      "contributions": 3
     }
    ]
-  },
-  {
-   "name": "llmfactory",
-   "fullName": "Kentucky-Open-Science/llmfactory",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/llmfactory",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "kentucky-open-science",
-    "large-language-models"
-   ],
-   "language": null,
-   "languages": [],
-   "license": null,
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": false,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "main",
-   "createdAt": "2024-01-31T21:52:56Z",
-   "pushedAt": "2024-01-31T21:52:57Z",
-   "sizeKb": 0,
-   "readme": null,
-   "release": null,
-   "contributors": []
   },
   {
    "name": "LocalLLMStructured",
@@ -4981,53 +4035,6 @@
    ]
   },
   {
-   "name": "N-PEER",
-   "fullName": "Kentucky-Open-Science/N-PEER",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/N-PEER",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "kentucky-open-science"
-   ],
-   "language": "Python",
-   "languages": [
-    {
-     "name": "Python",
-     "percent": 100
-    }
-   ],
-   "license": null,
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": false,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "main",
-   "createdAt": "2025-05-19T15:30:36Z",
-   "pushedAt": "2026-01-05T18:58:12Z",
-   "sizeKb": 12,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/N-PEER#readme",
-    "summary": [
-     "Repo for the LLM work for the RADOR project, like using DeepSeek to help users navigate the dashboard site."
-    ],
-    "headings": [],
-    "text": "Repo for the LLM work for the RADOR project, like using DeepSeek to help users navigate the dashboard site."
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "amullen34",
-     "url": "https://github.com/amullen34",
-     "contributions": 6
-    }
-   ]
-  },
-  {
    "name": "native_research_llms",
    "fullName": "Kentucky-Open-Science/native_research_llms",
    "visibility": "public",
@@ -5251,6 +4258,115 @@
      "login": "codybum",
      "url": "https://github.com/codybum",
      "contributions": 3
+    }
+   ]
+  },
+  {
+   "name": "OpenSidewalk",
+   "fullName": "Kentucky-Open-Science/OpenSidewalk",
+   "visibility": "public",
+   "url": "https://github.com/Kentucky-Open-Science/OpenSidewalk",
+   "description": "Apache-2.0 LoRaWAN firmware for Silicon Labs KG100S kits: automatic TTN OTAA, temperature and button telemetry.",
+   "homepage": "",
+   "topics": [],
+   "language": "C",
+   "languages": [
+    {
+     "name": "C",
+     "percent": 53.6
+    },
+    {
+     "name": "Python",
+     "percent": 34.9
+    },
+    {
+     "name": "JavaScript",
+     "percent": 10.9
+    },
+    {
+     "name": "CMake",
+     "percent": 0.6
+    }
+   ],
+   "license": {
+    "spdx": "Apache-2.0",
+    "name": "Apache License 2.0"
+   },
+   "stars": 0,
+   "forks": 0,
+   "openIssues": 0,
+   "hasIssues": true,
+   "archived": false,
+   "fork": false,
+   "isTemplate": false,
+   "parent": null,
+   "defaultBranch": "main",
+   "createdAt": "2026-11-13T18:16:57Z",
+   "pushedAt": "2026-11-13T19:48:47Z",
+   "sizeKb": 2871,
+   "readme": {
+    "url": "https://github.com/Kentucky-Open-Science/OpenSidewalk#readme",
+    "summary": [
+     "Independent BLE and LoRaWAN firmware for the Silicon Labs KG100S development kit. BLE connection events, automatic OTAA joining, MCU temperature, two buttons, and a ready-to-use TTN decoder. Project code is licensed under Apache-2.0; third-party licenses are retained.",
+     "Contributed hardware photo, identifiers redacted with an image-editing model. The expansion adapter is pictured; this firmware uses the KG100S module's integrated SX1262 radio. The photograph is not a pinout reference.",
+     "OpenSidewalk is a replacement application built on Zephyr/LoRaMac-node. It does not implement Amazon Sidewalk or connect to AWS. It is not affiliated with or endorsed by Amazon, Silicon Labs, Semtech or The Things Network.",
+     "Back up your own existing application and USERDATA privately before replacing factory firmware. Use Silicon Labs Simplicity Commander:"
+    ],
+    "headings": [
+     {
+      "level": 2,
+      "text": "What it does",
+      "anchor": "what-it-does"
+     },
+     {
+      "level": 2,
+      "text": "Supported hardware",
+      "anchor": "supported-hardware"
+     },
+     {
+      "level": 2,
+      "text": "Connect an iPhone over BLE",
+      "anchor": "connect-an-iphone-over-ble"
+     },
+     {
+      "level": 2,
+      "text": "Flash the supplied firmware",
+      "anchor": "flash-the-supplied-firmware"
+     },
+     {
+      "level": 2,
+      "text": "Register and provision",
+      "anchor": "register-and-provision"
+     },
+     {
+      "level": 2,
+      "text": "TTN payload decoder",
+      "anchor": "ttn-payload-decoder"
+     },
+     {
+      "level": 2,
+      "text": "Build from source",
+      "anchor": "build-from-source"
+     },
+     {
+      "level": 2,
+      "text": "Publishing and contributing",
+      "anchor": "publishing-and-contributing"
+     }
+    ],
+    "text": "Independent BLE and LoRaWAN firmware for the Silicon Labs KG100S development kit. BLE connection events, automatic OTAA joining, MCU temperature, two buttons, and a ready-to-use TTN decoder. Project code is licensed under Apache-2.0; third-party licenses are retained.\nContributed hardware photo, identifiers redacted with an image-editing model. The expansion adapter is pictured; this firmware uses the KG100S module's integrated SX1262 radio. The photograph is not a pinout reference.\nWhat it does\n• LoRaWAN Class A, OTAA, US915 FSB 2, compatible with The Things Network. • Starts joining about three seconds after boot/reset; failed joins back off for 60, 120, 240, 480, then 900 seconds, capped at fifteen minutes. • Sends a ten-byte sample after joining, every five minutes, and after button changes (coalesced with a ten-second cooldown after a send attempt). • Reports MCU die temperature in °C and °F, BTN0/BTN1 states and press counters. • Stores credentials and monotonically reserved DevNonce in NVS; every reboot performs a fresh join. Storage errors and nonce exhaustion stop auto-joins. • USB serial shell, larger ASCII boot banner, optional controller LCD nickname. • Advertises as OpenSidewalk over BLE; each successful connection queues a connected event for TTN on FPort 3, under the existing LoRaWAN identity.\nOpenSidewalk is a replacement application built on Zephyr/LoRaMac-node. It does not implement Amazon Sidewalk or connect to AWS. It is not affiliated with or endorsed by Amazon, Silicon Labs, Semtech or The Things Network.\nSupported hardware\nTested with KG100S BRD4332A, EFR32BG21B010F1024IM32, on the BRD4002A Wireless Pro Kit mainboard. The built-in SX1262 uses its 915 MHz antenna. The pictured BRD8042A expansion adapter/external shield is not used.\nConnect an iPhone over BLE\n• Power the provisioned board with its 915 MHz antenna attached. It joins TTN automatically and advertises as OpenSidewalk. • Open a BLE scanner app such as nRF Connect for Mobile on your iPhone, allow Bluetooth access, scan, and tap Connect on OpenSidewalk. Use the BLE app to establish the connection; no custom phone app or pairing setup is required for this prototype. • In this TTN device's Live data, look for an FPort 3 uplink decoded as event: \"connected\", with ble_address, ble_address_type, and sequence. Install the updated decoder.js as the device's custom uplink formatter. • Up to four BLE devices can remain connected at the same time. Each connection queues its own event, identified by that peer's BLE address. The board keeps advertising while slots remain, and resumes after a slot is freed. Reconnecting generates another event.\nThis version forwards connection events, not arbitrary Bluetooth streams. The peer address identifies the connection; iPhones can rotate private BLE addresses, so it is not a permanent phone ID. The peer's friendly name is not automatically available. A generic BLE sensor that cannot initiate connections would need a separate sensor-specific client implementation on the KG100S.\nEvents use unconfirmed LoRaWAN uplinks and are best effort. Up to eight events wait in RAM while unjoined or while radio retries are pending. A full queue drops the newest event and increments the drop counter. Reset discards queued events. Attempts are spaced by 30 seconds; retries retain the head event. ble status reports active connections (for example 2/4), queued, locally sent and dropped counts. A burst of four events is forwarded in order, with 30 seconds between event attempts; this can take over 90 seconds to drain. Locally sent does not mean TTN acknowledged receipt.\nFPort 3 is 11 bytes: schema 1, event 1 (connected), big-endian 16-bit sequence, address type (0 public / 1 random), six address bytes in display order. Sequence starts at 1 each boot and wraps after 65535.\nConnect the correct antenna before powering a provisioned board. It transmits automatically. This is an experimental prototype, not a certified LoRaWAN product. Only the US915 build is supplied; use it where that frequency plan is permitted.\nTemperature is the MCU's internal die reading, not a calibrated ambient sensor. The mainboard LCD is not wired to the KG100S application processor. A controller nickname can display a short ASCII badge while retaining its normal logo/status.\nFlash the supplied firmware\nDownload a complete release bundle, including LICENSE, NOTICE, THIRD_PARTY_NOTICES.md and licenses/, alongside the firmware. The application image contains no device credentials or saved session. Each user must provision their own TTN registration.\nBack up your own existing application and USERDATA privately before replacing factory firmware. Use Silicon Labs Simplicity Commander:\nThe image starts at address zero. NVS occupies 0x000f8000–0x000fffff; application flash is 0x00000000–0x000f7fff. USERDATA lies outside main flash. Do not use --masserase for updates: it would erase credentials and the nonce counter. An initial conversion from different firmware may have incompatible settings at that location; inspect/erase only that storage partition if needed before provisioning fresh credentials. Never resume an old credential profile with a rolled-back nonce. No bootloader/security/debug-lock updates are included.\nRegister and provision\nIn your TTN application, register an OTAA device with your own unique DevEUI, JoinEUI and AppKey. Choose US 902–928 MHz FSB 2, LoRaWAN 1.0.4, Regional Parameters RP002 1.0.3, Class A. The gateway must use the same channel plan and forward traffic to that TTN cluster. No TTN account or gateway is included.\nCopy credentials.example.json to credentials.json, fill in your values, and keep it private. Use a different identity/key for each device. Never provision this board with another user's registration or include real keys in issues.\nSerial: 115200, 8N1. On macOS the port generally starts /dev/cu.usbmodem; on Linux /dev/ttyACM; on Windows COM. After provisioning, the firmware joins automatically. Provision while unjoined; changing a joined profile requires a reset and issuing the configuration command before the three-second autojoin. The helper sets the sub-band before provisioning to avoid a join between steps.\nlw join is an optional manual attempt. lw send takes a fresh telemetry sample. The shell and helper suppress key echo; keep terminal logs private regardless. Manual sends bypass the button-event cooldown.\nOptional LCD badge (controller nickname, independent of application flash):\nThe existing controller logo/status remains. To remove the badge, use commander adapter nick --clear --serialno YOUR_JLINK_SERIAL and reset the controller. The larger USB ASCII banner does not require this step.\nTTN payload decoder\nUnder this device's Payload formatters → Uplink, choose Custom Javascript formatter, paste decoder.js, and save. Set the formatter on the device rather than changing other devices' application defaults. FPort is 2. Example: 01000309E70000020002 decodes to:\nPress counts and sequence reset at boot and wrap after 65535. Counts preserve short presses even if both buttons are released when sampled. Unavailable temperature decodes to null with a warning. Fahrenheit is calculated in the decoder and rounded to two decimals; resolution does not imply sensor accuracy.\nBuild from source\nUse Python 3.12 or newer, Git, Node.js, CMake/Ninja, and Zephyr SDK 1.0.1 with the arm-zephyr-eabi toolchain. Host tests also need Clang. Start in a parent directory whose path has no spaces:\nwest.yml pins Zephyr v4.5.0 and imports only the needed module set, including Mbed TLS / TF-PSA for Bluetooth controller support. Silicon Labs controller and RAIL libraries are fetched with west blobs fetch hal_silabs. The build script verifies the Zephyr commit and applies the two tracked patches, or checks that they are already applied. It stages the application outside paths containing spaces and produces firmware/opensidewalk-us915.hex and .bin. See validation, RF-switch provenance and …"
+   },
+   "release": {
+    "name": "OpenSidewalk v0.3.1",
+    "tag": "v0.3.1",
+    "url": "https://github.com/Kentucky-Open-Science/OpenSidewalk/releases/tag/v0.3.1",
+    "publishedAt": "2026-11-13T18:19:49Z"
+   },
+   "contributors": [
+    {
+     "login": "armstrongsam25",
+     "url": "https://github.com/armstrongsam25",
+     "contributions": 4
     }
    ]
   },
@@ -5672,64 +4788,6 @@
    ]
   },
   {
-   "name": "Rat-seizure-combined",
-   "fullName": "Kentucky-Open-Science/Rat-seizure-combined",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/Rat-seizure-combined",
-   "description": "Combination of EEG and video rat seizure methods",
-   "homepage": "",
-   "topics": [
-    "eeg",
-    "kentucky-open-science",
-    "neuroscience"
-   ],
-   "language": "Python",
-   "languages": [
-    {
-     "name": "Python",
-     "percent": 100
-    }
-   ],
-   "license": null,
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 2,
-   "hasIssues": true,
-   "archived": false,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "main",
-   "createdAt": "2024-05-16T17:27:09Z",
-   "pushedAt": "2026-05-26T14:47:48Z",
-   "sizeKb": 338,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/Rat-seizure-combined#readme",
-    "summary": [
-     "Combination of EEG and video rat seizure methods",
-     "This is the final repo for running evaluation for the seizure rats. Currently updated to include both training and evaluation",
-     "setup_directory.py - Script to process video files into short clips and organize",
-     "video_utils.py - Functions to process and organize video clips",
-     "multi_modal_distributed.py - Newest main file, uses distributed DGX training and custom multimodal model architecture to train models on EEG and video data",
-     "convertEDF.py - reads in EEG data from EDF files and formats it",
-     "run_trainer_new.py - some postprocessing and helper functions",
-     "post_process.py - generates summary results after training/evaluation has completed",
-     "combine_distributed_results.py - helper functions for postprocessing",
-     "All other files: unused helper functions or previous attempts at model building/evaluation"
-    ],
-    "headings": [],
-    "text": "Combination of EEG and video rat seizure methods\nThis is the final repo for running evaluation for the seizure rats. Currently updated to include both training and evaluation\nFILE GUIDE:\nsetup_directory.py - Script to process video files into short clips and organize\nvideo_utils.py - Functions to process and organize video clips\nmulti_modal_distributed.py - Newest main file, uses distributed DGX training and custom multimodal model architecture to train models on EEG and video data\nconvertEDF.py - reads in EEG data from EDF files and formats it\nrun_trainer_new.py - some postprocessing and helper functions\npost_process.py - generates summary results after training/evaluation has completed\ncombine_distributed_results.py - helper functions for postprocessing\nAll other files: unused helper functions or previous attempts at model building/evaluation"
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "amullen34",
-     "url": "https://github.com/amullen34",
-     "contributions": 42
-    }
-   ]
-  },
-  {
    "name": "raw2ometiff",
    "fullName": "Kentucky-Open-Science/raw2ometiff",
    "visibility": "public",
@@ -5924,97 +4982,6 @@
      "login": "tnilest",
      "url": "https://github.com/tnilest",
      "contributions": 3
-    }
-   ]
-  },
-  {
-   "name": "SOAP_Notes_Flutter",
-   "fullName": "Kentucky-Open-Science/SOAP_Notes_Flutter",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/SOAP_Notes_Flutter",
-   "description": "SOAP Note Flutter App",
-   "homepage": "",
-   "topics": [
-    "clinical-informatics",
-    "kentucky-open-science"
-   ],
-   "language": "C++",
-   "languages": [
-    {
-     "name": "C++",
-     "percent": 41.7
-    },
-    {
-     "name": "CMake",
-     "percent": 34.4
-    },
-    {
-     "name": "Dart",
-     "percent": 9.1
-    },
-    {
-     "name": "Ruby",
-     "percent": 5.1
-    },
-    {
-     "name": "HTML",
-     "percent": 3.4
-    },
-    {
-     "name": "Swift",
-     "percent": 3.4
-    },
-    {
-     "name": "C",
-     "percent": 2.6
-    },
-    {
-     "name": "Kotlin",
-     "percent": 0.2
-    },
-    {
-     "name": "Objective-C",
-     "percent": 0.1
-    }
-   ],
-   "license": null,
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": true,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "main",
-   "createdAt": "2023-07-12T15:21:12Z",
-   "pushedAt": "2023-07-29T00:47:47Z",
-   "sizeKb": 276,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/SOAP_Notes_Flutter#readme",
-    "summary": [
-     "This app is the base of a flutter recording app designed to record audio, send it to a speech to text parser, and then do assorted AI things to process that text. Future updates soon to come"
-    ],
-    "headings": [
-     {
-      "level": 2,
-      "text": "Getting Started",
-      "anchor": "getting-started"
-     },
-     {
-      "level": 1,
-      "text": "recording_this",
-      "anchor": "recording_this"
-     }
-    ],
-    "text": "A new Flutter project.\nGetting Started\nThis app is the base of a flutter recording app designed to record audio, send it to a speech to text parser, and then do assorted AI things to process that text. Future updates soon to come\nrecording_this"
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "22quinteros",
-     "url": "https://github.com/22quinteros",
-     "contributions": 6
     }
    ]
   },
@@ -6581,188 +5548,6 @@
      "login": "EvanDamron",
      "url": "https://github.com/EvanDamron",
      "contributions": 7
-    }
-   ]
-  },
-  {
-   "name": "UKy-Campus-LIDAR",
-   "fullName": "Kentucky-Open-Science/UKy-Campus-LIDAR",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/UKy-Campus-LIDAR",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "kentucky-open-science",
-    "lidar"
-   ],
-   "language": "JavaScript",
-   "languages": [
-    {
-     "name": "JavaScript",
-     "percent": 68.8
-    },
-    {
-     "name": "Python",
-     "percent": 29.6
-    },
-    {
-     "name": "CSS",
-     "percent": 0.9
-    },
-    {
-     "name": "HTML",
-     "percent": 0.8
-    }
-   ],
-   "license": null,
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": false,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "main",
-   "createdAt": "2026-06-12T13:29:56Z",
-   "pushedAt": "2026-07-18T04:36:40Z",
-   "sizeKb": 18391,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/UKy-Campus-LIDAR#readme",
-    "summary": [
-     "Extract UE 4.24.3 UKy Campus LiDAR point cloud + DTM terrain tiles + aerial imagery into open formats and view them in an interactive Three.js web viewer — no Unreal Engine required at runtime. The twin now extends past campus to the full Lexington / Lextran service area: authoritative LFUCG building footprints and street centerlines, KyFromAbove/KYAPED-derived elevations, active LFUCG traffic-signal locations, attributed OpenStreetMap crossing evidence, and the live Lextran bus feed. Large city layers stay packed into one buffer / draw call per layer, with adaptive quality controls protecting the viewer's 30 fps interaction target.",
-     "Google Photorealistic 3D Tiles streamed into the Three.js twin — the whole city in real, textured 3D (campus, downtown skyline, the Lextran service area). This optional layer stays off until enabled with a valid provider key; its cache is transient."
-    ],
-    "headings": [
-     {
-      "level": 2,
-      "text": "Gallery",
-      "anchor": "gallery"
-     },
-     {
-      "level": 2,
-      "text": "Quick start",
-      "anchor": "quick-start"
-     },
-     {
-      "level": 2,
-      "text": "What's in here",
-      "anchor": "whats-in-here"
-     },
-     {
-      "level": 2,
-      "text": "Re-extracting from source",
-      "anchor": "re-extracting-from-source"
-     },
-     {
-      "level": 2,
-      "text": "Filling in Lexington — KyFromAbove LiDAR",
-      "anchor": "filling-in-lexington--kyfromabove-lidar"
-     },
-     {
-      "level": 2,
-      "text": "Authoritative public-data rebuild",
-      "anchor": "authoritative-public-data-rebuild"
-     },
-     {
-      "level": 3,
-      "text": "Exact service bbox",
-      "anchor": "exact-service-bbox"
-     },
-     {
-      "level": 3,
-      "text": "Source precedence and modeled fields",
-      "anchor": "source-precedence-and-modeled-fields"
-     },
-     {
-      "level": 3,
-      "text": "Reproduce the current layers",
-      "anchor": "reproduce-the-current-layers"
-     },
-     {
-      "level": 3,
-      "text": "Export the complete static map to USD",
-      "anchor": "export-the-complete-static-map-to-usd"
-     },
-     {
-      "level": 3,
-      "text": "Licensing and redistribution",
-      "anchor": "licensing-and-redistribution"
-     },
-     {
-      "level": 2,
-      "text": "Photorealistic basemap — Google 3D Tiles (opt-in)",
-      "anchor": "photorealistic-basemap--google-3d-tiles-opt-in"
-     },
-     {
-      "level": 2,
-      "text": "Viewer controls",
-      "anchor": "viewer-controls"
-     },
-     {
-      "level": 2,
-      "text": "Generated artifacts and exact counts",
-      "anchor": "generated-artifacts-and-exact-counts"
-     },
-     {
-      "level": 2,
-      "text": "Digital twin — controllable signals + autonomous agents",
-      "anchor": "digital-twin--controllable-signals--autonomous-agents"
-     },
-     {
-      "level": 3,
-      "text": "Radio survey and LoRaWAN placement",
-      "anchor": "radio-survey-and-lorawan-placement"
-     },
-     {
-      "level": 2,
-      "text": "Live traffic cameras",
-      "anchor": "live-traffic-cameras"
-     },
-     {
-      "level": 3,
-      "text": "Camera-detected cars (Phase 1 — geometry + spawn)",
-      "anchor": "camera-detected-cars-phase-1--geometry--spawn"
-     },
-     {
-      "level": 2,
-      "text": "Multiplayer twin server — shared world over an API",
-      "anchor": "multiplayer-twin-server--shared-world-over-an-api"
-     },
-     {
-      "level": 3,
-      "text": "Runtime traffic and scenario API",
-      "anchor": "runtime-traffic-and-scenario-api"
-     },
-     {
-      "level": 3,
-      "text": "First-person cameras + vision navigation (YOLO)",
-      "anchor": "first-person-cameras--vision-navigation-yolo"
-     },
-     {
-      "level": 2,
-      "text": "Gym environment (campus_gym)",
-      "anchor": "gym-environment-campus_gym"
-     },
-     {
-      "level": 3,
-      "text": "Language-conditioned navigation + evaluation (the agentic layer)",
-      "anchor": "language-conditioned-navigation--evaluation-the-agentic-layer"
-     },
-     {
-      "level": 3,
-      "text": "NPC traffic + signals, scenarios, vectorization, training",
-      "anchor": "npc-traffic--signals-scenarios-vectorization-training"
-     }
-    ],
-    "text": "Extract UE 4.24.3 UKy Campus LiDAR point cloud + DTM terrain tiles + aerial imagery into open formats and view them in an interactive Three.js web viewer — no Unreal Engine required at runtime. The twin now extends past campus to the full Lexington / Lextran service area: authoritative LFUCG building footprints and street centerlines, KyFromAbove/KYAPED-derived elevations, active LFUCG traffic-signal locations, attributed OpenStreetMap crossing evidence, and the live Lextran bus feed. Large city layers stay packed into one buffer / draw call per layer, with adaptive quality controls protecting the viewer's 30 fps interaction target.\nGallery\nGoogle Photorealistic 3D Tiles streamed into the Three.js twin — the whole city in real, textured 3D (campus, downtown skyline, the Lextran service area). This optional layer stays off until enabled with a valid provider key; its cache is transient.\nOblique over campus toward the downtown skyline — real building textures, trees, and terrain, with the live overlays (roads, signals, cameras, buses) draped on top.\nTop-down: the generated road network, intersections and signals draped onto the photorealistic surface at real elevation (so overpasses stay above the roads beneath).\nThe earlier OSM/LiDAR base map (still available): street level following a live Route 7 bus. Signal locations are anchored to LFUCG records; explicit crossing evidence comes from attributed OSM data, while any generated markings and timings are labeled models.\nQuick start\ntools/twin_server.py is one server that serves the static viewer, proxies the live Lexington (Lextran) GTFS-Realtime feed so you get moving buses on the map, proxies the city's live traffic-camera stream URLs so you can watch real traffic at the intersections (/api/cameras/*), and runs the authoritative shared-world agent API (/api/world/*) — with solid geometry: agents collide with (and are pushed out of) all buildings in the active pack via oriented per-building collision boxes, drones land on roofs, and the ground model reports road / terrain / none per position. Add --render for first-person agent cameras, --npc 12 for signal-aware background traffic, --mock to replay a recorded bus feed offline, --no-transit to skip the bus proxy, or --no-cameras to skip the camera proxy. No buses or agents needed at all? Plain cd web && python -m http.server 8000 still works — routes, stops, and camera markers render; live buses and video just stay off.\n--detect-device auto selects CUDA FP16 when PyTorch can see an NVIDIA GPU and otherwise falls back to CPU FP32. For an NVIDIA Container Toolkit installation, the equivalent GPU-enabled container command is docker compose -f docker-compose.yml -f docker-compose.gpu.yml up --build.\nThe viewer loads generated web/data/manifest.json and streams terrain tiles + LiDAR point chunks. The runtime server serves active artifacts; it does not silently refresh their public-data provenance.\nWhat's in here\nRe-extracting from source\nGenerated data lives under the gitignored web/data/. If it is absent or you need to regenerate the campus georeference from the source assets:\nFilling in Lexington — KyFromAbove LiDAR\nThe campus point cloud started as a single UE asset (POINT_CLOUD_2019); the rest of Lexington is filled in from the statewide KyFromAbove / KYAPED LiDAR (Phase 3), which supersedes the campus scan where the sources overlap. tools/ky_lidar.py queries the published tile index for the bbox in city.json, downloads 5,000-ft .copc.laz tiles, reprojects them from NAD83 Kentucky Single Zone (US ft) into the scene's UTM-16N frame, and writes viewer point chunks plus the citywide ground.f32 elevation grid. KyFromAbove data is distributed as public domain under its published distribution policy; the generated manifest records the source and transformation.\nThen open http://localhost:8000/, expand the LiDAR panel, and tick visible. Agent ground-snapping (tools/twin_server.Ground) uses the new ground.f32 grid as the primary elevation citywide, so cars/buses follow real terrain beyond the campus tiles. Everything lands under the gitignored web/data/; the previous campus manifest is backed up to web/data/manifest.campus.bak.json.\nAuthoritative public-data rebuild\nThe public-data build requires an existing georeferenced web/data/manifest.json and the extracted campus terrain; run tools.build_all first when rebuilding those from the UE source assets. From that georeference onward, plan geometry and elevation come from public GIS/LiDAR sources and every downstream layer is clipped to city.json.\nExact service bbox\nThe currently baked service extent is the exact city.json bbox_lonlat, ordered [west, south, east, north]:\npython -m tools.osm_city derives this from the current Lextran GTFS stops and shapes (including its documented service margin), projects the matching scene bbox, and writes the lightweight OSM street context. A later GTFS release can change the extent; builders therefore read city.json rather than copying these coordinates into code. LFUCG roads are clipped to that extent, LFUCG buildings are selected within it, and the OSM crossing fetcher queries it without padding.\nSource precedence and modeled fields\ntools.public_data paginates each ArcGIS FeatureServer, checks the advertised feature count, writes atomically, hashes the result, and creates web/data/sources/provenance.json with publisher, item/service URLs, query, source CRS, last-edit time, retrieval time, record count, and SHA-256. fetch_osm_crossings separately records the exact bbox, Overpass pages/mirrors, OSM base timestamps, full tags, WGS84 and scene geometry, retrieval time, attribution, and ODbL terms. The generated roads, signals, and building metadata carry the relevant source IDs and fallback labels forward. The downloader also exposes bikeped, cameras, and streetlights for downstream audits and placement tools; the current road/crossing bake does not pretend those partial inventories are a comprehensive as-built crosswalk layer.\nReproduce the current layers\nThe order matters: osm_city establishes the AOI; KyFromAbove builds the elevation grid; the legacy OSM building pass supplies a temporary measured-height reference; then the LFUCG geometry replaces it. Existing installations that already have a KyFromAbove-derived buildings.pack.json can skip the two bootstrap-building commands.\nThe bootstrap build_city pass estimates a roof from the configured percentile (85th by default) of in-footprint KyFromAbove class 1/6 returns above ground.f32, falling back to explicit OSM height/levels when needed. The LFUCG builder does not claim to re-measure each replacement polygon: it spatially transfers those heights, uses a nearby reference within its bounded search when necessary, and labels an unmatched default. That distinction is preserved in heightSourceCounts and every building record.\nbuild_lfucg_buildings first writes buildings.lfucg.pack.{bin,json}. With --activate, it replaces the conventional one-draw-call buildings.pack.{bin,json} and retains one recoverable *.pre-lfucg backup. Each building records the LFUCG source ID, the height/ground source, and confidence. For a QA-first activation, run the builder without --activate, inspect its summary (or run python -m tools.verify_lfucg_buildings), then use --activate-existing. Always run build_obb after changing the active pack so browser, server, and Gym collision geometry remain in the same building order.\nThe LFUCG builder writes BPK2: a 20-byte count header, scene-space positions, the complete wall+roof index stream, and a separate exact roof-only index stream. Roof triangles must be fully covered by their source polygon (including concavities and courtyards) and are wound upward. The viewer shares those exact vertices for nearby walls and roofs; its city overview uses orientation-aligned two-triangle roof proxies from buildings.obb.json, so the performance LOD cannot rotate a roof away from its building. Legacy BPK1 packs remain …"
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "armstrongsam25",
-     "url": "https://github.com/armstrongsam25",
-     "contributions": 97
     }
    ]
   },
@@ -7408,166 +6193,6 @@
    ]
   },
   {
-   "name": "WebSAM-for-UKHC",
-   "fullName": "Kentucky-Open-Science/WebSAM-for-UKHC",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/WebSAM-for-UKHC",
-   "description": "",
-   "homepage": "",
-   "topics": [],
-   "language": "Python",
-   "languages": [
-    {
-     "name": "Python",
-     "percent": 68.6
-    },
-    {
-     "name": "TypeScript",
-     "percent": 30.3
-    },
-    {
-     "name": "Dockerfile",
-     "percent": 0.5
-    },
-    {
-     "name": "JavaScript",
-     "percent": 0.4
-    },
-    {
-     "name": "CSS",
-     "percent": 0.2
-    }
-   ],
-   "license": null,
-   "stars": 0,
-   "forks": 1,
-   "openIssues": 18,
-   "hasIssues": false,
-   "archived": false,
-   "fork": true,
-   "isTemplate": false,
-   "parent": {
-    "fullName": "Kingfish404/segment-anything-webui",
-    "url": "https://github.com/Kingfish404/segment-anything-webui",
-    "description": "Yet another SAM webui + CLIP"
-   },
-   "defaultBranch": "main",
-   "createdAt": "2023-05-23T12:56:12Z",
-   "pushedAt": "2026-02-14T12:50:32Z",
-   "sizeKb": 7966,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/WebSAM-for-UKHC#readme",
-    "summary": [
-     "WebSAM for UKHC is a three part package:",
-     "WebSAM for UKHC leverages Segment Anything to provide in-browser image segmentations. It consists of a ReactJS frontend, and a FastAPI python backend which contains API functions for saving and loading images, generating segmentation masks, and uploading JSON files with points to replicate results.",
-     "To create a segmentation, all you have to do is upload a file, click, and then when done clicking you can save the image to the database. Additionally, the threshold slider allows you to tweak segmentation around the click points.",
-     "There is a tab which only shows up when an image is uploaded and the first point has been placed. The button is Download Results which allows you to download the file, generate and save a mask file, and save a json file with the points used to create the segmentation to the WebSAM Image Database.",
-     "WebSAM Image Database Repository"
-    ],
-    "headings": [
-     {
-      "level": 2,
-      "text": "Interactive parts of this site include:",
-      "anchor": "interactive-parts-of-this-site-include"
-     },
-     {
-      "level": 1,
-      "text": "Sturdy Waddle",
-      "anchor": "sturdy-waddle"
-     },
-     {
-      "level": 1,
-      "text": "WebSAM Image Database",
-      "anchor": "websam-image-database"
-     }
-    ],
-    "text": "WebSAM for UKHC is a three part package:\nWebSAM for UKHC Repository\nWebSAM for UKHC leverages Segment Anything to provide in-browser image segmentations. It consists of a ReactJS frontend, and a FastAPI python backend which contains API functions for saving and loading images, generating segmentation masks, and uploading JSON files with points to replicate results.\nTo create a segmentation, all you have to do is upload a file, click, and then when done clicking you can save the image to the database. Additionally, the threshold slider allows you to tweak segmentation around the click points.\nInteractive parts of this site include:\nThere is a tab which only shows up when an image is uploaded and the first point has been placed. The button is Download Results which allows you to download the file, generate and save a mask file, and save a json file with the points used to create the segmentation to the WebSAM Image Database.\nSturdy Waddle\nSturdy Waddle Repository\nSturdy Waddle is a fork of the template site. It has been modified to have a page which features the WebSAM interface, and a page which shows the files which are stored in the database. Minimal changes have been made from the original template site.\nWebSAM Image Database\nWebSAM Image Database Repository\nWebSAM Image Database contains code to save images that are downloaded frm WebSAM-for-UKHC, as well as to provide identifying information and thumbnails for the images to be placed in the processed tab of sturdy-waddle.\nThis is not an interactive site, it is simply a stand-in for a database implementation down the road. For now, it creates and saves files to a folder called datasets."
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "NCPE227",
-     "url": "https://github.com/NCPE227",
-     "contributions": 50
-    },
-    {
-     "login": "Kingfish404",
-     "url": "https://github.com/Kingfish404",
-     "contributions": 5
-    },
-    {
-     "login": "codybum",
-     "url": "https://github.com/codybum",
-     "contributions": 4
-    }
-   ]
-  },
-  {
-   "name": "WebSAM-React",
-   "fullName": "Kentucky-Open-Science/WebSAM-React",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/WebSAM-React",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "kentucky-open-science",
-    "medical-imaging"
-   ],
-   "language": "TypeScript",
-   "languages": [
-    {
-     "name": "TypeScript",
-     "percent": 57.2
-    },
-    {
-     "name": "Python",
-     "percent": 30
-    },
-    {
-     "name": "CSS",
-     "percent": 8.2
-    },
-    {
-     "name": "Dockerfile",
-     "percent": 1.5
-    },
-    {
-     "name": "JavaScript",
-     "percent": 1.4
-    },
-    {
-     "name": "PLpgSQL",
-     "percent": 1.2
-    },
-    {
-     "name": "HTML",
-     "percent": 0.5
-    }
-   ],
-   "license": null,
-   "stars": 0,
-   "forks": 1,
-   "openIssues": 0,
-   "hasIssues": true,
-   "archived": true,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "main",
-   "createdAt": "2024-08-12T13:11:07Z",
-   "pushedAt": "2024-08-16T18:17:20Z",
-   "sizeKb": 180,
-   "readme": null,
-   "release": null,
-   "contributors": [
-    {
-     "login": "NCPE227",
-     "url": "https://github.com/NCPE227",
-     "contributions": 5
-    }
-   ]
-  },
-  {
    "name": "worldmonitor",
    "fullName": "Kentucky-Open-Science/worldmonitor",
    "visibility": "public",
@@ -7947,76 +6572,6 @@
      "login": "codybum",
      "url": "https://github.com/codybum",
      "contributions": 8
-    }
-   ]
-  },
-  {
-   "name": "Yolo-Person-Detection",
-   "fullName": "Kentucky-Open-Science/Yolo-Person-Detection",
-   "visibility": "public",
-   "url": "https://github.com/Kentucky-Open-Science/Yolo-Person-Detection",
-   "description": "",
-   "homepage": "",
-   "topics": [
-    "kentucky-open-science",
-    "object-detection"
-   ],
-   "language": "Python",
-   "languages": [
-    {
-     "name": "Python",
-     "percent": 100
-    }
-   ],
-   "license": null,
-   "stars": 0,
-   "forks": 0,
-   "openIssues": 2,
-   "hasIssues": true,
-   "archived": false,
-   "fork": false,
-   "isTemplate": false,
-   "parent": null,
-   "defaultBranch": "main",
-   "createdAt": "2024-11-06T16:55:07Z",
-   "pushedAt": "2025-12-18T08:34:41Z",
-   "sizeKb": 35044,
-   "readme": {
-    "url": "https://github.com/Kentucky-Open-Science/Yolo-Person-Detection#readme",
-    "summary": [
-     "This repository contains multiple Python scripts utilizing the YOLO model for various real-time object detection and pose estimation tasks, including fall detection and general object recognition.",
-     "The scripts here use the YOLO model from the Ultralytics library for detecting objects and poses in video feeds, primarily via webcam. YOLO (You Only Look Once) is an advanced, high-speed object detection model, making it suitable for real-time applications."
-    ],
-    "headings": [
-     {
-      "level": 2,
-      "text": "Overview",
-      "anchor": "overview"
-     },
-     {
-      "level": 2,
-      "text": "Features",
-      "anchor": "features"
-     },
-     {
-      "level": 2,
-      "text": "Requirements",
-      "anchor": "requirements"
-     },
-     {
-      "level": 2,
-      "text": "Usage",
-      "anchor": "usage"
-     }
-    ],
-    "text": "This repository contains multiple Python scripts utilizing the YOLO model for various real-time object detection and pose estimation tasks, including fall detection and general object recognition.\nOverview\nThe scripts here use the YOLO model from the Ultralytics library for detecting objects and poses in video feeds, primarily via webcam. YOLO (You Only Look Once) is an advanced, high-speed object detection model, making it suitable for real-time applications.\nFeatures\n• Pose Detection: Detects human poses and highlights keypoints to monitor body orientation, with fall detection alerts when unusual body posture is identified. • Facial Detection: Recognizes facial features and keypoints to monitor entry way or apply filters. • Object Recognition: Identifies various object classes (e.g., person, vehicle, animals) in real-time video. • Customizable Thresholds: Adjusts confidence thresholds for object detection and classification.\nRequirements\n• Python • OpenCV • Ultralytics YOLO library\nUsage\n• Clone this repository. • Set up a virtual environment and install dependencies:"
-   },
-   "release": null,
-   "contributors": [
-    {
-     "login": "BernardZach",
-     "url": "https://github.com/BernardZach",
-     "contributions": 32
     }
    ]
   }
